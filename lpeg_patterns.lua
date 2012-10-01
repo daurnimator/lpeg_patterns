@@ -25,18 +25,18 @@ local domain_literal = P"[" * ( dtext + quoted_pair )^0 + P"]"
 local quoted_string = P'"' * ( qtext + quoted_pair )^0 * P'"'
 local word = atom + quoted_string
 
--- Implements an email "addr-spec" according to RFC822
-local email = P {
-	V"addr_spec" ;
-	addr_spec = V"local_part" * P"@" * C(V"domain") ;
-	local_part = word * ( P"." * word )^0 ;
-	domain = V"sub_domain" * ( P"." * V"sub_domain" )^0 ;
-	sub_domain = V"domain_ref" + domain_literal ;
-	domain_ref = atom ;
-}
+local email do
+	-- Implements an email "addr-spec" according to RFC822
+	local domain_ref = atom
+	local sub_domain = domain_ref + domain_literal
+	local domain     = sub_domain * ( P"." * sub_domain )^0
+	local local_part = word * ( P"." * word )^0
+	local addr_spec  = local_part * P"@" * C(domain)
 
-local phone
-do
+	email = addr_spec
+end
+
+local phone do
 	local digit = R"09"
 	local seperator = S"- ,."
 
