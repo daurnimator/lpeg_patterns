@@ -11,9 +11,9 @@ local S = lpeg.S
 local V = lpeg.V
 local C = lpeg.C
 
-local CHAR = R"\0\127"
+local CHAR  = R"\0\127"
 local SPACE = S"\40\32"
-local CTL = R"\0\31" + P"127"
+local CTL   = R"\0\31" + P"\127"
 
 local specials = S[=[()<>@,;:\".[]]=]
 
