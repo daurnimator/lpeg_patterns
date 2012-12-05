@@ -19,7 +19,7 @@ local CTL   = R"\0\31" + P"\127"
 local VCHAR = R"\21\126"
 local WSP   = S" \t"
 
-local email do --https://tools.ietf.org/html/rfc5322#section-2.2.3
+local email , email_nocfws do --https://tools.ietf.org/html/rfc5322#section-2.2.3
 
 	local quoted_pair = Cs ( "\\" * C(VCHAR + WSP) / function(...) return ... end )
 
@@ -43,17 +43,25 @@ local email do --https://tools.ietf.org/html/rfc5322#section-2.2.3
 	local dot_atom      = CFWS^-1 * C(dot_atom_text) * CFWS^-1
 
 	-- Quoted Strings
-	local qtext          = S"\33"+R("\35\91","\93\126")
-	local qcontent       = qtext + quoted_pair
-	local quoted_string  = CFWS^-1 * P'"' * Cs((FWS^-1 * qcontent)^0) * FWS^-1 * P'"' * CFWS^-1
+	local qtext              = S"\33"+R("\35\91","\93\126")
+	local qcontent           = qtext + quoted_pair
+	local quoted_string_text = P'"' * Cs((FWS^-1 * qcontent)^0) * FWS^-1 * P'"'
+	local quoted_string      = CFWS^-1 * quoted_string_text * CFWS^-1
 
 	-- Addr-spec
-	local dtext          = R("\33\90","\94\126")
-	local domain_literal = CFWS^-1 * P"[" * C((FWS^-1 * dtext)^0) * FWS^-1 * P"]" * CFWS^-1
+	local dtext               = R("\33\90","\94\126")
+	local domain_literal_text = P"[" * C((FWS^-1 * dtext)^0) * FWS^-1 * P"]"
+
+	local domain_text     = dot_atom_text + domain_literal_text
+	local local_part_text = dot_atom_text + quoted_string_text
+	local addr_spec_text  = local_part_text * P"@" * local_part_text
+
+	local domain_literal = CFWS^-1 * domain_literal_text * CFWS^-1
 	local domain         = dot_atom + domain_literal
 	local local_part     = dot_atom + quoted_string
 	local addr_spec      = local_part * P"@" * domain
 
+	email_nocfws = addr_spec_text -- A variant that does not allow comments or folding whitespace
 	email = addr_spec
 end
 
@@ -108,5 +116,6 @@ end
 
 return {
 	email = email ;
+	email_nocfws = email_nocfws ;
 	phone = phone ;
 }
