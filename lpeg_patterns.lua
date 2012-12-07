@@ -10,14 +10,45 @@ local R = lpeg.R
 local S = lpeg.S
 local V = lpeg.V
 local C = lpeg.C
+local Cg = lpeg.Cg
 local Cs = lpeg.Cs
+local Ct = lpeg.Ct
 
 -- Core Rules https://tools.ietf.org/html/rfc5234#appendix-B.1
+local ALPHA = R("AZ","az")
+local BIT   = S"01"
 local CHAR  = R"\1\127"
 local CRLF  = P"\r\n"
 local CTL   = R"\0\31" + P"\127"
+local DIGIT = R"09"
+local HEXDIG= DIGIT + S"ABCDEFabcdef"
 local VCHAR = R"\21\126"
 local WSP   = S" \t"
+
+local IPv4address do
+	local dec_octet = (
+			DIGIT
+			+ R"19" * DIGIT
+			+ P"1"  * DIGIT * DIGIT
+			+ P"2"  * R"04" * DIGIT
+			+ P"25" * R"05"
+		) / tonumber
+	IPv4address = Cg ( dec_octet * P"." * dec_octet * P"." * dec_octet * P"." * dec_octet )
+end
+
+local IPv6address do -- RFC 3986 Section 3.2.2
+	local h16 = HEXDIG * HEXDIG^-3 / function ( x ) return tonumber ( x , 16 ) end
+	local ls32 = ( h16 * P":" * h16 ) + IPv4address
+	IPv6address = Cg (                 h16 * h16 * h16 * h16 * h16 * h16 * ls32
+		+                            P"::" * h16 * h16 * h16 * h16 * h16 * ls32
+		+ (                h16)^-1 * P"::" * h16 * h16 * h16 * h16       * ls32
+		+ ((h16*P":")^-1 * h16)^-1 * P"::" * h16 * h16 * h16             * ls32
+		+ ((h16*P":")^-2 * h16)^-1 * P"::" * h16 * h16                   * ls32
+		+ ((h16*P":")^-3 * h16)^-1 * P"::" * h16                         * ls32
+		+ ((h16*P":")^-4 * h16)^-1 * P"::"                               * ls32
+		+ ((h16*P":")^-5 * h16)^-1 * P"::"                               * h16
+		+ ((h16*P":")^-6 * h16)^-1 * P"::" )
+end
 
 local email , email_nocfws do --https://tools.ietf.org/html/rfc5322#section-2.2.3
 
@@ -63,6 +94,46 @@ local email , email_nocfws do --https://tools.ietf.org/html/rfc5322#section-2.2.
 
 	email_nocfws = addr_spec_text -- A variant that does not allow comments or folding whitespace
 	email = addr_spec
+end
+
+local uri do -- RFC 3986
+	local pct_encoded = P"%" * C ( HEXDIG * HEXDIG ) / function ( hex_num ) return string.char ( tonumber ( hex_num , "16" ) )  end -- 2.1
+	local sub_delims  = S"!$&'()*+,;=" -- 2.2
+	local unreserved  = ALPHA + DIGIT + S"-._~" -- 2.3
+
+	local scheme      = C ( ALPHA * ( ALPHA + DIGIT + S"+-." )^0 ) -- 3.1
+
+	local userinfo    = C ( ( unreserved + pct_encoded + sub_delims + P":" )^0 ) -- 3.2.1
+
+	-- Host 3.2.2
+	local IPvFuture   = C ( P"v" * HEXDIG^1 * P"." * ( unreserved + sub_delims + P":" )^1 )
+	local IP_literal  = P"[" * ( IPv6address + IPvFuture ) * P"]"
+	local reg_name    = C ( ( unreserved + pct_encoded + sub_delims )^0 )
+	local host        = IP_literal + IPv4address + reg_name
+
+	local port        = DIGIT^0 -- 3.2.3
+
+	local authority = ( Cg ( userinfo , "userinfo" ) * P"@" )^-1
+		* Cg ( host , "host" )
+		* ( P":" * Cg ( port , "port" ) )^-1
+
+	-- Path 3.3
+	local pchar         = unreserved + pct_encoded + sub_delims + S":@"
+	local path_abempty  = ( "/" * pchar^0 )^0
+	local path_rootless = pchar^1 * path_abempty
+	local path_absolute = P"/" * path_rootless^-1
+	local path_noscheme = (pchar-P":")^1 * path_abempty
+
+	local query = C ( ( pchar + S"/?" )^0 ) -- 3.4
+	local fragment = query -- 3.5
+
+	uri = Ct (
+		( Cg ( scheme , "scheme" ) * P"://" )^-1
+		* authority
+		* Cg ( path_abempty , "path" )
+		* ( P"?" * Cg ( query , "query" ) )^-1
+		* ( P"#" * Cg ( fragment , "fragment" ) )^-1
+	)
 end
 
 local phone do
@@ -115,7 +186,8 @@ local phone do
 end
 
 return {
-	email = email ;
+	email        = email ;
 	email_nocfws = email_nocfws ;
-	phone = phone ;
+	uri          = uri ;
+	phone        = phone ;
 }
