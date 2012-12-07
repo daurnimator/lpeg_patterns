@@ -108,14 +108,16 @@ local uri do -- RFC 3986
 	-- Host 3.2.2
 	local IPvFuture   = C ( P"v" * HEXDIG^1 * P"." * ( unreserved + sub_delims + P":" )^1 )
 	local IP_literal  = P"[" * ( IPv6address + IPvFuture ) * P"]"
-	local reg_name    = C ( ( unreserved + pct_encoded + sub_delims )^0 )
-	local host        = IP_literal + IPv4address + reg_name
+	local IP_host     = IP_literal + IPv4address
+	local host_char   = unreserved + pct_encoded --+ sub_delims
+	local reg_name    = C ( host_char^0 )
+	local host        = IP_host + reg_name
+	-- Create a slightly more sane host pattern
+	local hostsegment = (host_char-P".")^1
+	local dns_entry   = C ( hostsegment * (P"."*hostsegment)^1 )
+	local sane_host   = IP_host + dns_entry
 
 	local port        = DIGIT^0 -- 3.2.3
-
-	local authority = ( Cg ( userinfo , "userinfo" ) * P"@" )^-1
-		* Cg ( host , "host" )
-		* ( P":" * Cg ( port , "port" ) )^-1
 
 	-- Path 3.3
 	local pchar         = unreserved + pct_encoded + sub_delims + S":@"
@@ -129,7 +131,10 @@ local uri do -- RFC 3986
 
 	uri = Ct (
 		( Cg ( scheme , "scheme" ) * P"://" )^-1
-		* authority
+		-- authority
+			* ( Cg ( userinfo , "userinfo" ) * P"@" )^-1
+			* Cg ( sane_host , "host" )
+			* ( P":" * Cg ( port , "port" ) )^-1
 		* Cg ( path_abempty , "path" )
 		* ( P"?" * Cg ( query , "query" ) )^-1
 		* ( P"#" * Cg ( fragment , "fragment" ) )^-1
