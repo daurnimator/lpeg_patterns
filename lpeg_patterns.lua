@@ -2,10 +2,6 @@ local tonumber = tonumber
 local strchar  = string.char
 local lpeg     = require "lpeg"
 
-d = function ( subject , pos , ... )
-	io.stderr:write ( "DEBUG\t" , string.sub ( subject , pos ) , "\t" , ... )
-	io.stderr:write ( "\n" )
-end
 local _M = { }
 
 local P = lpeg.P
