@@ -1,4 +1,6 @@
-local lpeg = require "lpeg"
+local tonumber = tonumber
+local strchar  = string.char
+local lpeg     = require "lpeg"
 
 d = function ( subject , pos , ... )
 	io.stderr:write ( "DEBUG\t" , string.sub ( subject , pos ) , "\t" , ... )
@@ -97,7 +99,7 @@ local email , email_nocfws do --https://tools.ietf.org/html/rfc5322#section-2.2.
 end
 
 local uri do -- RFC 3986
-	local pct_encoded = P"%" * C ( HEXDIG * HEXDIG ) / function ( hex_num ) return string.char ( tonumber ( hex_num , "16" ) )  end -- 2.1
+	local pct_encoded = P"%" * C ( HEXDIG * HEXDIG ) / function ( hex_num ) return strchar ( tonumber ( hex_num , "16" ) )  end -- 2.1
 	local sub_delims  = S"!$&'()*+,;=" -- 2.2
 	local unreserved  = ALPHA + DIGIT + S"-._~" -- 2.3
 
