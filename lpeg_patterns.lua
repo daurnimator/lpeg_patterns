@@ -116,7 +116,7 @@ do -- URI
 	local host        = IP_host + reg_name
 	-- Create a slightly more sane host pattern
 	local hostsegment = (host_char-P".")^1
-	local dns_entry   = Cs ( hostsegment * (P"."*hostsegment)^1 )
+	local dns_entry   = Cs ( ( hostsegment * P"." )^1 * ALPHA^2 )
 	local sane_host   = IP_host + dns_entry
 
 	local port        = DIGIT^0 -- 3.2.3
