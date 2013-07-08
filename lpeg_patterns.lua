@@ -29,7 +29,7 @@ do -- IPv4
 			P"1"  * DIGIT * DIGIT
 			+ P"2"  * R"04" * DIGIT
 			+ P"25" * R"05"
-			+ DIGIT^-2
+			+ DIGIT * DIGIT^-1
 		) / tonumber
 	_M.IPv4address = Cg ( dec_octet * P"." * dec_octet * P"." * dec_octet * P"." * dec_octet )
 end
