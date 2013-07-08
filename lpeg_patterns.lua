@@ -31,22 +31,40 @@ do -- IPv4
 			+ P"25" * R"05"
 			+ DIGIT * DIGIT^-1
 		) / tonumber
-	_M.IPv4address = Cg ( dec_octet * P"." * dec_octet * P"." * dec_octet * P"." * dec_octet )
+	local IPv4_mt = { }
+	function IPv4_mt:__tostring ( )
+		local o1, o2, o3, o4 = self.binary:byte(1,4)
+		return o1.."."..o2.."."..o3.."."..o4
+	end
+	local function new_IPv4 ( o1 , o2 , o3 , o4 )
+		local binary = string.char ( o1 , o2 , o3 , o4 )
+		return setmetatable ( { binary = binary } , IPv4_mt )
+	end
+	_M.IPv4address = Cg ( dec_octet * P"." * dec_octet * P"." * dec_octet * P"." * dec_octet ) / new_IPv4
 end
 
 do -- IPv6
+	local function new_IPv6 ( ... )
+		-- TODO: Assemble ipv6 object
+		return "[IPv6]"
+	end
+
 	-- RFC 3986 Section 3.2.2
 	local h16 = HEXDIG * HEXDIG^-3 / function ( x ) return tonumber ( x , 16 ) end
-	local ls32 = ( h16 * P":" * h16 ) + _M.IPv4address
-	_M.IPv6address = Cg (              h16 * h16 * h16 * h16 * h16 * h16 * ls32
-		+                            P"::" * h16 * h16 * h16 * h16 * h16 * ls32
-		+ (                h16)^-1 * P"::" * h16 * h16 * h16 * h16       * ls32
-		+ ((h16*P":")^-1 * h16)^-1 * P"::" * h16 * h16 * h16             * ls32
-		+ ((h16*P":")^-2 * h16)^-1 * P"::" * h16 * h16                   * ls32
-		+ ((h16*P":")^-3 * h16)^-1 * P"::" * h16                         * ls32
-		+ ((h16*P":")^-4 * h16)^-1 * P"::"                               * ls32
-		+ ((h16*P":")^-5 * h16)^-1 * P"::"                               * h16
-		+ ((h16*P":")^-6 * h16)^-1 * P"::" )
+	local ls32 = ( h16 * P":" * h16 ) + _M.IPv4address / function ( ipv4 )
+		local o1, o2, o3, o4 = ipv4.binary:byte(1,4)
+		return o1*2^8 + o2 , o3*2^8 + o4
+	end
+	_M.IPv6address = Cg (       h16 * P":" * h16 * P":" * h16 * P":" * h16 * P":" * h16 * P":" * h16 * P":" * ls32
+		+                            P"::" * h16 * P":" * h16 * P":" * h16 * P":" * h16 * P":" * h16 * P":" * ls32
+		+ (                h16)^-1 * P"::"              * h16 * P":" * h16 * P":" * h16 * P":" * h16 * P":" * ls32
+		+ ((h16*P":")^-1 * h16)^-1 * P"::"                           * h16 * P":" * h16 * P":" * h16 * P":" * ls32
+		+ ((h16*P":")^-2 * h16)^-1 * P"::"                                        * h16 * P":" * h16 * P":" * ls32
+		+ ((h16*P":")^-3 * h16)^-1 * P"::"                                                     * h16 * P":" * ls32
+		+ ((h16*P":")^-4 * h16)^-1 * P"::"                                                                  * ls32
+		+ ((h16*P":")^-5 * h16)^-1 * P"::"                                                                  * h16
+		+ ((h16*P":")^-6 * h16)^-1 * P"::"
+	) / new_IPv6
 end
 
 do -- Email Addresses
@@ -110,7 +128,7 @@ do -- URI
 	-- Host 3.2.2
 	local IPvFuture   = C ( P"v" * HEXDIG^1 * P"." * ( unreserved + sub_delims + P":" )^1 )
 	local IP_literal  = P"[" * ( _M.IPv6address + IPvFuture ) * P"]"
-	local IP_host     = IP_literal + _M.IPv4address
+	local IP_host     = ( IP_literal + _M.IPv4address ) / tostring
 	local host_char   = unreserved + pct_encoded --+ sub_delims
 	local reg_name    = Cs ( host_char^0 )
 	local host        = IP_host + reg_name
