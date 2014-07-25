@@ -1,6 +1,7 @@
 local lpeg = require "lpeg"
 
 describe ( "LPEG Pattern Validation" , function()
+	local lpeg = require "lpeg"
 	local lpeg_patterns = require "lpeg_patterns"
 
 	describe ( "Email Addresses" , function()
@@ -62,6 +63,12 @@ describe ( "LPEG Pattern Validation" , function()
 		end)
 		it("Not match misc words", function()
 			assert.falsy ( sane_uri:match "the quick fox jumped over the lazy dog." )
+		end)
+		it("Not match numbers", function()
+			assert.falsy( sane_uri:match "123" )
+			assert.falsy( sane_uri:match "17.3" )
+			assert.falsy( sane_uri:match "17.3234" )
+			assert.falsy( sane_uri:match "17.3234" )
 		end)
 	end)
 end)
