@@ -153,6 +153,16 @@ do -- URI
 		( Cg ( scheme , "scheme" ) * P"://" )^-1
 		-- authority
 			* ( Cg ( Cs ( userinfo ) , "userinfo" ) * P"@" )^-1
+			* Cg ( host , "host" )
+			* ( P":" * Cg ( port , "port" ) )^-1
+		* Cg ( Cs ( path_abempty ) , "path" )
+		* ( P"?" * Cg ( Cs ( query ) , "query" ) )^-1
+		* ( P"#" * Cg ( Cs ( fragment ) , "fragment" ) )^-1
+	)
+	_M.sane_uri = Ct (
+		( Cg ( scheme , "scheme" ) * P"://" )^-1
+		-- authority
+			* ( Cg ( Cs ( userinfo ) , "userinfo" ) * P"@" )^-1
 			* Cg ( sane_host , "host" )
 			* ( P":" * Cg ( port , "port" ) )^-1
 		* Cg ( Cs ( path_abempty ) , "path" )
