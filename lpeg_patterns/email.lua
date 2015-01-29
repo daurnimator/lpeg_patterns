@@ -1,5 +1,5 @@
 -- Email Addresses
--- RFC 5322 Section 2.2.3
+-- RFC 5322 Section 3.4.1
 
 local lpeg = require "lpeg"
 local P = lpeg.P
