@@ -16,7 +16,7 @@ _M.CRLF  = P"\r\n"
 _M.CTL   = R"\0\31" + P"\127"
 _M.DIGIT = R"09"
 _M.HEXDIG= _M.DIGIT + S"ABCDEFabcdef"
-_M.VCHAR = R"\21\126"
+_M.VCHAR = R"\33\126"
 _M.WSP   = S" \t"
 
 return _M
