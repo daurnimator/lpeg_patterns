@@ -36,7 +36,16 @@ local scheme      = C ( ALPHA * ( ALPHA + DIGIT + S"+-." )^0 ) -- 3.1
 local userinfo    = ( unreserved + pct_encoded + sub_delims + P":" )^0 -- 3.2.1
 
 -- Host 3.2.2
-local IPvFuture   = C ( P"v" * HEXDIG^1 * P"." * ( unreserved + sub_delims + P":" )^1 )
+
+local IPvFuture_mt = {}
+function IPvFuture_mt:__tostring()
+	return string.format("v%x.%s", self.version, self.string)
+end
+local function new_IPvFuture(version, string)
+	return setmetatable({version=version, string=string}, IPvFuture_mt)
+end
+local IPvFuture   = P"v" * (HEXDIG^1/read_hex) * P"." * C((unreserved+sub_delims+P":")^1) / new_IPvFuture
+
 local IP_literal  = P"[" * ( IPv6address + IPvFuture ) * P"]"
 local IP_host     = ( IP_literal + IPv4address ) / tostring
 local host_char   = unreserved + pct_encoded --+ sub_delims
