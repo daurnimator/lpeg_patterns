@@ -37,6 +37,11 @@ A small module implementing commonly used rules from [RFC-5234 appendix B.1](htt
 ### `IPv6`
 
   - `IPv6address` (pattern)
+  - `IPv6_methods` (table): methods available on IPv6 objects
+      - `unpack` (function): the IPv6 address as a series of 8 16bit numbers
+      - `binary` (function): the IPv6 address as a 16 byte binary string
+  - `IPv6_mt` (table): metatable given to IPv6 objects
+      - `__tostring` (function): will return the IPv6 address as a valid IPv6 string
 
 
 ### `uri`
