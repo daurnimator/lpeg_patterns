@@ -21,9 +21,13 @@ local HEXDIG = core.HEXDIG
 local IPv4address = require "lpeg_patterns.IPv4".IPv4address
 local IPv6address = require "lpeg_patterns.IPv6".IPv6address
 
+local function read_hex(hex_num)
+	return tonumber(hex_num, 16)
+end
+
 local _M = {}
 
-local pct_encoded = P"%" * C ( HEXDIG * HEXDIG ) / function ( hex_num ) return strchar ( tonumber ( hex_num , "16" ) )  end -- 2.1
+local pct_encoded = P"%" * C ( HEXDIG * HEXDIG ) / read_hex / strchar -- 2.1
 local sub_delims  = S"!$&'()*+,;=" -- 2.2
 local unreserved  = ALPHA + DIGIT + S"-._~" -- 2.3
 
