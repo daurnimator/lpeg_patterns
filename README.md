@@ -27,6 +27,7 @@ A small module implementing commonly used rules from [RFC-5234 appendix B.1](htt
 
   - `IPv4address` (pattern): on success, returns addresses as an IPv4 object
   - `IPv4_mt` (table): metatable given to IPv4 objects
+      - `__tostring` (function): returns the IPv4 address in dotted decimal notation
 
 
 ### `IPv6`
