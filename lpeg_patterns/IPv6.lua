@@ -18,8 +18,11 @@ local IPv6_mt = {
 	__index = IPv6_methods;
 }
 
-local function new_IPv6(o1, o2, o3, o4, o5, o6, o7, o8)
-	return setmetatable({o1, o2, o3, o4, o5, o6, o7, o8}, IPv6_mt)
+local function new_IPv6(o1, o2, o3, o4, o5, o6, o7, o8, zoneid)
+	return setmetatable({
+		o1, o2, o3, o4, o5, o6, o7, o8,
+		zoneid = zoneid;
+	}, IPv6_mt)
 end
 
 function IPv6_methods:unpack()
@@ -37,7 +40,11 @@ function IPv6_methods:binary()
 end
 
 function IPv6_mt:__tostring()
-	return string.format("%x:%x:%x:%x:%x:%x:%x:%x", self:unpack())
+	local s = string.format("%x:%x:%x:%x:%x:%x:%x:%x", self:unpack())
+	if self.zoneid then
+		return s .. "%" .. self.zoneid
+	end
+	return s
 end
 
 -- RFC 3986 Section 3.2.2
@@ -65,7 +72,7 @@ local function mcc(n)
 	return P"::" * Cc(unpack(t,1,n))
 end
 
-local IPv6address = Cg(
+local raw_IPv6address = Cg(
 	                      mh16c(6) * ls32
      +           mcc(1) * mh16c(5) * ls32
      +           mcc(2) * mh16c(4) * ls32
@@ -103,10 +110,16 @@ local IPv6address = Cg(
      + mh16(5) * mcc(3)
      + mh16(6) * mcc(2)
      + mh16(7) * mcc(1)
-) / new_IPv6
+)
+
+local IPv6address = raw_IPv6address / new_IPv6
+
+local ZoneID = P(1)^1 -- ZoneIDs can be any character
+local IPv6addrz = raw_IPv6address * (P"%" * ZoneID)^-1 / new_IPv6
 
 return {
 	IPv6_methods = IPv6_methods;
 	IPv6_mt = IPv6_mt;
 	IPv6address = IPv6address;
+	IPv6addrz = IPv6addrz;
 }

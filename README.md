@@ -36,7 +36,8 @@ A small module implementing commonly used rules from [RFC-5234 appendix B.1](htt
 
 ### `IPv6`
 
-  - `IPv6address` (pattern)
+  - `IPv6address` (pattern): parses an IPv6 address
+  - `IPv6addrz` (pattern): parses an IPv6 address with optional "ZoneID" (see [RFC-6874](https://tools.ietf.org/html/rfc6874))
   - `IPv6_methods` (table): methods available on IPv6 objects
       - `unpack` (function): the IPv6 address as a series of 8 16bit numbers
       - `binary` (function): the IPv6 address as a 16 byte binary string
