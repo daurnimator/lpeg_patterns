@@ -18,8 +18,7 @@ local dec_octet = (
 local IPv4_mt = { }
 
 function IPv4_mt:__tostring ( )
-	local o1, o2, o3, o4 = self.binary:byte(1,4)
-	return o1.."."..o2.."."..o3.."."..o4
+	return string.format("%d.%d.%d.%d", self.binary:byte(1,4))
 end
 
 local function new_IPv4 ( o1 , o2 , o3 , o4 )
