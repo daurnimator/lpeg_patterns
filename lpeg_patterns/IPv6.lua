@@ -26,7 +26,7 @@ local function new_IPv6(o1, o2, o3, o4, o5, o6, o7, o8, zoneid)
 end
 
 function IPv6_methods:unpack()
-	return self[1], self[2], self[3], self[4], self[5], self[6], self[7], self[8]
+	return self[1], self[2], self[3], self[4], self[5], self[6], self[7], self[8], self.zoneid
 end
 
 function IPv6_methods:binary()
@@ -36,15 +36,23 @@ function IPv6_methods:binary()
 		t[i*2-1] = (self[i] - lo) / 256
 		t[i*2] = lo
 	end
+	-- TODO: append zoneid.
+	-- In a struct sockaddr_in6 it is the numeric index of the scope, so need to lookup?
 	return string.char(unpack(t, 1, 16))
 end
 
+function IPv6_methods:setzoneid(zoneid)
+	self.zoneid = zoneid
+end
+
 function IPv6_mt:__tostring()
-	local s = string.format("%x:%x:%x:%x:%x:%x:%x:%x", self:unpack())
+	local fmt_str
 	if self.zoneid then
-		return s .. "%" .. self.zoneid
+		fmt_str = "%x:%x:%x:%x:%x:%x:%x:%x%%%s"
+	else
+		fmt_str = "%x:%x:%x:%x:%x:%x:%x:%x"
 	end
-	return s
+	return string.format(fmt_str, self:unpack())
 end
 
 -- RFC 3986 Section 3.2.2
