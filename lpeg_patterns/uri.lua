@@ -46,7 +46,14 @@ local function new_IPvFuture(version, string)
 end
 local IPvFuture   = P"v" * (HEXDIG^1/read_hex) * P"." * C((unreserved+sub_delims+P":")^1) / new_IPvFuture
 
-local IP_literal  = P"[" * ( IPv6address + IPvFuture ) * P"]"
+-- RFC 6874
+local ZoneID      = Cs ( (unreserved + pct_encoded )^1 )
+local IPv6addrz   = IPv6address * (P"%25" * ZoneID)^-1 / function(IPv6, ZoneID)
+	IPv6.zoneid = ZoneID
+	return IPv6
+end
+
+local IP_literal  = P"[" * ( IPv6addrz + IPvFuture ) * P"]"
 local IP_host     = ( IP_literal + IPv4address ) / tostring
 local host_char   = unreserved + pct_encoded --+ sub_delims
 local reg_name    = Cs ( host_char^1 ) + Cc ( nil )
