@@ -23,7 +23,7 @@ local function new_IPv6(o1, o2, o3, o4, o5, o6, o7, o8)
 end
 
 function IPv6_methods:unpack()
-	return unpack(self, 1, 8)
+	return self[1], self[2], self[3], self[4], self[5], self[6], self[7], self[8]
 end
 
 function IPv6_methods:binary()
