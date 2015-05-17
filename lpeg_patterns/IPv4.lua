@@ -10,8 +10,7 @@ local DIGIT = core.DIGIT
 
 local dec_octet = (
 		P"1"  * DIGIT * DIGIT
-		+ P"2"  * R"04" * DIGIT
-		+ P"25" * R"05"
+		+ P"2"  * (R"04"*DIGIT + P"5"*R"05")
 		+ DIGIT * DIGIT^-1
 	) / tonumber
 
