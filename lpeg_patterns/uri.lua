@@ -42,7 +42,7 @@ local hostsegment = (host_char-P".")^1
 local dns_entry   = Cs ( ( hostsegment * P"." )^1 * ALPHA^2 )
 local sane_host   = IP_host + dns_entry
 
-local port        = DIGIT^0 -- 3.2.3
+local port        = DIGIT^0 / tonumber -- 3.2.3
 
 -- Path 3.3
 local pchar         = unreserved + pct_encoded + sub_delims + S":@"
