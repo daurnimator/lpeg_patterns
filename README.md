@@ -33,6 +33,8 @@ A small module implementing commonly used rules from [RFC-5234 appendix B.1](htt
       - `__index` (table): `IPv4_methods`
       - `__tostring` (function): returns the IPv4 address in dotted decimal notation
 
+IPv4 "dotted decimal notation" in this document refers to "strict" form (see [RFC-6943 section 3.1.1](https://tools.ietf.org/html/rfc6943#section-3.1.1)) unless otherwise noted.
+
 
 ### `IPv6`
 
