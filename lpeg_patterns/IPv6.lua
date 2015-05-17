@@ -19,7 +19,7 @@ end
 -- RFC 3986 Section 3.2.2
 local h16 = HEXDIG * HEXDIG^-3 / function ( x ) return tonumber ( x , 16 ) end
 local ls32 = ( h16 * P":" * h16 ) + IPv4address / function ( ipv4 )
-	local o1, o2, o3, o4 = ipv4.binary:byte(1,4)
+	local o1, o2, o3, o4 = ipv4:unpack()
 	return o1*2^8 + o2 , o3*2^8 + o4
 end
 

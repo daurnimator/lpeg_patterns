@@ -25,8 +25,12 @@ A small module implementing commonly used rules from [RFC-5234 appendix B.1](htt
 
 ### `IPv4`
 
-  - `IPv4address` (pattern): on success, returns addresses as an IPv4 object
+  - `IPv4address` (pattern): parses an IPv4 address in dotted decimal notation. on success, returns addresses as an IPv4 object
+  - `IPv4_methods` (table):
+      - `unpack` (function): the IPv4 address as a series of 4 8 bit numbers
+      - `binary` (function): the IPv4 address as a 4 byte binary string
   - `IPv4_mt` (table): metatable given to IPv4 objects
+      - `__index` (table): `IPv4_methods`
       - `__tostring` (function): returns the IPv4 address in dotted decimal notation
 
 
