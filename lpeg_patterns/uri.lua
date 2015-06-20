@@ -1,10 +1,12 @@
 -- URI
 -- RFC 3986
 
+local string = require "string"
+local lpeg = require "lpeg"
+
 local tonumber = tonumber
 local strchar  = string.char
 
-local lpeg = require "lpeg"
 local P = lpeg.P
 local S = lpeg.S
 local C = lpeg.C
