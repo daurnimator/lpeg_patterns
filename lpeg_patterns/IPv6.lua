@@ -1,9 +1,11 @@
 -- IPv6
 
 local tonumber = tonumber
+local lpeg = require "lpeg"
+local string = require "string"
+local table = require "table"
 local unpack = table.unpack or unpack
 
-local lpeg = require "lpeg"
 local P = lpeg.P
 local Cc = lpeg.Cc
 local Cg = lpeg.Cg
