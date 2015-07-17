@@ -70,7 +70,7 @@ local path_noscheme = (pchar-P":")^1 * path_abempty
 -- an empty path is nil instead of the empty string
 local path_empty    = Cc(nil) * -#P(pchar)
 
-local query = C ( ( pchar + S"/?" )^0 ) -- 3.4
+local query = Cs ( ( pchar + S"/?" )^0 ) -- 3.4
 local fragment = query -- 3.5
 
 -- Put together with named captures

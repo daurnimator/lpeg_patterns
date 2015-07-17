@@ -55,6 +55,10 @@ describe("URI", function()
 
 		assert.falsy(path:match "/bad%x0percent")
 	end)
+	it("Should decode percent characters in query and fragment", function()
+		assert.same({query="query with/escapes"}, ref:match "?query%20with%2Fescapes")
+		assert.same({fragment="fragment with/escapes"}, ref:match "#fragment%20with%2Fescapes")
+	end)
 	it("Should match localhost", function()
 		assert.same({host="localhost", path=""}, ref:match "//localhost")
 		assert.same({host="localhost", port=8000, path=""}, ref:match "//localhost:8000")
@@ -77,11 +81,17 @@ describe("URI", function()
 	it("Should work with mailto URIs", function()
 		assert.same({scheme="mailto", path="user@example.com"}, uri:match "mailto:user@example.com")
 		assert.same({scheme="mailto", path="someone@example.com,someoneelse@example.com"}, uri:match "mailto:someone@example.com,someoneelse@example.com")
+		assert.same({scheme="mailto", path="user@example.com", query="subject=This is the subject&cc=someone_else@example.com&body=This is the body"},
+			uri:match "mailto:user@example.com?subject=This%20is%20the%20subject&cc=someone_else@example.com&body=This%20is%20the%20body")
 
 		-- Examples from RFC6068
 		-- Section 6.1
 		assert.same({scheme="mailto", path="chris@example.com"}, uri:match "mailto:chris@example.com")
 		assert.same({scheme="mailto", path="infobot@example.com", query="subject=current-issue"}, uri:match "mailto:infobot@example.com?subject=current-issue")
+		assert.same({scheme="mailto", path="infobot@example.com", query="body=send current-issue"}, uri:match "mailto:infobot@example.com?body=send%20current-issue")
+		assert.same({scheme="mailto", path="infobot@example.com", query="body=send current-issue\r\nsend index"}, uri:match "mailto:infobot@example.com?body=send%20current-issue%0D%0Asend%20index")
+		assert.same({scheme="mailto", path="list@example.org", query="In-Reply-To=<3469A91.D10AF4C@example.com>"}, uri:match "mailto:list@example.org?In-Reply-To=%3C3469A91.D10AF4C@example.com%3E")
+		assert.same({scheme="mailto", path="majordomo@example.com", query="body=subscribe bamboo-l"}, uri:match "mailto:majordomo@example.com?body=subscribe%20bamboo-l")
 		assert.same({scheme="mailto", path="joe@example.com", query="cc=bob@example.com&body=hello"}, uri:match "mailto:joe@example.com?cc=bob@example.com&body=hello")
 		assert.same({scheme="mailto", path="gorby%kremvax@example.com"}, uri:match "mailto:gorby%25kremvax@example.com")
 		assert.same({scheme="mailto", path="unlikely?address@example.com", query="blat=foop"}, uri:match "mailto:unlikely%3Faddress@example.com?blat=foop")
