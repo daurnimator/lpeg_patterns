@@ -80,26 +80,35 @@ describe("URI", function()
 	end)
 	it("Should work with mailto URIs", function()
 		assert.same({scheme="mailto", path="user@example.com"}, uri:match "mailto:user@example.com")
-		assert.same({scheme="mailto", path="someone@example.com,someoneelse@example.com"}, uri:match "mailto:someone@example.com,someoneelse@example.com")
+		assert.same({scheme="mailto", path="someone@example.com,someoneelse@example.com"},
+			uri:match "mailto:someone@example.com,someoneelse@example.com")
 		assert.same({scheme="mailto", path="user@example.com", query="subject=This is the subject&cc=someone_else@example.com&body=This is the body"},
 			uri:match "mailto:user@example.com?subject=This%20is%20the%20subject&cc=someone_else@example.com&body=This%20is%20the%20body")
 
-		-- Examples from RFC6068
+		-- Examples from RFC-6068
 		-- Section 6.1
 		assert.same({scheme="mailto", path="chris@example.com"}, uri:match "mailto:chris@example.com")
-		assert.same({scheme="mailto", path="infobot@example.com", query="subject=current-issue"}, uri:match "mailto:infobot@example.com?subject=current-issue")
-		assert.same({scheme="mailto", path="infobot@example.com", query="body=send current-issue"}, uri:match "mailto:infobot@example.com?body=send%20current-issue")
-		assert.same({scheme="mailto", path="infobot@example.com", query="body=send current-issue\r\nsend index"}, uri:match "mailto:infobot@example.com?body=send%20current-issue%0D%0Asend%20index")
-		assert.same({scheme="mailto", path="list@example.org", query="In-Reply-To=<3469A91.D10AF4C@example.com>"}, uri:match "mailto:list@example.org?In-Reply-To=%3C3469A91.D10AF4C@example.com%3E")
-		assert.same({scheme="mailto", path="majordomo@example.com", query="body=subscribe bamboo-l"}, uri:match "mailto:majordomo@example.com?body=subscribe%20bamboo-l")
-		assert.same({scheme="mailto", path="joe@example.com", query="cc=bob@example.com&body=hello"}, uri:match "mailto:joe@example.com?cc=bob@example.com&body=hello")
+		assert.same({scheme="mailto", path="infobot@example.com", query="subject=current-issue"},
+			uri:match "mailto:infobot@example.com?subject=current-issue")
+		assert.same({scheme="mailto", path="infobot@example.com", query="body=send current-issue"},
+			uri:match "mailto:infobot@example.com?body=send%20current-issue")
+		assert.same({scheme="mailto", path="infobot@example.com", query="body=send current-issue\r\nsend index"},
+			uri:match "mailto:infobot@example.com?body=send%20current-issue%0D%0Asend%20index")
+		assert.same({scheme="mailto", path="list@example.org", query="In-Reply-To=<3469A91.D10AF4C@example.com>"},
+			uri:match "mailto:list@example.org?In-Reply-To=%3C3469A91.D10AF4C@example.com%3E")
+		assert.same({scheme="mailto", path="majordomo@example.com", query="body=subscribe bamboo-l"},
+			uri:match "mailto:majordomo@example.com?body=subscribe%20bamboo-l")
+		assert.same({scheme="mailto", path="joe@example.com", query="cc=bob@example.com&body=hello"},
+			uri:match "mailto:joe@example.com?cc=bob@example.com&body=hello")
 		assert.same({scheme="mailto", path="gorby%kremvax@example.com"}, uri:match "mailto:gorby%25kremvax@example.com")
-		assert.same({scheme="mailto", path="unlikely?address@example.com", query="blat=foop"}, uri:match "mailto:unlikely%3Faddress@example.com?blat=foop")
+		assert.same({scheme="mailto", path="unlikely?address@example.com", query="blat=foop"},
+			uri:match "mailto:unlikely%3Faddress@example.com?blat=foop")
 		assert.same({scheme="mailto", path="Mike&family@example.org"}, uri:match "mailto:Mike%26family@example.org")
 		-- Section 6.2
 		assert.same({scheme="mailto", path=[["not@me"@example.org]]}, uri:match "mailto:%22not%40me%22@example.org")
 		assert.same({scheme="mailto", path=[["oh\\no"@example.org]]}, uri:match "mailto:%22oh%5C%5Cno%22@example.org")
-		assert.same({scheme="mailto", path=[["\\\"it's\ ugly\\\""@example.org]]}, uri:match "mailto:%22%5C%5C%5C%22it's%5C%20ugly%5C%5C%5C%22%22@example.org")
+		assert.same({scheme="mailto", path=[["\\\"it's\ ugly\\\""@example.org]]},
+			uri:match "mailto:%22%5C%5C%5C%22it's%5C%20ugly%5C%5C%5C%22%22@example.org")
 	end)
 	it("Should work with xmpp URIs", function()
 		-- Examples from RFC-5122
@@ -113,7 +122,8 @@ describe("URI", function()
 		assert.same({scheme="xmpp", path="example-node@example.com/some-resource"}, uri:match "xmpp:example-node@example.com/some-resource")
 		assert.same({scheme="xmpp", path="example.com"}, uri:match "xmpp:example.com")
 		assert.same({scheme="xmpp", path="example-node@example.com", query="message"}, uri:match "xmpp:example-node@example.com?message")
-		assert.same({scheme="xmpp", path="example-node@example.com", query="message;subject=Hello World"}, uri:match "xmpp:example-node@example.com?message;subject=Hello%20World")
+		assert.same({scheme="xmpp", path="example-node@example.com", query="message;subject=Hello World"},
+			uri:match "xmpp:example-node@example.com?message;subject=Hello%20World")
 		assert.same({scheme="xmpp", path=[[nasty!#$%()*+,-.;=?[\]^_`{|}~node@example.com]]},
 			uri:match "xmpp:nasty!%23$%25()*+,-.;=%3F%5B%5C%5D%5E_%60%7B%7C%7D~node@example.com")
 		assert.same({scheme="xmpp", path=[[node@example.com/repulsive !#"$%&'()*+,-./:;<=>?@[\]^_`{|}~resource]]},
