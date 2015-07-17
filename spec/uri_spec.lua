@@ -101,6 +101,25 @@ describe("URI", function()
 		assert.same({scheme="mailto", path=[["oh\\no"@example.org]]}, uri:match "mailto:%22oh%5C%5Cno%22@example.org")
 		assert.same({scheme="mailto", path=[["\\\"it's\ ugly\\\""@example.org]]}, uri:match "mailto:%22%5C%5C%5C%22it's%5C%20ugly%5C%5C%5C%22%22@example.org")
 	end)
+	it("Should work with xmpp URIs", function()
+		-- Examples from RFC-5122
+		assert.same({scheme="xmpp", path="node@example.com"}, uri:match "xmpp:node@example.com")
+		assert.same({scheme="xmpp", userinfo="guest", host="example.com", path=""}, uri:match "xmpp://guest@example.com")
+		assert.same({scheme="xmpp", userinfo="guest", host="example.com", path="/support@example.com", query="message"},
+			uri:match "xmpp://guest@example.com/support@example.com?message")
+		assert.same({scheme="xmpp", path="support@example.com", query="message"}, uri:match "xmpp:support@example.com?message")
+
+		assert.same({scheme="xmpp", path="example-node@example.com"}, uri:match "xmpp:example-node@example.com")
+		assert.same({scheme="xmpp", path="example-node@example.com/some-resource"}, uri:match "xmpp:example-node@example.com/some-resource")
+		assert.same({scheme="xmpp", path="example.com"}, uri:match "xmpp:example.com")
+		assert.same({scheme="xmpp", path="example-node@example.com", query="message"}, uri:match "xmpp:example-node@example.com?message")
+		assert.same({scheme="xmpp", path="example-node@example.com", query="message;subject=Hello World"}, uri:match "xmpp:example-node@example.com?message;subject=Hello%20World")
+		assert.same({scheme="xmpp", path=[[nasty!#$%()*+,-.;=?[\]^_`{|}~node@example.com]]},
+			uri:match "xmpp:nasty!%23$%25()*+,-.;=%3F%5B%5C%5D%5E_%60%7B%7C%7D~node@example.com")
+		assert.same({scheme="xmpp", path=[[node@example.com/repulsive !#"$%&'()*+,-./:;<=>?@[\]^_`{|}~resource]]},
+			uri:match [[xmpp:node@example.com/repulsive%20!%23%22$%25&'()*+,-.%2F:;%3C=%3E%3F%40%5B%5C%5D%5E_%60%7B%7C%7D~resource]])
+		assert.same({scheme="xmpp", path="jiři@čechy.example/v Praze"}, uri:match "xmpp:ji%C5%99i@%C4%8Dechy.example/v%20Praze")
+	end)
 end)
 
 describe("Sane URI", function()
