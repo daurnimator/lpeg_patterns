@@ -103,8 +103,8 @@ _M.path = Cs ( path_abempty + path_absolute + path_noscheme + path_rootless ) + 
 -- Create a slightly more sane host pattern
 -- scheme is optional
 -- the "//" isn't required
+	-- if missing, the host needs to at least have a "." and end in two alpha characters
 -- an authority is always required
--- hosts need to at least have a "." and end in two alpha characters
 local hostsegment = (host_char-P".")^1
 local dns_entry   = Cs ( ( hostsegment * P"." )^1 * ALPHA^2 )
 local sane_host   = IP_host + dns_entry
