@@ -4,7 +4,6 @@ local lpeg = require "lpeg"
 local P = lpeg.P
 local R = lpeg.R
 local S = lpeg.S
-local V = lpeg.V
 
 local digit = R"09"
 local seperator = S"- ,."
