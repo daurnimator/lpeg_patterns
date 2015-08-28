@@ -68,7 +68,7 @@ local path_rootless = pchar^1 * path_abempty
 local path_absolute = P"/" * path_rootless^-1
 local path_noscheme = (pchar-P":")^1 * path_abempty
 -- an empty path is nil instead of the empty string
-local path_empty    = Cc(nil) * -#P(pchar)
+local path_empty    = Cc(nil)
 
 local query = Cs ( ( pchar + S"/?" )^0 ) -- 3.4
 local fragment = query -- 3.5
