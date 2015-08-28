@@ -33,7 +33,6 @@ local CFWS = ((FWS^-1 * comment)^1 * FWS^-1 + FWS ) / function() end
 -- Atom
 local specials      = S[=[()<>@,;:\".[]]=]
 local atext         = CHAR-specials-P" "-CTL
-local atom          = CFWS^-1 * C(atext^1) * CFWS^-1
 local dot_atom_text = atext^1 * ( P"." * atext^1 )^0
 local dot_atom      = CFWS^-1 * C(dot_atom_text) * CFWS^-1
 
@@ -47,7 +46,6 @@ local quoted_string      = CFWS^-1 * quoted_string_text * CFWS^-1
 local dtext               = R("\33\90","\94\126")
 local domain_literal_text = P"[" * C((FWS^-1 * dtext)^0) * FWS^-1 * P"]"
 
-local domain_text     = dot_atom_text + domain_literal_text
 local local_part_text = dot_atom_text + quoted_string_text
 local addr_spec_text  = local_part_text * P"@" * local_part_text
 
