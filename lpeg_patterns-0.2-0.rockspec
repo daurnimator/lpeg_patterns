@@ -1,5 +1,5 @@
 package = "lpeg_patterns"
-version = "scm-0"
+version = "0.2-0"
 
 description= {
 	summary = "a collection of LPEG patterns";
@@ -12,7 +12,8 @@ dependencies = {
 }
 
 source = {
-	url = "git://github.com/daurnimator/lpeg_patterns.git";
+	url = "https://github.com/daurnimator/lpeg_patterns/archive/v0.2.zip";
+	dir = "lpeg_patterns-0.2";
 }
 
 build = {
