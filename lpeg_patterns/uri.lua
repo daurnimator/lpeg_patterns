@@ -70,7 +70,7 @@ local path_noscheme = (pchar-P":")^1 * path_abempty
 -- an empty path is nil instead of the empty string
 local path_empty    = Cc(nil)
 
-local query = Cs ( ( pchar + S"/?" )^0 ) -- 3.4
+local query = Cs( ( pchar + S"/?" )^0 ) -- 3.4
 local fragment = query -- 3.5
 
 -- Put together with named captures
@@ -84,8 +84,8 @@ local hier_part = P"//" * authority * Cg ( Cs ( path_abempty ) , "path" )
 _M.uri = Ct (
 	( Cg ( scheme , "scheme" ) * P":" )
 	* hier_part
-	* ( P"?" * Cg ( Cs ( query ) , "query" ) )^-1
-	* ( P"#" * Cg ( Cs ( fragment ) , "fragment" ) )^-1
+	* ( P"?" * Cg(query, "query"))^-1
+	* ( P"#" * Cg(fragment, "fragment"))^-1
 )
 
 local relative_part = P"//" * authority * Cg ( Cs ( path_abempty ) , "path" )
@@ -93,8 +93,8 @@ local relative_part = P"//" * authority * Cg ( Cs ( path_abempty ) , "path" )
 
 local relative_ref = Ct (
 	relative_part
-	* ( P"?" * Cg ( Cs ( query ) , "query" ) )^-1
-	* ( P"#" * Cg ( Cs ( fragment ) , "fragment" ) )^-1
+	* ( P"?" * Cg(query, "query"))^-1
+	* ( P"#" * Cg(fragment, "fragment"))^-1
 )
 _M.uri_reference = _M.uri + relative_ref
 
@@ -115,8 +115,8 @@ local sane_hier_part = (P"//")^-1 * sane_authority * Cg ( Cs ( path_absolute ) +
 _M.sane_uri = Ct (
 	( Cg ( scheme , "scheme" ) * P":" )^-1
 	* sane_hier_part
-	* ( P"?" * Cg ( Cs ( query ) , "query" ) )^-1
-	* ( P"#" * Cg ( Cs ( fragment ) , "fragment" ) )^-1
+	* ( P"?" * Cg(query, "query"))^-1
+	* ( P"#" * Cg(fragment, "fragment"))^-1
 )
 
 return _M
