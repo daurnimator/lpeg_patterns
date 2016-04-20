@@ -46,8 +46,9 @@ local quoted_string      = CFWS^-1 * quoted_string_text * CFWS^-1
 local dtext               = R("\33\90","\94\126")
 local domain_literal_text = P"[" * C((FWS^-1 * dtext)^0) * FWS^-1 * P"]"
 
+local domain_text     = dot_atom_text + domain_literal_text
 local local_part_text = dot_atom_text + quoted_string_text
-local addr_spec_text  = local_part_text * P"@" * local_part_text
+local addr_spec_text  = local_part_text * P"@" * domain_text
 
 local domain_literal = CFWS^-1 * domain_literal_text * CFWS^-1
 local domain         = dot_atom + domain_literal
