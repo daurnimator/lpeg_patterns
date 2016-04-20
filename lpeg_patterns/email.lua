@@ -56,8 +56,12 @@ local local_part     = dot_atom + quoted_string
 local addr_spec      = local_part * P"@" * domain
 
 return {
+	local_part = local_part;
+	domain = domain;
 	email = addr_spec;
 
 	-- A variant that does not allow comments or folding whitespace
+	local_part_nocfws = local_part_text;
+	domain_nocfws = domain_text;
 	email_nocfws = addr_spec_text;
 }
