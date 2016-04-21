@@ -34,8 +34,8 @@ local CFWS = ((FWS^-1 * comment)^1 * FWS^-1 + FWS ) / function() end
 -- Atom
 local specials      = S[=[()<>@,;:\".[]]=]
 local atext         = CHAR-specials-P" "-CTL
-local dot_atom_text = atext^1 * ( P"." * atext^1 )^0
-local dot_atom      = CFWS^-1 * C(dot_atom_text) * CFWS^-1
+local dot_atom_text = C(atext^1 * ( P"." * atext^1 )^0)
+local dot_atom      = CFWS^-1 * dot_atom_text * CFWS^-1
 
 -- Quoted Strings
 local qtext              = S"\33"+R("\35\91","\93\126")
