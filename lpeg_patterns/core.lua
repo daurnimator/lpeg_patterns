@@ -21,7 +21,7 @@ _M.HEXDIG= _M.DIGIT + S"ABCDEFabcdef"
 _M.HTAB  = P"\t"
 _M.LF    = P"\n"
 _M.OCTET = P(1)
-_M.SP    = P"\n"
+_M.SP    = P" "
 _M.VCHAR = R"\33\126"
 _M.WSP   = S" \t"
 
