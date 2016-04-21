@@ -13,6 +13,7 @@ local core = require "lpeg_patterns.core"
 local CHAR = core.CHAR
 local CRLF = core.CRLF
 local CTL = core.CTL
+local DQUOTE = core.DQUOTE
 local WSP = core.WSP
 local VCHAR = core.VCHAR
 
@@ -39,7 +40,7 @@ local dot_atom      = CFWS^-1 * C(dot_atom_text) * CFWS^-1
 -- Quoted Strings
 local qtext              = S"\33"+R("\35\91","\93\126")
 local qcontent           = qtext + quoted_pair
-local quoted_string_text = P'"' * Cs((FWS^-1 * qcontent)^0) * FWS^-1 * P'"'
+local quoted_string_text = DQUOTE * Cs((FWS^-1 * qcontent)^0) * FWS^-1 * DQUOTE
 local quoted_string      = CFWS^-1 * quoted_string_text * CFWS^-1
 
 -- Addr-spec
