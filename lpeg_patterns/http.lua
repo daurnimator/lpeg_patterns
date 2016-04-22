@@ -57,7 +57,7 @@ local ctext = core.HTAB + core.SP + R("\33\39", "\42\91", "\93\126") + obs_text
 local comment = P { P"(" * ( ctext + quoted_pair + V(1) )^0 * P")" }
 
 -- RFC 7230 Section 3.2
-local field_name = token
+local field_name = token / string.lower -- case insensitive
 local field_vchar = core.VCHAR + obs_text
 local field_content = field_vchar * (( core.SP + core.HTAB )^1 * field_vchar)^-1
 local obs_fold = core.CRLF * ( core.SP + core.HTAB )^1 / " "
@@ -69,7 +69,8 @@ local Content_Length = core.DIGIT^1
 
 -- RFC 7230 Section 4
 local transfer_parameter = token * BWS * P"=" * BWS * ( token + quoted_string )
-local transfer_extension = token * ( OWS * P";" * OWS * transfer_parameter )^0
+local transfer_extension = token / string.lower -- case insensitive
+	* ( OWS * P";" * OWS * transfer_parameter )^0
 local transfer_coding = transfer_extension
 
 -- RFC 7230 Section 3.3.1
@@ -82,7 +83,7 @@ local chunk_ext = ( P";" * chunk_ext_name * ( P"=" * chunk_ext_val)^-1 )^0
 
 -- RFC 7230 Section 4.3
 local rank = (P"0" * (P"." * core.DIGIT^-3)^-1 + P"1" * ("." * (P"0")^-3)^-1) / tonumber
-local t_ranking = OWS * P";" * OWS * P"q=" * rank
+local t_ranking = OWS * P";" * OWS * S"qQ" * P"=" * rank -- q is case insensitive
 local t_codings = transfer_coding * Cg(t_ranking)^-1
 local TE = comma_sep(t_codings)
 
@@ -112,7 +113,7 @@ local received_by = uri.host * (P":" * uri.port)^-1 + pseudonym
 local Via = comma_sep(received_protocol * RWS * received_by * (RWS * comment)^-1, 1)
 
 -- RFC 7230 Section 6.1
-local connection_option = token
+local connection_option = token / string.lower -- case insensitive
 local Connection = comma_sep(connection_option)
 
 return {
