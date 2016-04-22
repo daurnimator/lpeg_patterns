@@ -57,7 +57,7 @@ local IP_literal  = P"[" * ( IPv6addrz + IPvFuture ) * P"]"
 local IP_host     = ( IP_literal + IPv4address ) / tostring
 local host_char   = unreserved + pct_encoded --+ sub_delims
 local reg_name    = Cs ( host_char^1 ) + Cc ( nil )
-local host        = IP_host + reg_name
+_M.host = IP_host + reg_name
 
 _M.port = DIGIT^0 / tonumber -- 3.2.3
 
@@ -75,7 +75,7 @@ _M.fragment = _M.query -- 3.5
 
 -- Put together with named captures
 _M.authority = ( Cg(Cs(userinfo), "userinfo") * P"@" )^-1
-	* Cg ( host , "host" )
+	* Cg(_M.host, "host")
 	* ( P":" * Cg(_M.port, "port") )^-1
 
 local hier_part = P"//" * _M.authority * Cg (Cs(path_abempty), "path")
@@ -107,9 +107,9 @@ _M.path = Cs ( path_abempty + path_absolute + path_noscheme + path_rootless ) + 
 -- an authority is always required
 local hostsegment = (host_char-P".")^1
 local dns_entry   = Cs ( ( hostsegment * P"." )^1 * ALPHA^2 )
-local sane_host   = IP_host + dns_entry
+_M.sane_host = IP_host + dns_entry
 _M.sane_authority = ( Cg(Cs(userinfo), "userinfo") * P"@" )^-1
-	* Cg ( sane_host , "host" )
+	* Cg(_M.sane_host, "host")
 	* ( P":" * Cg(_M.port, "port") )^-1
 local sane_hier_part = (P"//")^-1 * _M.sane_authority * Cg(Cs(path_absolute) + path_empty , "path" )
 _M.sane_uri = Ct (
