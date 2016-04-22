@@ -82,8 +82,8 @@ local chunk_ext = ( P";" * chunk_ext_name * ( P"=" * chunk_ext_val)^-1 )^0
 
 -- RFC 7230 Section 4.3
 local rank = (P"0" * (P"." * core.DIGIT^-3)^-1 + P"1" * ("." * (P"0")^-3)^-1) / tonumber
-local t_ranking = OWS * P";" * OWS * Cg(P"q=" * rank, "q")
-local t_codings = P"trailers" + transfer_coding * t_ranking^-1
+local t_ranking = OWS * P";" * OWS * P"q=" * rank
+local t_codings = P"trailers" + transfer_coding * Cg(t_ranking)^-1
 local TE = comma_sep(t_codings)
 
 -- RFC 7230 Section 4.4
