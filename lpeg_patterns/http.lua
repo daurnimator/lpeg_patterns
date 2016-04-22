@@ -70,7 +70,7 @@ local Content_Length = core.DIGIT^1
 -- RFC 7230 Section 4
 local transfer_parameter = token * BWS * P"=" * BWS * ( token + quoted_string )
 local transfer_extension = token * ( OWS * P";" * OWS * transfer_parameter )^0
-local transfer_coding = P"chunked" + P"compress" + P"deflate" + P"gzip" + transfer_extension
+local transfer_coding = transfer_extension
 
 -- RFC 7230 Section 3.3.1
 local Transfer_Encoding = comma_sep(transfer_coding, 1)
@@ -83,7 +83,7 @@ local chunk_ext = ( P";" * chunk_ext_name * ( P"=" * chunk_ext_val)^-1 )^0
 -- RFC 7230 Section 4.3
 local rank = (P"0" * (P"." * core.DIGIT^-3)^-1 + P"1" * ("." * (P"0")^-3)^-1) / tonumber
 local t_ranking = OWS * P";" * OWS * P"q=" * rank
-local t_codings = P"trailers" + transfer_coding * Cg(t_ranking)^-1
+local t_codings = transfer_coding * Cg(t_ranking)^-1
 local TE = comma_sep(t_codings)
 
 -- RFC 7230 Section 4.4
