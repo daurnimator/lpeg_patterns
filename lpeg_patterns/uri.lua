@@ -74,12 +74,12 @@ _M.query = Cs( ( pchar + S"/?" )^0 ) -- 3.4
 _M.fragment = _M.query -- 3.5
 
 -- Put together with named captures
-local authority = ( Cg ( Cs ( userinfo ) , "userinfo" ) * P"@" )^-1
+_M.authority = ( Cg(Cs(userinfo), "userinfo") * P"@" )^-1
 	* Cg ( host , "host" )
 	* ( P":" * Cg(_M.port, "port") )^-1
 
-local hier_part = P"//" * authority * Cg ( Cs ( path_abempty ) , "path" )
-	+ Cg ( Cs ( path_absolute + path_rootless ) + path_empty , "path" )
+local hier_part = P"//" * _M.authority * Cg (Cs(path_abempty), "path")
+	+ Cg(Cs(path_absolute + path_rootless) + path_empty , "path")
 
 _M.uri = Ct (
 	( Cg ( scheme , "scheme" ) * P":" )
@@ -88,8 +88,8 @@ _M.uri = Ct (
 	* ( P"#" * Cg(_M.fragment, "fragment"))^-1
 )
 
-local relative_part = P"//" * authority * Cg ( Cs ( path_abempty ) , "path" )
-	+ Cg ( Cs ( path_absolute + path_noscheme ) + path_empty , "path" )
+local relative_part = P"//" * _M.authority * Cg(Cs(path_abempty), "path")
+	+ Cg(Cs(path_absolute + path_noscheme) + path_empty, "path")
 
 local relative_ref = Ct (
 	relative_part
@@ -108,10 +108,10 @@ _M.path = Cs ( path_abempty + path_absolute + path_noscheme + path_rootless ) + 
 local hostsegment = (host_char-P".")^1
 local dns_entry   = Cs ( ( hostsegment * P"." )^1 * ALPHA^2 )
 local sane_host   = IP_host + dns_entry
-local sane_authority = ( Cg ( Cs ( userinfo ) , "userinfo" ) * P"@" )^-1
+_M.sane_authority = ( Cg(Cs(userinfo), "userinfo") * P"@" )^-1
 	* Cg ( sane_host , "host" )
 	* ( P":" * Cg(_M.port, "port") )^-1
-local sane_hier_part = (P"//")^-1 * sane_authority * Cg ( Cs ( path_absolute ) + path_empty , "path" )
+local sane_hier_part = (P"//")^-1 * _M.sane_authority * Cg(Cs(path_absolute) + path_empty , "path" )
 _M.sane_uri = Ct (
 	( Cg ( scheme , "scheme" ) * P":" )^-1
 	* sane_hier_part

@@ -69,11 +69,13 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
       - `fragment`
   - `uri_reference` (pattern): similar to `uri`, but permits relative URIs
   - `port` (pattern): matches the port segment of a URI
+  - `authority` (pattern): matches the authority segment of a URI
   - `path` (pattern): matches the path segment of a URI
   - `query` (pattern): matches the query segment of a URI
   - `fragment` (pattern): matches the fragment segment of a URI
   - `sane_uri` (pattern): a variant that shouldn't match things that people would not normally consider URIs.
     e.g. uris without a hostname
+  - `sane_authority` (pattern): a variant that shouldn't match things that people would not normally consider valid hosts.
 
 
 ### `email`
