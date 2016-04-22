@@ -135,7 +135,7 @@ local charset = token / string.lower -- case insensitive
 local Content_Type = media_type
 
 -- RFC 7231 Section 5.3.1
-local qvalue = rank
+local qvalue = rank -- luacheck: ignore 211
 local weight = t_ranking
 
 -- RFC 7231 Section 5.3.2
