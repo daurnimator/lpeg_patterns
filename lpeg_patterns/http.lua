@@ -92,9 +92,9 @@ local Trailer = comma_sep(field_name, 1)
 
 -- RFC 7230 Section 5.3
 local origin_form = absolute_path * (P"?" * uri.query)^-1
-local absolute_form  = uri.absolute_uri
+local absolute_form = uri.absolute_uri
 local authority_form = uri.authority
-local asterisk_form  = P"*"
+local asterisk_form = P"*"
 local request_target = origin_form + absolute_form + authority_form + asterisk_form
 
 -- RFC 7230 Section 5.4
