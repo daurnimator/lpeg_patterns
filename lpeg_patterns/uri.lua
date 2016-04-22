@@ -62,11 +62,15 @@ _M.host = IP_host + reg_name
 _M.port = DIGIT^0 / tonumber -- 3.2.3
 
 -- Path 3.3
-local pchar         = unreserved + pct_encoded + sub_delims + S":@"
-local path_abempty  = ( P"/" * pchar^0 )^0
-local path_rootless = pchar^1 * path_abempty
+local pchar = unreserved + pct_encoded + sub_delims + S":@"
+local segment = pchar^0
+local segment_nz = pchar^1
+local segment_nz_nc = (pchar - P":")^1
+
+local path_abempty = (P"/" * segment)^0
+local path_rootless = segment_nz * path_abempty
+local path_noscheme = segment_nz_nc * path_abempty
 local path_absolute = P"/" * path_rootless^-1
-local path_noscheme = (pchar-P":")^1 * path_abempty
 -- an empty path is nil instead of the empty string
 local path_empty    = Cc(nil)
 
