@@ -59,7 +59,7 @@ local host_char   = unreserved + pct_encoded --+ sub_delims
 local reg_name    = Cs ( host_char^1 ) + Cc ( nil )
 local host        = IP_host + reg_name
 
-local port        = DIGIT^0 / tonumber -- 3.2.3
+_M.port = DIGIT^0 / tonumber -- 3.2.3
 
 -- Path 3.3
 local pchar         = unreserved + pct_encoded + sub_delims + S":@"
@@ -76,7 +76,7 @@ _M.fragment = _M.query -- 3.5
 -- Put together with named captures
 local authority = ( Cg ( Cs ( userinfo ) , "userinfo" ) * P"@" )^-1
 	* Cg ( host , "host" )
-	* ( P":" * Cg ( port , "port" ) )^-1
+	* ( P":" * Cg(_M.port, "port") )^-1
 
 local hier_part = P"//" * authority * Cg ( Cs ( path_abempty ) , "path" )
 	+ Cg ( Cs ( path_absolute + path_rootless ) + path_empty , "path" )
@@ -110,7 +110,7 @@ local dns_entry   = Cs ( ( hostsegment * P"." )^1 * ALPHA^2 )
 local sane_host   = IP_host + dns_entry
 local sane_authority = ( Cg ( Cs ( userinfo ) , "userinfo" ) * P"@" )^-1
 	* Cg ( sane_host , "host" )
-	* ( P":" * Cg ( port , "port" ) )^-1
+	* ( P":" * Cg(_M.port, "port") )^-1
 local sane_hier_part = (P"//")^-1 * sane_authority * Cg ( Cs ( path_absolute ) + path_empty , "path" )
 _M.sane_uri = Ct (
 	( Cg ( scheme , "scheme" ) * P":" )^-1
