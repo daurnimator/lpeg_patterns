@@ -85,6 +85,12 @@ _M.authority = ( Cg(userinfo, "userinfo") * P"@" )^-1
 local hier_part = P"//" * _M.authority * Cg (path_abempty, "path")
 	+ Cg(path_absolute + path_rootless + path_empty, "path")
 
+_M.absolute_uri = Ct (
+	( Cg ( scheme , "scheme" ) * P":" )
+	* hier_part
+	* ( P"?" * Cg(_M.query, "query"))^-1
+)
+
 _M.uri = Ct (
 	( Cg ( scheme , "scheme" ) * P":" )
 	* hier_part

@@ -2,6 +2,7 @@ local lpeg=require "lpeg"
 local uri_lib=require "lpeg_patterns.uri"
 
 describe("URI", function()
+	local absolute_uri = uri_lib.absolute_uri * lpeg.P(-1)
 	local uri = uri_lib.uri * lpeg.P(-1)
 	local ref = uri_lib.uri_reference * lpeg.P(-1)
 	local path = uri_lib.path * lpeg.P(-1)
@@ -20,6 +21,11 @@ describe("URI", function()
 			uri:match "scheme:///path")
 		assert.same({scheme="scheme", path=""},
 			uri:match "scheme://")
+	end)
+	it("shouldn't allow fragments when using absolute_uri", function()
+		assert.falsy(absolute_uri:match "scheme://userinfo@host:1234/path?query#fragment")
+		assert.same({scheme="scheme", userinfo="userinfo", host="host", port=1234, path="/path", query="query"},
+			absolute_uri:match "scheme://userinfo@host:1234/path?query")
 	end)
 	it("Should break down relative URIs correctly", function()
 		assert.same({scheme="scheme", userinfo="userinfo", host="host", port=1234, path="/path", query="query", fragment="fragment"},

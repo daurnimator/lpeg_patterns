@@ -67,6 +67,7 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
       - `path`
       - `query`
       - `fragment`
+  - `absolute_uri` (pattern): similar to `uri`, but does not permit fragments
   - `uri_reference` (pattern): similar to `uri`, but permits relative URIs
   - `host` (pattern): matches the host segment of a URI
   - `port` (pattern): matches the port segment of a URI
