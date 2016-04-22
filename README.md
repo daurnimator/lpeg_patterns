@@ -48,7 +48,7 @@ IPv4 "dotted decimal notation" in this document refers to "strict" form (see [RF
   - `IPv6address` (pattern): parses an IPv6 address
   - `IPv6addrz` (pattern): parses an IPv6 address with optional "ZoneID" (see [RFC-6874](https://tools.ietf.org/html/rfc6874))
   - `IPv6_methods` (table): methods available on IPv6 objects
-      - `unpack` (function): the IPv6 address as a series of 8 16bit numbers optional followed by zoneid
+      - `unpack` (function): the IPv6 address as a series of 8 16bit numbers, optionally followed by zoneid
       - `binary` (function): the IPv6 address as a 16 byte binary string
       - `setzoneid` (function): set the zoneid of this IPv6 address
   - `IPv6_mt` (table): metatable given to IPv6 objects
