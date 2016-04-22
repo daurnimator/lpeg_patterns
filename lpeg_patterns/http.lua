@@ -211,6 +211,10 @@ local HTTP_date = IMF_fixdate + obs_date
 local Date = HTTP_date
 
 return {
+	OWS = OWS;
+	RWS = RWS;
+	BWS = BWS;
+
 	token = token;
 	quoted_string = quoted_string;
 	comment = comment;
