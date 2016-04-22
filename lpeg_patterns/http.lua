@@ -1,12 +1,17 @@
--- https://tools.ietf.org/html/rfc7230
+--[[
+https://tools.ietf.org/html/rfc7230
+https://tools.ietf.org/html/rfc7231
+]]
 
 local lpeg = require "lpeg"
 local core = require "lpeg_patterns.core"
 local uri = require "lpeg_patterns.uri"
 
 local C = lpeg.C
+local Cc = lpeg.Cc
 local Cg = lpeg.Cg
 local Cs = lpeg.Cs
+local Ct = lpeg.Ct
 local P = lpeg.P
 local R = lpeg.R
 local S = lpeg.S
@@ -116,6 +121,95 @@ local Via = comma_sep(received_protocol * RWS * received_by * (RWS * comment)^-1
 local connection_option = token / string.lower -- case insensitive
 local Connection = comma_sep(connection_option)
 
+-- RFC 7231 Section 3.1.1
+local content_coding = token / string.lower -- case insensitive
+local Content_Encoding = comma_sep(content_coding, 1)
+
+-- RFC 7231 Section 3.1.2
+local type = token / string.lower -- case insensitive
+local subtype = token / string.lower -- case insensitive
+local parameter = token / string.lower -- case insensitive
+	* P"=" * (token + quoted_string)
+local media_type = type * P"/" * subtype * (OWS * P";" * OWS * parameter)^0
+local charset = token / string.lower -- case insensitive
+local Content_Type = media_type
+
+-- RFC 7231 Section 5.3.1
+local qvalue = rank
+local weight = t_ranking
+
+-- RFC 7231 Section 5.3.2
+local media_range = ( "*/*"
+	+ (type * P"/*")
+	+ (type * P"/" * subtype)
+) * (OWS * ";" * OWS * parameter)^0
+local accept_ext = OWS * P";" * OWS * token * (P"=" * (token + quoted_string))^-1
+local accept_params = weight * (accept_ext)^0
+local Accept = comma_sep(media_range * accept_params^-1)
+
+-- RFC 7231 Section 7.1.1.1
+-- Uses os.date field names
+local day_name = Cg(P"Mon"*Cc(2), "wday")
+	+ Cg(P"Tue"*Cc(3), "wday")
+	+ Cg(P"Wed"*Cc(4), "wday")
+	+ Cg(P"Thu"*Cc(5), "wday")
+	+ Cg(P"Fri"*Cc(6), "wday")
+	+ Cg(P"Sat"*Cc(7), "wday")
+	+ Cg(P"Sun"*Cc(1), "wday")
+local day = Cg(core.DIGIT * core.DIGIT / tonumber, "day")
+local month = Cg(P"Jan"*Cc(1), "month")
+	+ Cg(P"Feb"*Cc(2), "month")
+	+ Cg(P"Mar"*Cc(3), "month")
+	+ Cg(P"Apr"*Cc(4), "month")
+	+ Cg(P"May"*Cc(5), "month")
+	+ Cg(P"Jun"*Cc(6), "month")
+	+ Cg(P"Jul"*Cc(7), "month")
+	+ Cg(P"Aug"*Cc(8), "month")
+	+ Cg(P"Sep"*Cc(9), "month")
+	+ Cg(P"Oct"*Cc(10), "month")
+	+ Cg(P"Nov"*Cc(11), "month")
+	+ Cg(P"Dec"*Cc(12), "month")
+local year = Cg(core.DIGIT * core.DIGIT * core.DIGIT * core.DIGIT / tonumber, "year")
+local date1 = day * core.SP * month * core.SP * year
+
+local GMT = P"GMT"
+
+local minute = Cg(core.DIGIT * core.DIGIT / tonumber, "min")
+local second = Cg(core.DIGIT * core.DIGIT / tonumber, "sec")
+local hour = Cg(core.DIGIT * core.DIGIT / tonumber, "hour")
+-- XXX only match 00:00:00 - 23:59:60 (leap second)?
+
+local time_of_day = hour * P":" * minute * P":" * second
+local IMF_fixdate = Ct(day_name * P"," * core.SP * date1 * core.SP * time_of_day * core.SP * GMT)
+
+local date2 do
+	local year_barrier = 70
+	local twodayyear = Cg(core.DIGIT * core.DIGIT / function(y)
+		y = tonumber(y, 10)
+		if y < year_barrier then
+			return 2000+y
+		else
+			return 1900+y
+		end
+	end, "year")
+	date2 = day * P"-" * month * P"-" * twodayyear
+end
+local day_name_l = Cg(P"Monday"*Cc(2), "wday")
+	+ Cg(P"Tuesday"*Cc(3), "wday")
+	+ Cg(P"Wednesday"*Cc(4), "wday")
+	+ Cg(P"Thursday"*Cc(5), "wday")
+	+ Cg(P"Friday"*Cc(6), "wday")
+	+ Cg(P"Saturday"*Cc(7), "wday")
+	+ Cg(P"Sunday"*Cc(1), "wday")
+local rfc850_date = Ct(day_name_l * P"," * core.SP * date2 * core.SP * time_of_day * core.SP * GMT)
+
+local date3 = month * core.SP * (day + Cg(core.SP * core.DIGIT / tonumber, "day"))
+local asctime_date = Ct(day_name * core.SP * date3 * core.SP * time_of_day * core.SP * year)
+local obs_date = rfc850_date + asctime_date
+
+local HTTP_date = IMF_fixdate + obs_date
+local Date = HTTP_date
+
 return {
 	token = token;
 	quoted_string = quoted_string;
@@ -134,4 +228,9 @@ return {
 	Transfer_Encoding = Transfer_Encoding;
 	Upgrade = Upgrade;
 	Via = Via;
+
+	Accept = Accept;
+	Content_Encoding = Content_Encoding;
+	Content_Type = Content_Type;
+	Date = Date;
 }
