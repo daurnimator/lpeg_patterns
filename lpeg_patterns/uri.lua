@@ -67,10 +67,10 @@ local segment = pchar^0
 local segment_nz = pchar^1
 local segment_nz_nc = (pchar - P":")^1
 
-local path_abempty = (P"/" * segment)^0
-local path_rootless = segment_nz * path_abempty
-local path_noscheme = segment_nz_nc * path_abempty
-local path_absolute = P"/" * path_rootless^-1
+local path_abempty = Cs((P"/" * segment)^0)
+local path_rootless = Cs(segment_nz * (P"/" * segment)^0)
+local path_noscheme = Cs(segment_nz_nc * (P"/" * segment)^0)
+local path_absolute = Cs(P"/" * (segment_nz * (P"/" * segment)^0)^-1)
 -- an empty path is nil instead of the empty string
 local path_empty    = Cc(nil)
 
@@ -82,8 +82,8 @@ _M.authority = ( Cg(Cs(userinfo), "userinfo") * P"@" )^-1
 	* Cg(_M.host, "host")
 	* ( P":" * Cg(_M.port, "port") )^-1
 
-local hier_part = P"//" * _M.authority * Cg (Cs(path_abempty), "path")
-	+ Cg(Cs(path_absolute + path_rootless) + path_empty , "path")
+local hier_part = P"//" * _M.authority * Cg (path_abempty, "path")
+	+ Cg(path_absolute + path_rootless + path_empty, "path")
 
 _M.uri = Ct (
 	( Cg ( scheme , "scheme" ) * P":" )
@@ -92,8 +92,8 @@ _M.uri = Ct (
 	* ( P"#" * Cg(_M.fragment, "fragment"))^-1
 )
 
-local relative_part = P"//" * _M.authority * Cg(Cs(path_abempty), "path")
-	+ Cg(Cs(path_absolute + path_noscheme) + path_empty, "path")
+local relative_part = P"//" * _M.authority * Cg(path_abempty, "path")
+	+ Cg(path_absolute + path_noscheme + path_empty, "path")
 
 local relative_ref = Ct (
 	relative_part
@@ -102,7 +102,7 @@ local relative_ref = Ct (
 )
 _M.uri_reference = _M.uri + relative_ref
 
-_M.path = Cs ( path_abempty + path_absolute + path_noscheme + path_rootless ) + path_empty
+_M.path = path_abempty + path_absolute + path_noscheme + path_rootless + path_empty
 
 -- Create a slightly more sane host pattern
 -- scheme is optional
@@ -115,7 +115,7 @@ _M.sane_host = IP_host + dns_entry
 _M.sane_authority = ( Cg(Cs(userinfo), "userinfo") * P"@" )^-1
 	* Cg(_M.sane_host, "host")
 	* ( P":" * Cg(_M.port, "port") )^-1
-local sane_hier_part = (P"//")^-1 * _M.sane_authority * Cg(Cs(path_absolute) + path_empty , "path" )
+local sane_hier_part = (P"//")^-1 * _M.sane_authority * Cg(path_absolute + path_empty, "path")
 _M.sane_uri = Ct (
 	( Cg ( scheme , "scheme" ) * P":" )^-1
 	* sane_hier_part
