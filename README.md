@@ -73,6 +73,7 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `port` (pattern): matches the port portion of a URI
   - `authority` (pattern): matches the authority portion of a URI
   - `path` (pattern): matches the path portion of a URI
+  - `segment` (pattern): matches a path segment (a piece of a path without a `/`)
   - `query` (pattern): matches the query portion of a URI
   - `fragment` (pattern): matches the fragment portion of a URI
   - `sane_uri` (pattern): a variant that shouldn't match things that people would not normally consider URIs.

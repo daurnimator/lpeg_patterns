@@ -64,6 +64,7 @@ _M.port = DIGIT^0 / tonumber -- 3.2.3
 -- Path 3.3
 local pchar = unreserved + pct_encoded + sub_delims + S":@"
 local segment = pchar^0
+_M.segment = Cs(segment)
 local segment_nz = pchar^1
 local segment_nz_nc = (pchar - P":")^1
 
