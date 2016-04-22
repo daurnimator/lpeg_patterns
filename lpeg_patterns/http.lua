@@ -66,7 +66,8 @@ local field_name = token / string.lower -- case insensitive
 local field_vchar = core.VCHAR + obs_text
 local field_content = field_vchar * (( core.SP + core.HTAB )^1 * field_vchar)^-1
 local obs_fold = core.CRLF * ( core.SP + core.HTAB )^1 / " "
-local field_value = Cs(( field_content + obs_fold )^0)
+-- field_value is not correct, see Errata: https://www.rfc-editor.org/errata_search.php?rfc=7230&eid=4189
+local field_value = Cs((field_content + obs_fold)^0)
 local header_field = field_name * P":" * OWS * field_value * OWS
 
 -- RFC 7230 Section 3.3.2
