@@ -9,6 +9,7 @@ local uri = require "lpeg_patterns.uri"
 
 local C = lpeg.C
 local Cc = lpeg.Cc
+local Cf = lpeg.Cf
 local Cg = lpeg.Cg
 local Cs = lpeg.Cs
 local Ct = lpeg.Ct
@@ -132,7 +133,7 @@ local type = token / string.lower -- case insensitive
 local subtype = token / string.lower -- case insensitive
 local parameter = token / string.lower -- case insensitive
 	* P"=" * (token + quoted_string)
-local media_type = type * P"/" * subtype * (OWS * P";" * OWS * parameter)^0
+local media_type = type * P"/" * subtype * Cf(Ct(true) * (OWS * P";" * OWS * Cg(parameter))^0, rawset)
 local charset = token / string.lower -- case insensitive
 local Content_Type = media_type
 

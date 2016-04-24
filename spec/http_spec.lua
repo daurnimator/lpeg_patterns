@@ -32,6 +32,14 @@ describe("http patterns", function()
 		assert.same({"foo", "bar"}, Trailer:match("foo\t, bar"))
 		assert.same({"foo", "bar"}, Trailer:match("foo,,,  ,bar"))
 	end)
+	it("Parses a Content-Type header", function()
+		local Content_Type = lpeg.Ct(http.Content_Type) * EOF
+		assert.same({"foo", "bar", {}}, Content_Type:match("foo/bar"))
+		assert.same({"foo", "bar", {param="value"}}, Content_Type:match("foo/bar;param=value"))
+		assert.same({"text", "html", {charset="utf-8"}}, Content_Type:match([[text/html;charset=utf-8]]))
+		assert.same({"text", "html", {charset="utf-8"}}, Content_Type:match([[Text/HTML;Charset="utf-8"]]))
+		assert.same({"text", "html", {charset="utf-8"}}, Content_Type:match([[text/html; charset="utf-8"]]))
+	end)
 	it("Matches the 3 date formats", function()
 		local Date = http.Date * EOF
 		local example_time = {
