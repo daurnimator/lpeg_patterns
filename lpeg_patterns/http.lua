@@ -149,6 +149,12 @@ local Content_Type = Ct(media_type)
 -- RFC 7231 Section 3.1.4.2
 -- local Content_Location = uri.absolute_uri + partial_uri
 
+-- RFC 7231 Section 5.1.1
+local Expect = P"100-"*S"cC"*S"oO"*S"nN"*S"tT"*S"iI"*S"nN"*S"uU"*S"eE" * Cc("100-continue")
+
+-- RFC 7231 Section 5.1.2
+local Max_Forwards = core.DIGIT^1 / tonumber
+
 -- RFC 7231 Section 5.3.1
 local qvalue = rank -- luacheck: ignore 211
 local weight = t_ranking
@@ -168,6 +174,18 @@ local Accept_Charset = comma_sep((charset + P"*") * weight^-1, 1)
 -- RFC 7231 Section 5.3.4
 local codings = content_coding + "*"
 local Accept_Encoding = comma_sep(codings * weight^-1)
+
+-- RFC 4647 Section 2.1
+local alphanum = core.ALPHA + core.DIGIT
+local language_range = (core.ALPHA * core.ALPHA^-7 * (P"-" * alphanum * alphanum^-7)^0) + P"*"
+-- RFC 7231 Section 5.3.5
+local Accept_Language = comma_sep(language_range * weight^-1, 1 )
+
+
+-- RFC 7231 Section 5.5.3
+local product_version = token
+local product = token * (P"/" * product_version)^-1
+local User_Agent = product * (RWS * (product + comment))^0
 
 -- RFC 7231 Section 7.1.1.1
 -- Uses os.date field names
@@ -232,6 +250,22 @@ local obs_date = rfc850_date + asctime_date
 local HTTP_date = IMF_fixdate + obs_date
 local Date = HTTP_date
 
+-- RFC 7231 Section 7.1.2
+local Location = uri.uri_reference
+
+-- RFC 7231 Section 7.1.3
+local delay_seconds = core.DIGIT^1 / tonumber
+local Retry_After = HTTP_date + delay_seconds
+
+-- RFC 7231 Section 7.1.4
+local Vary = P"*" + comma_sep(field_name, 1)
+
+-- RFC 7231 Section 7.4.1
+local Allow = comma_sep(method)
+
+-- RFC 7231 Section 7.4.2
+local Server = product * (RWS * (product + comment))^0
+
 return {
 	OWS = OWS;
 	RWS = RWS;
@@ -259,7 +293,16 @@ return {
 	Accept = Accept;
 	Accept_Charset = Accept_Charset;
 	Accept_Encoding = Accept_Encoding;
+	Accept_Language = Accept_Language;
+	Allow = Allow;
 	Content_Encoding = Content_Encoding;
 	Content_Type = Content_Type;
 	Date = Date;
+	Expect = Expect;
+	Location = Location;
+	Max_Forwards = Max_Forwards;
+	Retry_After = Retry_After;
+	Server = Server;
+	User_Agent = User_Agent;
+	Vary = Vary;
 }
