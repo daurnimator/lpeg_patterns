@@ -133,9 +133,10 @@ local type = token / string.lower -- case insensitive
 local subtype = token / string.lower -- case insensitive
 local parameter = token / string.lower -- case insensitive
 	* P"=" * (token + quoted_string)
-local media_type = type * P"/" * subtype * Cf(Ct(true) * (OWS * P";" * OWS * Cg(parameter))^0, rawset)
+local media_type = Cg(type, "type") * P"/" * Cg(subtype, "subtype")
+	* Cg(Cf(Ct(true) * (OWS * P";" * OWS * Cg(parameter))^0, rawset), "parameters")
 local charset = token / string.lower -- case insensitive
-local Content_Type = media_type
+local Content_Type = Ct(media_type)
 
 -- RFC 7231 Section 5.3.1
 local qvalue = rank -- luacheck: ignore 211
