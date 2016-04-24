@@ -266,6 +266,28 @@ local Allow = comma_sep(method)
 -- RFC 7231 Section 7.4.2
 local Server = product * (RWS * (product + comment))^0
 
+-- RFC 7232 Section 2.2
+local Last_Modified = HTTP_date
+
+-- RFC 7232 Section 2.3
+local weak = P"W/"
+local etagc = P"\33" + R"\35\115" + obs_text
+local opaque_tag = core.DQUOTE * etagc^0 * core.DQUOTE
+local entity_tag = weak^-1 * opaque_tag
+local ETag = entity_tag
+
+-- RFC 7232 Section 3.1
+local If_Match = P"*" + comma_sep(entity_tag, 1)
+
+-- RFC 7232 Section 3.2
+local If_None_Match = P"*" + comma_sep(entity_tag, 1)
+
+-- RFC 7232 Section 3.3
+local If_Modified_Since = HTTP_date
+
+-- RFC 7232 Section 3.4
+local If_Unmodified_Since = HTTP_date
+
 return {
 	OWS = OWS;
 	RWS = RWS;
@@ -305,4 +327,11 @@ return {
 	Server = Server;
 	User_Agent = User_Agent;
 	Vary = Vary;
+
+	Last_Modified = Last_Modified;
+	ETag = ETag;
+	If_Match = If_Match;
+	If_None_Match = If_None_Match;
+	If_Modified_Since = If_Modified_Since;
+	If_Unmodified_Since = If_Unmodified_Since;
 }
