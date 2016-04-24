@@ -49,8 +49,12 @@ local comma_sep do
 	end
 end
 
+-- RFC 7230 Section 2.6
+local HTTP_name = P"HTTP"
+local HTTP_version = HTTP_name * P"/" * (core.DIGIT * P"." * core.DIGIT / tonumber)
+
 -- RFC 7230 Section 2.7
-local absolute_path = Cs((P"/" * uri.segment )^1)
+local absolute_path = (P"/" * uri.segment )^1
 
 -- RFC 7230 Section 3.2.6
 local tchar = S "!#$%&'*+-.^_`|~" + core.DIGIT + core.ALPHA
@@ -99,11 +103,15 @@ local TE = comma_sep(t_codings)
 local Trailer = comma_sep(field_name, 1)
 
 -- RFC 7230 Section 5.3
-local origin_form = absolute_path * (P"?" * uri.query)^-1
+local origin_form = Cs(absolute_path * (P"?" * uri.query)^-1)
 local absolute_form = uri.absolute_uri
 local authority_form = uri.authority
-local asterisk_form = P"*"
-local request_target = origin_form + absolute_form + authority_form + asterisk_form
+local asterisk_form = C"*"
+local request_target = asterisk_form + origin_form + absolute_form + authority_form
+
+-- RFC 7230 Section 3.1.1
+local method = token
+local request_line = method * core.SP * request_target * core.SP * HTTP_version * core.CRLF
 
 -- RFC 7230 Section 5.4
 local Host = uri.host * (P":" * uri.port)^-1
@@ -233,6 +241,7 @@ return {
 	quoted_string = quoted_string;
 	comment = comment;
 	request_target = request_target;
+	request_line = request_line;
 	field_name = field_name;
 	field_value = field_value;
 	header_field = header_field;

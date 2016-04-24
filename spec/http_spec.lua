@@ -2,6 +2,11 @@ describe("http patterns", function()
 	local http = require "lpeg_patterns.http"
 	local lpeg = require "lpeg"
 	local EOF = lpeg.P(-1)
+	it("Splits a request line", function()
+		local request_line = lpeg.Ct(http.request_line) * EOF
+		assert.same({"GET", "/", 1.0}, request_line:match("GET / HTTP/1.0\r\n"))
+		assert.same({"OPTIONS", "*", 1.1}, request_line:match("OPTIONS * HTTP/1.1\r\n"))
+	end)
 	it("Splits a Connection header", function()
 		local Connection = lpeg.Ct(http.Connection) * EOF
 		assert.same({}, Connection:match(" "))
