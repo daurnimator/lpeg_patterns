@@ -362,6 +362,12 @@ local Authorization = credentials
 local Proxy_Authenticate = comma_sep(challenge, 1)
 local Proxy_Authorization = credentials
 
+-- RFC 7239 Section 4
+local value = token + quoted_string
+local forwarded_pair = token * P"=" * value
+local forwarded_element = forwarded_pair^-1 * (P";" * forwarded_pair^-1)^0
+local Forwarded = comma_sep(forwarded_element)
+
 return {
 	OWS = OWS;
 	RWS = RWS;
@@ -424,4 +430,6 @@ return {
 	Authorization = Authorization;
 	Proxy_Authenticate = Proxy_Authenticate;
 	Proxy_Authorization = Proxy_Authorization;
+
+	Forwarded = Forwarded;
 }
