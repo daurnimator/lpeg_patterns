@@ -23,28 +23,29 @@ local RWS = (core.SP + core.HTAB)^1
 local BWS = OWS
 
 -- Analogue to RFC 7320 Section 7's ABNF extension of '#'
-local function comma_sep(element, min, max)
-	local sep = OWS * lpeg.P"," * OWS
-	local extra = sep^1 * element
-	local patt = element
-	if min then
-		for _=2, min do
-			patt = patt * extra
+local comma_sep do
+	local sep = OWS * lpeg.P "," * OWS
+	local optional_sep = (lpeg.P"," + core.SP + core.HTAB)^0
+	comma_sep = function(element, min, max)
+		local extra = sep * optional_sep * element
+		local patt = element
+		if min then
+			for _=2, min do
+				patt = patt * extra
+			end
+		else
+			min = 0
+			patt = patt^-1
 		end
-	else
-		min = 0
+		if max then
+			local more = max-min-1
+			patt = patt * extra^-more
+		else
+			patt = patt * extra^0
+		end
+		patt = optional_sep * patt * optional_sep -- allow leading + trailing
+		return patt
 	end
-	if max then
-		local more = max-min
-		patt = patt * extra^-more
-	else
-		patt = patt * extra^0
-	end
-	if min == 0 then
-		patt = patt^-1
-	end
-	patt = sep^0 * patt * sep^0 -- allow trailing or leading whitespace and commas
-	return patt
 end
 
 -- RFC 7230 Section 2.7
