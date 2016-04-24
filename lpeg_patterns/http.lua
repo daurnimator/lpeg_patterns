@@ -323,6 +323,32 @@ local other_range_resp = core.CHAR^0
 local other_content_range = other_range_unit * core.SP * other_range_resp
 local Content_Range = byte_content_range + other_content_range
 
+-- RFC 7234 Section 1.2.1
+local delta_seconds = core.DIGIT^1
+
+-- RFC 7234 Section 5.1
+local Age = delta_seconds
+
+-- RFC 7234 Section 5.2
+local cache_directive = token * (P"=" * (token + quoted_string))^-1
+local Cache_Control = comma_sep(cache_directive, 1)
+
+-- RFC 7234 Section 5.3
+local Expires = HTTP_date
+
+-- RFC 7234 Section 5.4
+local extension_pragma = token * (P"=" * (token + quoted_string))^-1
+local pragma_directive = "no_cache" + extension_pragma
+local Pragma = comma_sep(pragma_directive, 1)
+
+-- RFC 7234 Section 5.5
+local warn_code = core.DIGIT * core.DIGIT * core.DIGIT
+local warn_agent = (uri.host * (P":" * uri.port)^-1) + pseudonym
+local warn_text = quoted_string
+local warn_date = core.DQUOTE * HTTP_date * core.DQUOTE
+local warning_value = warn_code * core.SP * warn_agent * core.SP * warn_text * (core.SP * warn_date)^-1
+local Warning = comma_sep(warning_value, 1)
+
 return {
 	OWS = OWS;
 	RWS = RWS;
@@ -374,4 +400,10 @@ return {
 	If_Range = If_Range;
 	Content_Range = Content_Range;
 	Range = Range;
+
+	Age = Age;
+	Cache_Control = Cache_Control;
+	Expires = Expires;
+	Pragma = Pragma;
+	Warning = Warning;
 }
