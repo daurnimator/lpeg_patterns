@@ -138,18 +138,21 @@ local media_type = Cg(type, "type") * P"/" * Cg(subtype, "subtype")
 local charset = token / string.lower -- case insensitive
 local Content_Type = Ct(media_type)
 
+-- RFC 7231 Section 3.1.4.2
+-- local Content_Location = uri.absolute_uri + partial_uri
+
 -- RFC 7231 Section 5.3.1
 local qvalue = rank -- luacheck: ignore 211
 local weight = t_ranking
 
 -- RFC 7231 Section 5.3.2
-local media_range = ( "*/*"
-	+ (type * P"/*")
-	+ (type * P"/" * subtype)
-) * (OWS * ";" * OWS * parameter)^0
+local media_range = (P"*/*"
+	+ (Cg(type, "type") * P"/*")
+	+ (Cg(type, "type") * P"/" * Cg(subtype, "subtype"))
+) * Cg(Cf(Ct(true) * (OWS * ";" * OWS * Cg(parameter) - weight)^0, rawset), "parameters")
 local accept_ext = OWS * P";" * OWS * token * (P"=" * (token + quoted_string))^-1
-local accept_params = weight * (accept_ext)^0
-local Accept = comma_sep(media_range * accept_params^-1)
+local accept_params = Cg(weight, "q") * Cg(Cf(Ct(true) * Cg(accept_ext)^0, rawset), "extensions")
+local Accept = comma_sep(Ct(media_range * (accept_params+Cg(Ct(true), "extensions"))))
 
 -- RFC 7231 Section 5.3.3
 local Accept_Charset = comma_sep((charset + P"*") * weight^-1, 1)

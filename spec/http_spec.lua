@@ -36,9 +36,38 @@ describe("http patterns", function()
 		local Content_Type = http.Content_Type * EOF
 		assert.same({ type = "foo", subtype = "bar", parameters = {}}, Content_Type:match("foo/bar"))
 		assert.same({ type = "foo", subtype = "bar", parameters = {param="value"}}, Content_Type:match("foo/bar;param=value"))
+		-- Examples from RFC7231 3.1.1.1.
 		assert.same({ type = "text", subtype = "html", parameters = {charset="utf-8"}}, Content_Type:match([[text/html;charset=utf-8]]))
+		-- assert.same({ type = "text", subtype = "html", parameters = {charset="utf-8"}}, Content_Type:match([[text/html;charset=UTF-8]]))
 		assert.same({ type = "text", subtype = "html", parameters = {charset="utf-8"}}, Content_Type:match([[Text/HTML;Charset="utf-8"]]))
 		assert.same({ type = "text", subtype = "html", parameters = {charset="utf-8"}}, Content_Type:match([[text/html; charset="utf-8"]]))
+	end)
+	it("Parses an Accept header", function()
+		local Accept = lpeg.Ct(http.Accept) * EOF
+		assert.same({{type = "foo", subtype = "bar", parameters = {}, q = nil, extensions = {}}}, Accept:match("foo/bar"))
+		assert.same({
+				{type = "audio", subtype = nil, parameters = {}, q = 0.2, extensions = {}};
+				{type = "audio", subtype = "basic", parameters = {}, q = nil, extensions = {}};
+			}, Accept:match("audio/*; q=0.2, audio/basic"))
+		assert.same({
+				{type = "text", subtype = "plain", parameters = {}, q = 0.5, extensions = {}};
+				{type = "text", subtype = "html", parameters = {}, q = nil, extensions = {}};
+				{type = "text", subtype = "x-dvi", parameters = {}, q = 0.8, extensions = {}};
+				{type = "text", subtype = "x-c", parameters = {}, q = nil, extensions = {}};
+			}, Accept:match("text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c"))
+		assert.same({
+				{type = "text", subtype = nil, parameters = {}, extensions = {}};
+				{type = "text", subtype = "plain", parameters = {}, extensions = {}};
+				{type = "text", subtype = "plain", parameters = {format = "flowed"}, extensions = {}};
+				{type = nil, subtype = nil, parameters = {}, extensions = {}};
+			}, Accept:match("text/*, text/plain, text/plain;format=flowed, */*"))
+		assert.same({
+				{type = "text", subtype = nil, parameters = {}, q = 0.3, extensions = {}};
+				{type = "text", subtype = "html", parameters = {}, q = 0.7, extensions = {}};
+				{type = "text", subtype = "html", parameters = {level = "1"}, q = nil, extensions = {}};
+				{type = "text", subtype = "html", parameters = {level = "2"}, q = 0.4, extensions = {}};
+				{type = nil, subtype = nil, parameters = {}, q = 0.5, extensions = {}};
+			}, Accept:match("text/*;q=0.3, text/html;q=0.7, text/html;level=1,text/html;level=2;q=0.4, */*;q=0.5"))
 	end)
 	it("Matches the 3 date formats", function()
 		local Date = http.Date * EOF
