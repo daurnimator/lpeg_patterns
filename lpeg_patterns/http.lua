@@ -152,6 +152,10 @@ local Accept = comma_sep(media_range * accept_params^-1)
 -- RFC 7231 Section 5.3.3
 local Accept_Charset = comma_sep((charset + P"*") * weight^-1, 1)
 
+-- RFC 7231 Section 5.3.4
+local codings = content_coding + "*"
+local Accept_Encoding = comma_sep(codings * weight^-1)
+
 -- RFC 7231 Section 7.1.1.1
 -- Uses os.date field names
 local day_name = Cg(P"Mon"*Cc(2), "wday")
@@ -240,6 +244,7 @@ return {
 
 	Accept = Accept;
 	Accept_Charset = Accept_Charset;
+	Accept_Encoding = Accept_Encoding;
 	Content_Encoding = Content_Encoding;
 	Content_Type = Content_Type;
 	Date = Date;
