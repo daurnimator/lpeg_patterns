@@ -288,6 +288,41 @@ local If_Modified_Since = HTTP_date
 -- RFC 7232 Section 3.4
 local If_Unmodified_Since = HTTP_date
 
+-- RFC 7233
+local bytes_unit = P"bytes"
+local other_range_unit = token
+local range_unit = C(bytes_unit) + other_range_unit
+
+local first_byte_pos = core.DIGIT^1 / tonumber
+local last_byte_pos = core.DIGIT^1 / tonumber
+local byte_range_spec = first_byte_pos * P"-" * last_byte_pos^-1
+local suffix_length = core.DIGIT^1 / tonumber
+local suffix_byte_range_spec = Cc(nil) * P"-" * suffix_length
+local byte_range_set = comma_sep(byte_range_spec + suffix_byte_range_spec, 1)
+local byte_ranges_specifier = bytes_unit * P"=" * byte_range_set
+
+-- RFC 7233 Section 2.3
+local acceptable_ranges = comma_sep(range_unit, 1) + P"none"
+local Accept_Ranges = acceptable_ranges
+
+-- RFC 7233 Section 3.1
+local other_range_set = core.VCHAR^1
+local other_ranges_specifier = other_range_unit * P"=" * other_range_set
+local Range = byte_ranges_specifier + other_ranges_specifier
+
+-- RFC 7233 Section 3.2
+local If_Range = entity_tag + HTTP_date
+
+-- RFC 7233 Section 4.2
+local complete_length = core.DIGIT^1 / tonumber
+local unsatisfied_range = P"*/" * complete_length
+local byte_range = first_byte_pos * P"-" * last_byte_pos
+local byte_range_resp = byte_range * P"/" * (complete_length + P"*")
+local byte_content_range = bytes_unit * core.SP * (byte_range_resp + unsatisfied_range)
+local other_range_resp = core.CHAR^0
+local other_content_range = other_range_unit * core.SP * other_range_resp
+local Content_Range = byte_content_range + other_content_range
+
 return {
 	OWS = OWS;
 	RWS = RWS;
@@ -334,4 +369,9 @@ return {
 	If_None_Match = If_None_Match;
 	If_Modified_Since = If_Modified_Since;
 	If_Unmodified_Since = If_Unmodified_Since;
+
+	Accept_Ranges = Accept_Ranges;
+	If_Range = If_Range;
+	Content_Range = Content_Range;
+	Range = Range;
 }
