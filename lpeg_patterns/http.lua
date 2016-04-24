@@ -349,6 +349,19 @@ local warn_date = core.DQUOTE * HTTP_date * core.DQUOTE
 local warning_value = warn_code * core.SP * warn_agent * core.SP * warn_text * (core.SP * warn_date)^-1
 local Warning = comma_sep(warning_value, 1)
 
+-- RFC 7235 Section 2
+local auth_scheme = token
+local auth_param = token * BWS * P"=" * BWS * (token + quoted_string)
+local token68 = (core.ALPHA + core.DIGIT + P"-" + P"." + P"_" + P"~" + P"+" + P"/" )^1 * (P"=")^0
+local challenge = auth_scheme * (core.SP^1 * (token68 + comma_sep(auth_param)))^-1
+local credentials = auth_scheme * (core.SP^1 * (token68 + comma_sep(auth_param)))^-1
+
+-- RFC 7235 Section 4
+local WWW_Authenticate = comma_sep(challenge, 1)
+local Authorization = credentials
+local Proxy_Authenticate = comma_sep(challenge, 1)
+local Proxy_Authorization = credentials
+
 return {
 	OWS = OWS;
 	RWS = RWS;
@@ -406,4 +419,9 @@ return {
 	Expires = Expires;
 	Pragma = Pragma;
 	Warning = Warning;
+
+	WWW_Authenticate = WWW_Authenticate;
+	Authorization = Authorization;
+	Proxy_Authenticate = Proxy_Authenticate;
+	Proxy_Authorization = Proxy_Authorization;
 }
