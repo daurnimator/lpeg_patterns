@@ -99,11 +99,11 @@ _M.uri = Ct (
 	* ( P"#" * Cg(_M.fragment, "fragment"))^-1
 )
 
-local relative_part = P"//" * _M.authority * Cg(path_abempty, "path")
+_M.relative_part = P"//" * _M.authority * Cg(path_abempty, "path")
 	+ Cg(path_absolute + path_noscheme + path_empty, "path")
 
 local relative_ref = Ct (
-	relative_part
+	_M.relative_part
 	* ( P"?" * Cg(_M.query, "query"))^-1
 	* ( P"#" * Cg(_M.fragment, "fragment"))^-1
 )
