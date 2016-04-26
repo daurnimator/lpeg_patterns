@@ -2,6 +2,12 @@ describe("http patterns", function()
 	local http = require "lpeg_patterns.http"
 	local lpeg = require "lpeg"
 	local EOF = lpeg.P(-1)
+	it("Parses an Origin header", function()
+		local Origin = lpeg.Ct(http.Origin) * EOF
+		assert.same({}, Origin:match("null"))
+		assert.same({"http://example.com"}, Origin:match("http://example.com"))
+		assert.same({"http://example.com", "https://foo.org"}, Origin:match("http://example.com https://foo.org"))
+	end)
 	it("Splits a request line", function()
 		local request_line = lpeg.Ct(http.request_line) * EOF
 		assert.same({"GET", "/", 1.0}, request_line:match("GET / HTTP/1.0\r\n"))

@@ -26,7 +26,8 @@ _M.RWS = (core.SP + core.HTAB)^1
 _M.BWS = _M.OWS
 
 -- RFC 6454
-local serialized_origin = uri.scheme * P"://" * uri.host * (P":" * uri.port)
+-- discard captures from scheme, host, port and just get whole string
+local serialized_origin = C(uri.scheme * P"://" * uri.host * (P":" * uri.port)^-1/function() end)
 local origin_list = serialized_origin * (core.SP * serialized_origin)^0
 local origin_list_or_null = P"null" + origin_list
 _M.Origin = _M.OWS * origin_list_or_null * _M.OWS
