@@ -106,9 +106,9 @@ describe("http patterns", function()
 			Expires = "Sun Nov  6 08:49:37 1994";
 		}}, Set_Cookie:match"SID=31d4d96e407aad42; Path=/; Domain=example.com; Secure; Expires=Sun Nov  6 08:49:37 1994")
 		-- Space before '='
-		assert.same({"SID", "31d4d96e407aad42", {
-			Path = "/";
-		}}, Set_Cookie:match"SID=31d4d96e407aad42; Path =/")
+		assert.same({"SID", "31d4d96e407aad42", {Path = "/";}}, Set_Cookie:match"SID=31d4d96e407aad42; Path =/")
+		-- Quoted cookie value
+		assert.same({"SID", "31d4d96e407aad42", {Path = "/";}}, Set_Cookie:match[[SID="31d4d96e407aad42"; Path=/]])
 	end)
 	it("Parses a Cookie header", function()
 		local Cookie = http.Cookie * EOF

@@ -281,7 +281,7 @@ _M.Server = product * (_M.RWS * (product + _M.comment))^0
 do -- RFC 6265
 	local cookie_name = _M.token
 	local cookie_octet = S"!" + R("\35\43", "\45\58", "\60\91", "\93\126")
-	local cookie_value = C(cookie_octet^0) + core.DQUOTE * C(cookie_octet^0) * core.DQUOTE
+	local cookie_value = core.DQUOTE * C(cookie_octet^0) * core.DQUOTE + C(cookie_octet^0)
 	local cookie_pair = cookie_name * _M.BWS * P"=" * _M.BWS * cookie_value
 
 	local ext_char = core.CHAR - core.CTL - S";"
