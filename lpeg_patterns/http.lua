@@ -371,6 +371,10 @@ local Forwarded = comma_sep(forwarded_element)
 -- RFC 7486
 local Hobareg = C"regok" + C"reginwork"
 
+-- RFC 7615
+local Authentication_Info = comma_sep(auth_param)
+local Proxy_Authentication_Info = comma_sep(auth_param)
+
 return {
 	OWS = OWS;
 	RWS = RWS;
@@ -437,4 +441,7 @@ return {
 	Forwarded = Forwarded;
 
 	Hobareg = Hobareg;
+
+	Authentication_Info = Authentication_Info;
+	Proxy_Authentication_Info = Proxy_Authentication_Info;
 }
