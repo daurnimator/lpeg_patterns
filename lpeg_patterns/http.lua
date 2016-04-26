@@ -375,6 +375,10 @@ local Hobareg = C"regok" + C"reginwork"
 local Authentication_Info = comma_sep(auth_param)
 local Proxy_Authentication_Info = comma_sep(auth_param)
 
+-- RFC 7639
+local protocol_id = token
+local ALPN = comma_sep(protocol_id, 1)
+
 return {
 	OWS = OWS;
 	RWS = RWS;
@@ -444,4 +448,6 @@ return {
 
 	Authentication_Info = Authentication_Info;
 	Proxy_Authentication_Info = Proxy_Authentication_Info;
+
+	ALPN = ALPN;
 }
