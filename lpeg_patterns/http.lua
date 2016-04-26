@@ -379,6 +379,9 @@ local Proxy_Authentication_Info = comma_sep(auth_param)
 local protocol_id = token
 local ALPN = comma_sep(protocol_id, 1)
 
+-- RFC 7809
+local CalDAV_Timezones = P"T" + P"F"
+
 -- RFC 7838
 local clear = C"clear" -- case-sensitive
 local alt_authority = quoted_string -- containing [ uri_host ] ":" port
@@ -458,6 +461,8 @@ return {
 	Proxy_Authentication_Info = Proxy_Authentication_Info;
 
 	ALPN = ALPN;
+
+	CalDAV_Timezones = CalDAV_Timezones;
 
 	Alt_Svc = Alt_Svc;
 	Alt_Used = Alt_Used;
