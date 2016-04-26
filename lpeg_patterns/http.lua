@@ -278,6 +278,16 @@ _M.Allow = comma_sep(method)
 -- RFC 7231 Section 7.4.2
 _M.Server = product * (_M.RWS * (product + _M.comment))^0
 
+do -- RFC 6265
+	local cookie_name = _M.token
+	local cookie_octet = S"!" + R("\35\43", "\45\58", "\60\91", "\93\126")
+	local cookie_value = C(cookie_octet^0) + core.DQUOTE * C(cookie_octet^0) * core.DQUOTE
+	local cookie_pair = cookie_name * _M.BWS * P"=" * _M.BWS * cookie_value
+
+	local cookie_string = Cf(Ct(true) * Cg(cookie_pair) * (P";" * _M.OWS * Cg(cookie_pair))^0, rawset)
+	_M.Cookie = cookie_string
+end
+
 -- RFC 7232 Section 2.2
 _M.Last_Modified = HTTP_date
 
