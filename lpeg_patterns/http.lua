@@ -284,6 +284,13 @@ do -- RFC 6265
 	local cookie_value = C(cookie_octet^0) + core.DQUOTE * C(cookie_octet^0) * core.DQUOTE
 	local cookie_pair = cookie_name * _M.BWS * P"=" * _M.BWS * cookie_value
 
+	local ext_char = core.CHAR - core.CTL - S";"
+	-- Complexity is to make sure whitespace before an `=` isn't captured
+	local extension_av = C(((ext_char - S"=" - core.SP - core.HTAB) + _M.RWS * #(1-S"="))^0) * _M.BWS * P"=" * _M.BWS * C(ext_char^0) + C(ext_char^0) * Cc(true)
+	local cookie_av = extension_av
+	local set_cookie_string = cookie_pair * Cf(Ct(true) * (P";" * _M.OWS * Cg(cookie_av))^0, rawset)
+	_M.Set_Cookie = set_cookie_string
+
 	local cookie_string = Cf(Ct(true) * Cg(cookie_pair) * (P";" * _M.OWS * Cg(cookie_pair))^0, rawset)
 	_M.Cookie = cookie_string
 end

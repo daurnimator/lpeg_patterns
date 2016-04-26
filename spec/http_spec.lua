@@ -95,6 +95,21 @@ describe("http patterns", function()
 		assert.same(example_time, Date:match"Sunday, 06-Nov-94 08:49:37 GMT")
 		assert.same(example_time, Date:match"Sun Nov  6 08:49:37 1994")
 	end)
+	it("Parses a Set-Cookie header", function()
+		local Set_Cookie = lpeg.Ct(http.Set_Cookie) * EOF
+		assert.same({"SID", "31d4d96e407aad42", {}}, Set_Cookie:match"SID=31d4d96e407aad42")
+		assert.same({"SID", "31d4d96e407aad42", {Path="/"; Domain="example.com"}}, Set_Cookie:match"SID=31d4d96e407aad42; Path=/; Domain=example.com")
+		assert.same({"SID", "31d4d96e407aad42", {
+			Path = "/";
+			Domain = "example.com";
+			Secure = true;
+			Expires = "Sun Nov  6 08:49:37 1994";
+		}}, Set_Cookie:match"SID=31d4d96e407aad42; Path=/; Domain=example.com; Secure; Expires=Sun Nov  6 08:49:37 1994")
+		-- Space before '='
+		assert.same({"SID", "31d4d96e407aad42", {
+			Path = "/";
+		}}, Set_Cookie:match"SID=31d4d96e407aad42; Path =/")
+	end)
 	it("Parses a Cookie header", function()
 		local Cookie = http.Cookie * EOF
 		assert.same({SID = "31d4d96e407aad42"}, Cookie:match"SID=31d4d96e407aad42")
