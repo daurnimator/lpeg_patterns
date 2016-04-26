@@ -379,6 +379,14 @@ local Proxy_Authentication_Info = comma_sep(auth_param)
 local protocol_id = token
 local ALPN = comma_sep(protocol_id, 1)
 
+-- RFC 7838
+local clear = C"clear" -- case-sensitive
+local alt_authority = quoted_string -- containing [ uri_host ] ":" port
+local alternative = protocol_id * P"=" * alt_authority
+local alt_value = alternative * (OWS * P";" * OWS * parameter)^0
+local Alt_Svc = clear + comma_sep(alt_value, 1)
+local Alt_Used = uri.host * (P":" * uri.port)^-1
+
 return {
 	OWS = OWS;
 	RWS = RWS;
@@ -450,4 +458,7 @@ return {
 	Proxy_Authentication_Info = Proxy_Authentication_Info;
 
 	ALPN = ALPN;
+
+	Alt_Svc = Alt_Svc;
+	Alt_Used = Alt_Used;
 }
