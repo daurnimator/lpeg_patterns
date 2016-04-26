@@ -368,6 +368,9 @@ local forwarded_pair = token * P"=" * value
 local forwarded_element = forwarded_pair^-1 * (P";" * forwarded_pair^-1)^0
 local Forwarded = comma_sep(forwarded_element)
 
+-- RFC 7486
+local Hobareg = C"regok" + C"reginwork"
+
 return {
 	OWS = OWS;
 	RWS = RWS;
@@ -432,4 +435,6 @@ return {
 	Proxy_Authorization = Proxy_Authorization;
 
 	Forwarded = Forwarded;
+
+	Hobareg = Hobareg;
 }
