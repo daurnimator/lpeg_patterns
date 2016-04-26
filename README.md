@@ -73,7 +73,7 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `userinfo` (pattern): matches the userinfo portion of a URI
   - `host` (pattern): matches the host portion of a URI
   - `port` (pattern): matches the port portion of a URI
-  - `authority` (pattern): matches the authority portion of a URI
+  - `authority` (pattern): matches the authority portion of a URI; data is held in named group captures of `"userinfo"`, `"host"`, `"port"`
   - `path` (pattern): matches the path portion of a URI
   - `segment` (pattern): matches a path segment (a piece of a path without a `/`)
   - `query` (pattern): matches the query portion of a URI
