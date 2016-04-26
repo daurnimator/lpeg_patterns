@@ -324,7 +324,7 @@ local other_content_range = other_range_unit * core.SP * other_range_resp
 local Content_Range = byte_content_range + other_content_range
 
 -- RFC 7234 Section 1.2.1
-local delta_seconds = core.DIGIT^1
+local delta_seconds = core.DIGIT^1 / tonumber
 
 -- RFC 7234 Section 5.1
 local Age = delta_seconds
