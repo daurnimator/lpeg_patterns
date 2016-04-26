@@ -31,7 +31,7 @@ local pct_encoded = P"%" * C ( HEXDIG * HEXDIG ) / read_hex / strchar -- 2.1
 local sub_delims  = S"!$&'()*+,;=" -- 2.2
 local unreserved  = ALPHA + DIGIT + S"-._~" -- 2.3
 
-local scheme      = C ( ALPHA * ( ALPHA + DIGIT + S"+-." )^0 ) -- 3.1
+_M.scheme = C(ALPHA * (ALPHA + DIGIT + S"+-.")^0) -- 3.1
 
 local userinfo    = Cs((unreserved + pct_encoded + sub_delims + P":")^0) -- 3.2.1
 
@@ -87,13 +87,13 @@ local hier_part = P"//" * _M.authority * Cg (path_abempty, "path")
 	+ Cg(path_absolute + path_rootless + path_empty, "path")
 
 _M.absolute_uri = Ct (
-	( Cg ( scheme , "scheme" ) * P":" )
+	( Cg(_M.scheme, "scheme") * P":" )
 	* hier_part
 	* ( P"?" * Cg(_M.query, "query"))^-1
 )
 
 _M.uri = Ct (
-	( Cg ( scheme , "scheme" ) * P":" )
+	( Cg(_M.scheme, "scheme") * P":" )
 	* hier_part
 	* ( P"?" * Cg(_M.query, "query"))^-1
 	* ( P"#" * Cg(_M.fragment, "fragment"))^-1
@@ -124,7 +124,7 @@ _M.sane_authority = ( Cg(userinfo, "userinfo") * P"@" )^-1
 	* ( P":" * Cg(_M.port, "port") )^-1
 local sane_hier_part = (P"//")^-1 * _M.sane_authority * Cg(path_absolute + path_empty, "path")
 _M.sane_uri = Ct (
-	( Cg ( scheme , "scheme" ) * P":" )^-1
+	( Cg(_M.scheme, "scheme") * P":" )^-1
 	* sane_hier_part
 	* ( P"?" * Cg(_M.query, "query"))^-1
 	* ( P"#" * Cg(_M.fragment, "fragment"))^-1
