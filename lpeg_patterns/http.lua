@@ -23,6 +23,12 @@ local OWS = (core.SP + core.HTAB)^0
 local RWS = (core.SP + core.HTAB)^1
 local BWS = OWS
 
+-- RFC 6454
+local serialized_origin = uri.scheme * P"://" * uri.host * (P":" * uri.port)
+local origin_list = serialized_origin * (core.SP * serialized_origin)^0
+local origin_list_or_null = P"null" + origin_list
+local Origin = OWS * origin_list_or_null * OWS
+
 -- Analogue to RFC 7320 Section 7's ABNF extension of '#'
 local comma_sep do
 	local sep = OWS * lpeg.P "," * OWS
@@ -407,6 +413,8 @@ return {
 	field_value = field_value;
 	header_field = header_field;
 	chunk_ext = chunk_ext;
+
+	Origin = Origin;
 
 	Connection = Connection;
 	Content_Length = Content_Length;
