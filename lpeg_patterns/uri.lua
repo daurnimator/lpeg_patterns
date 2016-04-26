@@ -33,7 +33,7 @@ local unreserved  = ALPHA + DIGIT + S"-._~" -- 2.3
 
 _M.scheme = C(ALPHA * (ALPHA + DIGIT + S"+-.")^0) -- 3.1
 
-local userinfo    = Cs((unreserved + pct_encoded + sub_delims + P":")^0) -- 3.2.1
+_M.userinfo = Cs((unreserved + pct_encoded + sub_delims + P":")^0) -- 3.2.1
 
 -- Host 3.2.2
 
@@ -79,7 +79,7 @@ _M.query = Cs( ( pchar + S"/?" )^0 ) -- 3.4
 _M.fragment = _M.query -- 3.5
 
 -- Put together with named captures
-_M.authority = ( Cg(userinfo, "userinfo") * P"@" )^-1
+_M.authority = ( Cg(_M.userinfo, "userinfo") * P"@" )^-1
 	* Cg(_M.host, "host")
 	* ( P":" * Cg(_M.port, "port") )^-1
 
@@ -119,7 +119,7 @@ _M.path = path_abempty + path_absolute + path_noscheme + path_rootless + path_em
 local hostsegment = (host_char-P".")^1
 local dns_entry   = Cs ( ( hostsegment * P"." )^1 * ALPHA^2 )
 _M.sane_host = IP_host + dns_entry
-_M.sane_authority = ( Cg(userinfo, "userinfo") * P"@" )^-1
+_M.sane_authority = ( Cg(_M.userinfo, "userinfo") * P"@" )^-1
 	* Cg(_M.sane_host, "host")
 	* ( P":" * Cg(_M.port, "port") )^-1
 local sane_hier_part = (P"//")^-1 * _M.sane_authority * Cg(path_absolute + path_empty, "path")
