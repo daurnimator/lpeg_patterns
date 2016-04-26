@@ -55,6 +55,7 @@ local HTTP_version = HTTP_name * P"/" * (core.DIGIT * P"." * core.DIGIT / tonumb
 
 -- RFC 7230 Section 2.7
 local absolute_path = (P"/" * uri.segment )^1
+local partial_uri = Ct(uri.relative_part * (P"?" * uri.query)^-1)
 
 -- RFC 7230 Section 3.2.6
 local tchar = S "!#$%&'*+-.^_`|~" + core.DIGIT + core.ALPHA
@@ -147,7 +148,7 @@ local charset = token / string.lower -- case insensitive
 local Content_Type = Ct(media_type)
 
 -- RFC 7231 Section 3.1.4.2
--- local Content_Location = uri.absolute_uri + partial_uri
+local Content_Location = uri.absolute_uri + partial_uri
 
 -- RFC 7231 Section 5.1.1
 local Expect = P"100-"*S"cC"*S"oO"*S"nN"*S"tT"*S"iI"*S"nN"*S"uU"*S"eE" * Cc("100-continue")
@@ -181,6 +182,8 @@ local language_range = (core.ALPHA * core.ALPHA^-7 * (P"-" * alphanum * alphanum
 -- RFC 7231 Section 5.3.5
 local Accept_Language = comma_sep(language_range * weight^-1, 1 )
 
+-- RFC 7231 Section 5.5.2
+local Referer = uri.absolute_uri + partial_uri
 
 -- RFC 7231 Section 5.5.3
 local product_version = token
@@ -420,11 +423,13 @@ return {
 	Accept_Language = Accept_Language;
 	Allow = Allow;
 	Content_Encoding = Content_Encoding;
+	Content_Location = Content_Location;
 	Content_Type = Content_Type;
 	Date = Date;
 	Expect = Expect;
 	Location = Location;
 	Max_Forwards = Max_Forwards;
+	Referer = Referer;
 	Retry_After = Retry_After;
 	Server = Server;
 	User_Agent = User_Agent;
