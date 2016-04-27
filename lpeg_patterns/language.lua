@@ -3,38 +3,46 @@
 local lpeg = require "lpeg"
 local core = require "lpeg_patterns.core"
 
+local C = lpeg.C
 local P = lpeg.P
 local R = lpeg.R
+local Cf = lpeg.Cf
+local Cg = lpeg.Cg
+local Ct = lpeg.Ct
 
 local alphanum = core.ALPHA + core.DIGIT
 
-local extlang = core.ALPHA * core.ALPHA * core.ALPHA
-	* (P"-" * core.ALPHA * core.ALPHA * core.ALPHA)^2
+local extlang = core.ALPHA * core.ALPHA * core.ALPHA * -#alphanum
+	* (P"-" * core.ALPHA * core.ALPHA * core.ALPHA * -#alphanum)^-2
 
-local language = core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA^-3
-	+ core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA
-	+ core.ALPHA * core.ALPHA * core.ALPHA^-1 * (P"-" * extlang)^-1
+local language = Cg(core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA^-3, "language")
+	+ Cg(core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA, "language")
+	+ Cg(core.ALPHA * core.ALPHA * core.ALPHA^-1, "language") * (P"-" * Cg(extlang, "extlang"))^-1
 
-local script = core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA
+local script = core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA * -#alphanum
 
-local region = core.ALPHA * core.ALPHA
+local region = (
+	core.ALPHA * core.ALPHA
 	+ core.DIGIT * core.DIGIT * core.DIGIT
+) * -#alphanum
 
-local variant = alphanum * alphanum * alphanum * alphanum *alphanum * alphanum^-3
-	+ core.DIGIT * alphanum * alphanum * alphanum
+local variant = (
+	core.DIGIT * alphanum * alphanum * alphanum
+	+ alphanum * alphanum * alphanum * alphanum * alphanum * alphanum^-3
+)-- * -#alphanum
 
 local singleton = core.DIGIT + R("AW", "YZ", "aw", "yz")
 
-local extension = singleton * (P"-" * (alphanum*alphanum*alphanum^-6))^1
+local extension = C(singleton) * Ct((P"-" * (alphanum*alphanum*alphanum^-6 / string.lower))^1)
 
-local privateuse = P"x" * (P"-" * (alphanum*alphanum^-7))^1
+local privateuse = P"x" * Ct((P"-" * C(alphanum*alphanum^-7))^1)
 
 local langtag = language
-	* (P"-" * script)^-1
-	* (P"-" * region)^-1
-	* (P"-" * variant)^0
-	* (P"-" * extension)^0
-	* (P"-" * privateuse)^-1
+	* (P"-" * Cg(script, "script"))^-1
+	* (P"-" * Cg(region, "region"))^-1
+	* Cg(Ct((P"-" * C(variant))^0), "variant")
+	* Cg(Cf(Ct(true)*(P"-" * Cg(extension))^0, rawset), "extension")
+	* (P"-" * Cg(privateuse, "privateuse"))^-1
 
 local irregular = P"en-GB-oed"
 	+ P"i-ami"
@@ -54,19 +62,21 @@ local irregular = P"en-GB-oed"
 	+ P"sgn-BE-NL"
 	+ P"sgn-CH-DE"
 
-local regular = P"art-lojban"
-	+ P"cel-gaulish"
-	+ P"no-bok"
-	+ P"no-nyn"
-	+ P"zh-guoyu"
-	+ P"zh-hakka"
-	+ P"zh-min"
-	+ P"zh-min-nan"
-	+ P"zh-xiang"
+local regular = P"art" * P"-" * P"lojban"
+	+ P"cel" * P"-" * P"gaulish"
+	+ P"no" * P"-" * P"bok"
+	+ P"no" * P"-" * P"nyn"
+	+ P"zh" * P"-" * P"guoyu"
+	+ P"zh" * P"-" * P"hakka"
+	+ P"zh" * P"-" * P"min"
+	+ P"zh" * P"-" * P"min" * P"-" * P"nan"
+	+ P"zh" * P"-" * P"xiang"
 
 local grandfathered = irregular + regular
 
-local Language_Tag = langtag + privateuse + grandfathered
+local Language_Tag = langtag
+	+ Cg(privateuse, "privateuse") * Cg(Ct(true), "variant") * Cg(Ct(true), "extension")
+	+ grandfathered
 
 return {
 	Language_Tag = Language_Tag;
