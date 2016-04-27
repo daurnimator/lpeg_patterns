@@ -27,13 +27,13 @@ end
 
 local _M = {}
 
-local pct_encoded = P"%" * C ( HEXDIG * HEXDIG ) / read_hex / strchar -- 2.1
+_M.pct_encoded = P"%" * C ( HEXDIG * HEXDIG ) / read_hex / strchar -- 2.1
 local sub_delims  = S"!$&'()*+,;=" -- 2.2
 local unreserved  = ALPHA + DIGIT + S"-._~" -- 2.3
 
 _M.scheme = C(ALPHA * (ALPHA + DIGIT + S"+-.")^0) -- 3.1
 
-_M.userinfo = Cs((unreserved + pct_encoded + sub_delims + P":")^0) -- 3.2.1
+_M.userinfo = Cs((unreserved + _M.pct_encoded + sub_delims + P":")^0) -- 3.2.1
 
 -- Host 3.2.2
 
@@ -47,7 +47,7 @@ end
 local IPvFuture   = P"v" * (HEXDIG^1/read_hex) * P"." * C((unreserved+sub_delims+P":")^1) / new_IPvFuture
 
 -- RFC 6874
-local ZoneID      = Cs ( (unreserved + pct_encoded )^1 )
+local ZoneID = Cs((unreserved + _M.pct_encoded)^1)
 local IPv6addrz   = IPv6address * (P"%25" * ZoneID)^-1 / function(IPv6, zoneid)
 	IPv6:setzoneid(zoneid)
 	return IPv6
@@ -55,14 +55,14 @@ end
 
 local IP_literal  = P"[" * ( IPv6addrz + IPvFuture ) * P"]"
 local IP_host     = ( IP_literal + IPv4address ) / tostring
-local host_char   = unreserved + pct_encoded --+ sub_delims
+local host_char   = unreserved + _M.pct_encoded --+ sub_delims
 local reg_name    = Cs ( host_char^1 ) + Cc ( nil )
 _M.host = IP_host + reg_name
 
 _M.port = DIGIT^0 / tonumber -- 3.2.3
 
 -- Path 3.3
-local pchar = unreserved + pct_encoded + sub_delims + S":@"
+local pchar = unreserved + _M.pct_encoded + sub_delims + S":@"
 local segment = pchar^0
 _M.segment = Cs(segment)
 local segment_nz = pchar^1
