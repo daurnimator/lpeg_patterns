@@ -13,6 +13,8 @@ local Cg = lpeg.Cg
 local Cs = lpeg.Cs
 local Ct = lpeg.Ct
 
+local util = require "lpeg_patterns.util"
+
 local core = require "lpeg_patterns.core"
 local ALPHA = core.ALPHA
 local DIGIT = core.DIGIT
@@ -21,13 +23,9 @@ local HEXDIG = core.HEXDIG
 local IPv4address = require "lpeg_patterns.IPv4".IPv4address
 local IPv6address = require "lpeg_patterns.IPv6".IPv6address
 
-local function read_hex(hex_num)
-	return tonumber(hex_num, 16)
-end
-
 local _M = {}
 
-_M.pct_encoded = P"%" * C ( HEXDIG * HEXDIG ) / read_hex / strchar -- 2.1
+_M.pct_encoded = P"%" * C(HEXDIG * HEXDIG) / util.read_hex / strchar -- 2.1
 local sub_delims  = S"!$&'()*+,;=" -- 2.2
 local unreserved  = ALPHA + DIGIT + S"-._~" -- 2.3
 
@@ -44,7 +42,7 @@ end
 local function new_IPvFuture(version, string)
 	return setmetatable({version=version, string=string}, IPvFuture_mt)
 end
-local IPvFuture   = P"v" * (HEXDIG^1/read_hex) * P"." * C((unreserved+sub_delims+P":")^1) / new_IPvFuture
+local IPvFuture = P"v" * (HEXDIG^1/util.read_hex) * P"." * C((unreserved+sub_delims+P":")^1) / new_IPvFuture
 
 -- RFC 6874
 local ZoneID = Cs((unreserved + _M.pct_encoded)^1)

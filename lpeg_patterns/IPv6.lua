@@ -1,12 +1,13 @@
 -- IPv6
 
-local tonumber = tonumber
 local unpack = table.unpack or unpack -- luacheck: ignore 113
 
 local lpeg = require "lpeg"
 local P = lpeg.P
 local Cc = lpeg.Cc
 local Cg = lpeg.Cg
+
+local util = require "lpeg_patterns.util"
 
 local core = require "lpeg_patterns.core"
 local HEXDIG = core.HEXDIG
@@ -56,7 +57,7 @@ function IPv6_mt:__tostring()
 end
 
 -- RFC 3986 Section 3.2.2
-local h16 = HEXDIG * HEXDIG^-3 / function ( x ) return tonumber ( x , 16 ) end
+local h16 = HEXDIG * HEXDIG^-3 / util.read_hex
 local h16c = h16 * P":"
 local ls32 = ( h16c * h16 ) + IPv4address / function ( ipv4 )
 	local o1, o2, o3, o4 = ipv4:unpack()
