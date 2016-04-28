@@ -18,6 +18,7 @@ source = {
 build = {
 	type = "builtin";
 	modules = {
+		["lpeg_patterns.util"] = "lpeg_patterns/util.lua";
 		["lpeg_patterns.core"] = "lpeg_patterns/core.lua";
 		["lpeg_patterns.IPv4"] = "lpeg_patterns/IPv4.lua";
 		["lpeg_patterns.IPv6"] = "lpeg_patterns/IPv6.lua";
