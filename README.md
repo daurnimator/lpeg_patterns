@@ -88,7 +88,9 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
 
 ### `email`
 
-  - `email` (pattern): follows [RFC-5322 section 3.4.1](http://tools.ietf.org/html/rfc5322#section-3.4.1)
+  - `email` (pattern): also known as an "addr-spec"; follows [RFC-5322 section 3.4.1](http://tools.ietf.org/html/rfc5322#section-3.4.1)
+    Has captures of the local_part and the domain
+    Be careful trying to reconstruct the email address from the captures; you may need escaping
   - `local_part` (pattern): the bit before the `@` in an email address
   - `domain` (pattern): the bit after the `@` in an email address
   - `email_nocfws` (pattern): a variant that doesn't allow for comments or folding whitespace
