@@ -78,6 +78,7 @@ return {
 	local_part = local_part;
 	domain = domain;
 	email = addr_spec;
+	name_addr = name_addr;
 	mailbox = mailbox;
 
 	-- A variant that does not allow comments or folding whitespace
