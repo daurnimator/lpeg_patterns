@@ -88,6 +88,8 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
 
 ### `email`
 
+  - `mailbox` (pattern): the mailbox format, i.e. `Display Name<email@example.com>` or an addr-spec.
+    Has captures of the local_part and the domain. Captures the display name in the named capture `"display"`
   - `email` (pattern): also known as an "addr-spec"; follows [RFC-5322 section 3.4.1](http://tools.ietf.org/html/rfc5322#section-3.4.1)
     Has captures of the local_part and the domain
     Be careful trying to reconstruct the email address from the captures; you may need escaping

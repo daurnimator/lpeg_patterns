@@ -7,6 +7,8 @@ local R = lpeg.R
 local S = lpeg.S
 local V = lpeg.V
 local C = lpeg.C
+local Cg = lpeg.Cg
+local Ct = lpeg.Ct
 local Cs = lpeg.Cs
 
 local core = require "lpeg_patterns.core"
@@ -34,6 +36,7 @@ local CFWS = ((FWS^-1 * comment)^1 * FWS^-1 + FWS ) / function() end
 -- Atom
 local specials      = S[=[()<>@,;:\".[]]=]
 local atext         = CHAR-specials-P" "-CTL
+local atom          = CFWS^-1 * C(atext^1) * CFWS^-1
 local dot_atom_text = C(atext^1 * ( P"." * atext^1 )^0)
 local dot_atom      = CFWS^-1 * dot_atom_text * CFWS^-1
 
@@ -42,6 +45,11 @@ local qtext              = S"\33"+R("\35\91","\93\126")
 local qcontent           = qtext + quoted_pair
 local quoted_string_text = DQUOTE * Cs((FWS^-1 * qcontent)^0) * FWS^-1 * DQUOTE
 local quoted_string      = CFWS^-1 * quoted_string_text * CFWS^-1
+
+-- Miscellaneous Tokens
+local word = atom + quoted_string
+local obs_phrase = C(word * (word + P"." + CFWS)^0 / function() end)
+local phrase = obs_phrase -- obs_phrase is more broad than `word^1`, it's really the same but allows "."
 
 -- Addr-spec
 local dtext               = R("\33\90","\94\126")
@@ -56,10 +64,21 @@ local domain         = dot_atom + domain_literal
 local local_part     = dot_atom + quoted_string
 local addr_spec      = local_part * P"@" * domain
 
+local display_name = phrase
+local obs_domain_list = (CFWS + P",")^0 * P"@" * domain
+	* (P"," * CFWS^-1 * (P"@" * domain)^-1)^0
+local obs_route = Cg(Ct(obs_domain_list) * P":", "route")
+local obs_angle_addr = CFWS^-1 * P"<" * obs_route * addr_spec * P">" * CFWS^-1
+local angle_addr = CFWS^-1 * P"<" * addr_spec * P">" * CFWS^-1
+	+ obs_angle_addr
+local name_addr = Cg(display_name, "display")^-1 * angle_addr
+local mailbox = name_addr + addr_spec
+
 return {
 	local_part = local_part;
 	domain = domain;
 	email = addr_spec;
+	mailbox = mailbox;
 
 	-- A variant that does not allow comments or folding whitespace
 	local_part_nocfws = local_part_text;
