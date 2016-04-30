@@ -6,6 +6,7 @@ https://tools.ietf.org/html/rfc7231
 local lpeg = require "lpeg"
 local core = require "lpeg_patterns.core"
 local uri = require "lpeg_patterns.uri"
+local util = require "lpeg_patterns.util"
 
 local C = lpeg.C
 local Cc = lpeg.Cc
@@ -60,7 +61,7 @@ end
 
 -- RFC 7230 Section 2.6
 local HTTP_name = P"HTTP"
-local HTTP_version = HTTP_name * P"/" * (core.DIGIT * P"." * core.DIGIT / tonumber)
+local HTTP_version = HTTP_name * P"/" * (core.DIGIT * P"." * core.DIGIT / util.safe_tonumber)
 
 -- RFC 7230 Section 2.7
 local absolute_path = (P"/" * uri.segment )^1
@@ -104,7 +105,7 @@ local chunk_ext_val = _M.token + _M.quoted_string
 _M.chunk_ext = ( P";" * chunk_ext_name * ( P"=" * chunk_ext_val)^-1 )^0
 
 -- RFC 7230 Section 4.3
-local rank = (P"0" * (P"." * core.DIGIT^-3)^-1 + P"1" * ("." * (P"0")^-3)^-1) / tonumber
+local rank = (P"0" * (P"." * core.DIGIT^-3)^-1 + P"1" * ("." * (P"0")^-3)^-1) / util.safe_tonumber
 local t_ranking = _M.OWS * P";" * _M.OWS * S"qQ" * P"=" * rank -- q is case insensitive
 local t_codings = transfer_coding * Cg(t_ranking)^-1
 _M.TE = comma_sep(t_codings)
