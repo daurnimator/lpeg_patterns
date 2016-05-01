@@ -19,7 +19,7 @@ local DQUOTE = core.DQUOTE
 local WSP = core.WSP
 local VCHAR = core.VCHAR
 
-local quoted_pair = Cs ( "\\" * C(VCHAR + WSP) / function(...) return ... end )
+local quoted_pair = Cg(P"\\" * C(VCHAR + WSP))
 
 -- Folding White Space
 local FWS = Cs ( (WSP^0 * CRLF)^-1 * WSP^1 / " " ) -- Fold whitespace into a single " "
@@ -29,7 +29,7 @@ local ctext   = R"\33\39" + R"\42\91" + R"\93\126"
 local comment = P {
 	V"comment" ;
 	ccontent = ctext + quoted_pair + V"comment" ;
-	comment  = P"("* C ( (FWS^-1*V"ccontent")^0 ) * FWS^-1 * P")" ;
+	comment = P"("* (FWS^-1 * V"ccontent")^0 * FWS^-1 * P")";
 }
 local CFWS = ((FWS^-1 * comment)^1 * FWS^-1 + FWS ) / function() end
 
