@@ -56,6 +56,8 @@ describe("email Addresses", function()
 	it("Handle escaped items in quotes", function()
 		assert.same({"escape d", "example.com"}, {email:match [["escape\ d"(comment)@example.com]]})
 		assert.same({"escape\"d", "example.com"}, {email:match [["escape\"d"(comment)@example.com]]})
+		-- tests obs-qp
+		assert.same({"escape\0d", "example.com"}, {email:match "\"escape\\\0d\"@example.com"})
 	end)
 	it("Examples from RFC 3696 Section 3", function()
 		-- Note: Look at errata 246, the followup 3563 and the followup to the followup 4002

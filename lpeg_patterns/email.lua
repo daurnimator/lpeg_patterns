@@ -19,7 +19,10 @@ local DQUOTE = core.DQUOTE
 local WSP = core.WSP
 local VCHAR = core.VCHAR
 
-local quoted_pair = Cg(P"\\" * C(VCHAR + WSP))
+local obs_NO_WS_CTL = R("\1\8", "\11\12", "\14\31") + P"\127"
+
+local obs_qp = Cg(P"\\" * C(P"\0" + obs_NO_WS_CTL + core.LF + core.CR))
+local quoted_pair = Cg(P"\\" * C(VCHAR + WSP)) + obs_qp
 
 -- Folding White Space
 local FWS = Cs ( (WSP^0 * CRLF)^-1 * WSP^1 / " " ) -- Fold whitespace into a single " "
