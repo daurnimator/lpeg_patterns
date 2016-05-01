@@ -1,6 +1,6 @@
 local lpeg = require "lpeg"
 
-describe("email_nocfws Addresses", function()
+describe("email Addresses", function()
 	local email = require "lpeg_patterns.email".email * lpeg.P(-1)
 	it("Pass valid addresses", function()
 		assert.same({"localpart", "example.com"}, {email:match "localpart@example.com"})
