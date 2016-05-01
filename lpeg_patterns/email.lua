@@ -53,7 +53,7 @@ local phrase = obs_phrase -- obs_phrase is more broad than `word^1`, it's really
 
 -- Addr-spec
 local dtext               = R("\33\90","\94\126")
-local domain_literal_text = P"[" * C((FWS^-1 * dtext)^0) * FWS^-1 * P"]"
+local domain_literal_text = P"[" * Cs((FWS^-1 * dtext)^0 * FWS^-1) * P"]"
 
 local domain_text     = dot_atom_text + domain_literal_text
 local local_part_text = dot_atom_text + quoted_string_text
