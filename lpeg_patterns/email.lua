@@ -25,7 +25,7 @@ local obs_qp = Cg(P"\\" * C(P"\0" + obs_NO_WS_CTL + core.LF + core.CR))
 local quoted_pair = Cg(P"\\" * C(VCHAR + WSP)) + obs_qp
 
 -- Folding White Space
-local FWS = Cs ( (WSP^0 * CRLF)^-1 * WSP^1 / " " ) -- Fold whitespace into a single " "
+local FWS = (WSP^0 * CRLF)^-1 * WSP^1 / " " -- Fold whitespace into a single " "
 
 -- Comments
 local ctext   = R"\33\39" + R"\42\91" + R"\93\126"
