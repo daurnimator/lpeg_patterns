@@ -59,6 +59,9 @@ describe("email Addresses", function()
 		-- tests obs-qp
 		assert.same({"escape\0d", "example.com"}, {email:match "\"escape\\\0d\"@example.com"})
 	end)
+	it("processes obs-dtext", function()
+		assert.same({"localpart", "escape d"}, {email:match "localpart@[escape\\ d]"})
+	end)
 	it("Examples from RFC 3696 Section 3", function()
 		-- Note: Look at errata 246, the followup 3563 and the followup to the followup 4002
 		-- not only did the RFC author get some of these wrong, so did the RFC errata verifiers

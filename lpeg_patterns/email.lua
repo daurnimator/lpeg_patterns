@@ -55,7 +55,8 @@ local obs_phrase = C(word * (word + P"." + CFWS)^0 / function() end)
 local phrase = obs_phrase -- obs_phrase is more broad than `word^1`, it's really the same but allows "."
 
 -- Addr-spec
-local dtext               = R("\33\90","\94\126")
+local obs_dtext = obs_NO_WS_CTL + quoted_pair
+local dtext = R("\33\90", "\94\126") + obs_dtext
 local domain_literal_text = P"[" * Cs((FWS^-1 * dtext)^0 * FWS^-1) * P"]"
 
 local domain_text     = dot_atom_text + domain_literal_text
