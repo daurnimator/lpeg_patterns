@@ -62,6 +62,16 @@ describe("email Addresses", function()
 	it("processes obs-dtext", function()
 		assert.same({"localpart", "escape d"}, {email:match "localpart@[escape\\ d]"})
 	end)
+	it("processes obs-local-part", function()
+		-- obs-local-part allows whitespace between atoms
+		assert.same({"local.part", "example.com"}, {email:match [[local  .part@example.com]]})
+		-- obs-local-part allows individually quoted atoms
+		assert.same({"local.part", "example.com"}, {email:match [["local".part@example.com]]})
+	end)
+	it("processes obs-domain", function()
+		-- obs-domain allows whitespace between atoms
+		assert.same({"localpart", "example.com"}, {email:match [[localpart@example  .com]]})
+	end)
 	it("Examples from RFC 3696 Section 3", function()
 		-- Note: Look at errata 246, the followup 3563 and the followup to the followup 4002
 		-- not only did the RFC author get some of these wrong, so did the RFC errata verifiers
