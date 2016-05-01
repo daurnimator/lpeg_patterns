@@ -43,7 +43,7 @@ local dot_atom      = CFWS^-1 * dot_atom_text * CFWS^-1
 -- Quoted Strings
 local qtext              = S"\33"+R("\35\91","\93\126")
 local qcontent           = qtext + quoted_pair
-local quoted_string_text = DQUOTE * Cs((FWS^-1 * qcontent)^0) * FWS^-1 * DQUOTE
+local quoted_string_text = DQUOTE * Cs((FWS^-1 * qcontent)^0 * FWS^-1) * DQUOTE
 local quoted_string      = CFWS^-1 * quoted_string_text * CFWS^-1
 
 -- Miscellaneous Tokens
