@@ -5,6 +5,7 @@ https://tools.ietf.org/html/rfc7231
 
 local lpeg = require "lpeg"
 local core = require "lpeg_patterns.core"
+local email = require "lpeg_patterns.email"
 local uri = require "lpeg_patterns.uri"
 local util = require "lpeg_patterns.util"
 
@@ -191,6 +192,9 @@ local alphanum = core.ALPHA + core.DIGIT
 local language_range = (core.ALPHA * core.ALPHA^-7 * (P"-" * alphanum * alphanum^-7)^0) + P"*"
 -- RFC 7231 Section 5.3.5
 _M.Accept_Language = comma_sep(language_range * weight^-1, 1 )
+
+-- RFC 7231 Section 5.5.1
+_M.From = email.mailbox
 
 -- RFC 7231 Section 5.5.2
 _M.Referer = uri.absolute_uri + partial_uri
