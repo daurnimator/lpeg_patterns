@@ -300,6 +300,32 @@ do -- RFC 6265
 	_M.Cookie = cookie_string
 end
 
+-- RFC 6455
+local base64_character = core.ALPHA + core.DIGIT + S"+/"
+local base64_data = base64_character * base64_character * base64_character * base64_character
+local base64_padding = base64_character * base64_character * P"=="
+	+ base64_character * base64_character * base64_character * P"="
+local base64_value_non_empty = (base64_data^1 * base64_padding^-1) + base64_padding
+_M.Sec_WebSocket_Accept = base64_value_non_empty
+_M.Sec_WebSocket_Key = base64_value_non_empty
+local registered_token = _M.token
+local extension_token = registered_token
+local extension_param = _M.token * ((P"=" * (_M.token + _M.quoted_string)) + Cc(true))
+local extension = extension_token * Cg(Cf(Ct(true) * (P";" * Cg(extension_param))^0, rawset), "parameters")
+local extension_list = comma_sep(Ct(extension))
+_M.Sec_WebSocket_Extensions = extension_list
+_M.Sec_WebSocket_Protocol_Client = comma_sep(_M.token)
+_M.Sec_WebSocket_Protocol_Server = _M.token
+local NZDIGIT =  S"123456789"
+-- Limited to 0-255 range, with no leading zeros
+local version = (
+	P"2" * (S"01234" * core.DIGIT + P"5" * S"012345")
+	+ (P"1") * core.DIGIT * core.DIGIT
+	+ NZDIGIT * core.DIGIT^-1
+) / tonumber
+_M.Sec_WebSocket_Version_Client = version
+_M.Sec_WebSocket_Version_Server = comma_sep(version)
+
 -- RFC 7232 Section 2.2
 _M.Last_Modified = HTTP_date
 
