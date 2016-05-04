@@ -93,9 +93,10 @@ _M.header_field = _M.field_name * P":" * _M.OWS * _M.field_value * _M.OWS
 _M.Content_Length = core.DIGIT^1
 
 -- RFC 7230 Section 4
-local transfer_parameter = _M.token * _M.BWS * P"=" * _M.BWS * ( _M.token + _M.quoted_string )
-local transfer_extension = _M.token / string.lower -- case insensitive
-	* ( _M.OWS * P";" * _M.OWS * transfer_parameter )^0
+-- See https://www.rfc-editor.org/errata_search.php?rfc=7230&eid=4683
+local transfer_parameter = (_M.token - S"qQ" * _M.BWS * P"=") * _M.BWS * P"=" * _M.BWS * ( _M.token + _M.quoted_string )
+local transfer_extension = Cf(Ct(_M.token / string.lower) -- case insensitive
+	* ( _M.OWS * P";" * _M.OWS * Cg(transfer_parameter) )^0, rawset)
 local transfer_coding = transfer_extension
 
 -- RFC 7230 Section 3.3.1
@@ -104,12 +105,18 @@ _M.Transfer_Encoding = comma_sep(transfer_coding, 1)
 -- RFC 7230 Section 4.1.1
 local chunk_ext_name = _M.token
 local chunk_ext_val = _M.token + _M.quoted_string
+-- See https://www.rfc-editor.org/errata_search.php?rfc=7230&eid=4667
 _M.chunk_ext = ( P";" * chunk_ext_name * ( P"=" * chunk_ext_val)^-1 )^0
 
 -- RFC 7230 Section 4.3
-local rank = (P"0" * (P"." * core.DIGIT^-3)^-1 + P"1" * ("." * (P"0")^-3)^-1) / util.safe_tonumber
+local rank = (P"0" * ((P"." * core.DIGIT^-3) / util.safe_tonumber + Cc(0)) + P"1" * ("." * (P"0")^-3)^-1) * Cc(1)
 local t_ranking = _M.OWS * P";" * _M.OWS * S"qQ" * P"=" * rank -- q is case insensitive
-local t_codings = transfer_coding * Cg(t_ranking)^-1
+local t_codings = (transfer_coding * t_ranking^-1) / function(t, q)
+	if q then
+		t["q"] = q
+	end
+	return t
+end
 _M.TE = comma_sep(t_codings)
 
 -- RFC 7230 Section 4.4

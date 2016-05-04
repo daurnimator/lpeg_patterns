@@ -28,6 +28,25 @@ describe("http patterns", function()
 		assert.same({"foo", "bar"}, Connection:match("foo\t, bar"))
 		assert.same({"foo", "bar"}, Connection:match("foo,,,  ,bar"))
 	end)
+	it("Parses a Transfer-Encoding header", function()
+		local Transfer_Encoding = lpeg.Ct(http.Transfer_Encoding) * EOF
+		assert.falsy(Transfer_Encoding:match("")) -- doesn't allow empty
+		assert.same({{"foo"}}, Transfer_Encoding:match("foo"))
+		assert.same({{"foo"}, {"bar"}}, Transfer_Encoding:match("foo, bar"))
+		assert.same({{"foo", someext = "bar"}}, Transfer_Encoding:match("foo;someext=bar"))
+		assert.same({{"foo", someext = "bar", another = "qux"}}, Transfer_Encoding:match("foo;someext=bar;another=\"qux\""))
+		-- q not allowed
+		assert.falsy(Transfer_Encoding:match("foo;q=0.5"))
+		assert.same({{"foo", queen = "foo"}}, Transfer_Encoding:match("foo;queen=foo")) -- check transfer parameters starting with q (but not q) are allowed
+	end)
+	it("Parses a TE header", function()
+		local TE = lpeg.Ct(http.TE) * EOF
+		assert.same({}, TE:match("")) -- allows empty
+		assert.same({{"foo"}}, TE:match("foo"))
+		assert.same({{"foo"}, {"bar"}}, TE:match("foo, bar"))
+		assert.same({{"foo", q=0.5}}, TE:match("foo;q=0.5"))
+		assert.same({{"foo", someext = "foo", q=0.5}}, TE:match("foo;someext=foo;q=0.5"))
+	end)
 	it("Splits a Trailer header", function()
 		local Trailer = lpeg.Ct(http.Trailer) * EOF
 		assert.falsy(Trailer:match(" "))
