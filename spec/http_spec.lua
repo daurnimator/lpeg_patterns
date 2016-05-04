@@ -101,6 +101,8 @@ describe("http patterns", function()
 		assert.same({{"foo", parameters = {}}, {"bar", parameters = {}}}, Sec_WebSocket_Extensions:match"foo, bar")
 		assert.same({{"foo", parameters = {hello = true; world = "extension"}}, {"bar", parameters = {}}}, Sec_WebSocket_Extensions:match"foo;hello;world=extension, bar")
 		assert.same({{"foo", parameters = {hello = true; world = "extension"}}, {"bar", parameters = {}}}, Sec_WebSocket_Extensions:match"foo;hello;world=\"extension\", bar")
+		-- quoted strings must be valid tokens
+		assert.falsy(Sec_WebSocket_Extensions:match"foo;hello;world=\"exte\\\"nsion\", bar")
 	end)
 	it("Parses a Sec_WebSocket-Version-Client header", function()
 		local Sec_WebSocket_Version_Client = http.Sec_WebSocket_Version_Client * EOF

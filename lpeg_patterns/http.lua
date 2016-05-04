@@ -15,6 +15,7 @@ local Cf = lpeg.Cf
 local Cg = lpeg.Cg
 local Cs = lpeg.Cs
 local Ct = lpeg.Ct
+local Cmt = lpeg.Cmt
 local P = lpeg.P
 local R = lpeg.R
 local S = lpeg.S
@@ -310,7 +311,15 @@ _M.Sec_WebSocket_Accept = base64_value_non_empty
 _M.Sec_WebSocket_Key = base64_value_non_empty
 local registered_token = _M.token
 local extension_token = registered_token
-local extension_param = _M.token * ((P"=" * (_M.token + _M.quoted_string)) + Cc(true))
+local extension_param do
+	local EOF = P(-1)
+	local token_then_EOF = Cc(true) * _M.token * EOF
+	-- the quoted-string must be a valid token
+	local quoted_token = Cmt(_M.quoted_string, function(_, _, q)
+		return token_then_EOF:match(q)
+	end)
+	extension_param = _M.token * ((P"=" * (_M.token + quoted_token)) + Cc(true))
+end
 local extension = extension_token * Cg(Cf(Ct(true) * (P";" * Cg(extension_param))^0, rawset), "parameters")
 local extension_list = comma_sep(Ct(extension))
 _M.Sec_WebSocket_Extensions = extension_list
