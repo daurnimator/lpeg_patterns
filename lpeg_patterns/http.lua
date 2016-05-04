@@ -73,9 +73,9 @@ local partial_uri = Ct(uri.relative_part * (P"?" * uri.query)^-1)
 local tchar = S "!#$%&'*+-.^_`|~" + core.DIGIT + core.ALPHA
 _M.token = C(tchar^1)
 local obs_text = R("\128\255")
-local qdtext = core.HTAB + core.SP + P("\33") + R("\35\91", "\93\126") + obs_text
+_M.qdtext = core.HTAB + core.SP + P"\33" + R("\35\91", "\93\126") + obs_text
 local quoted_pair = Cs(P"\\" * C(core.HTAB + core.SP + core.VCHAR + obs_text) / "%1")
-_M.quoted_string = core.DQUOTE * Cs((qdtext + quoted_pair)^0) * core.DQUOTE
+_M.quoted_string = core.DQUOTE * Cs((_M.qdtext + quoted_pair)^0) * core.DQUOTE
 
 local ctext = core.HTAB + core.SP + R("\33\39", "\42\91", "\93\126") + obs_text
 _M.comment = P { P"(" * ( ctext + quoted_pair + V(1) )^0 * P")" }
