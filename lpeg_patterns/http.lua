@@ -356,6 +356,12 @@ local version = (
 _M.Sec_WebSocket_Version_Client = version
 _M.Sec_WebSocket_Version_Server = comma_sep(version)
 
+-- RFC 6797
+local directive_name = _M.token / string.lower
+local directive_value = _M.token + _M.quoted_string
+local directive = Cg(directive_name * ((P"=" * directive_value) + Cc(true)))
+_M.Strict_Transport_Security = directive^-1 * (_M.OWS * P";" * _M.OWS * directive^-1)^0
+
 -- RFC 7089
 _M.Accept_Datetime = IMF_fixdate
 _M.Memento_Datetime = IMF_fixdate
