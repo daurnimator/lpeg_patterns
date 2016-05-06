@@ -418,6 +418,9 @@ local TimeType = case_insensitive "Second-" * DAVTimeOutVal
 	+ case_insensitive "Infinite" * Cc(math.huge)
 _M.TimeOut = comma_sep(TimeType)
 
+-- RFC 5323
+_M.DASL = comma_sep(Coded_URL, 1)
+
 -- RFC 6638
 _M.Schedule_Reply = T_F
 _M.Schedule_Tag = opaque_tag
