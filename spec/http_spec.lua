@@ -2,6 +2,13 @@ describe("http patterns", function()
 	local http = require "lpeg_patterns.http"
 	local lpeg = require "lpeg"
 	local EOF = lpeg.P(-1)
+	it("Parses a SLUG header", function()
+		local SLUG = http.SLUG * EOF
+		assert.same("foo", SLUG:match("foo"))
+		assert.same("foo bar", SLUG:match("foo bar"))
+		assert.same("foo bar", SLUG:match("foo  bar"))
+		assert.same("foo   bar", SLUG:match("foo %20 bar"))
+	end)
 	it("Parses an Origin header", function()
 		local Origin = lpeg.Ct(http.Origin) * EOF
 		assert.same({}, Origin:match("null"))

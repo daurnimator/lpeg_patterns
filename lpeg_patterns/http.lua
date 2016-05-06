@@ -39,6 +39,12 @@ _M.OWS = (core.SP + core.HTAB)^0
 _M.RWS = (core.SP + core.HTAB)^1
 _M.BWS = _M.OWS
 
+-- RFC 5023
+local slugtext = _M.RWS / " "
+	+ P"%" * (core.HEXDIG * core.HEXDIG / util.read_hex) / string.char
+	+ R"\32\126"
+_M.SLUG = Cs(slugtext^0)
+
 -- RFC 6454
 -- discard captures from scheme, host, port and just get whole string
 local serialized_origin = C(uri.scheme * P"://" * uri.host * (P":" * uri.port)^-1/function() end)
