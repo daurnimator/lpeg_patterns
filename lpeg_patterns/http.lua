@@ -356,6 +356,10 @@ local version = (
 _M.Sec_WebSocket_Version_Client = version
 _M.Sec_WebSocket_Version_Server = comma_sep(version)
 
+-- RFC 7089
+_M.Accept_Datetime = IMF_fixdate
+_M.Memento_Datetime = IMF_fixdate
+
 -- RFC 7232 Section 2.2
 _M.Last_Modified = HTTP_date
 
