@@ -390,6 +390,31 @@ _M.If_Modified_Since = HTTP_date
 -- RFC 7232 Section 3.4
 _M.If_Unmodified_Since = HTTP_date
 
+-- RFC 4918
+local Coded_URL = P"<" * uri.absolute_uri * P">"
+local extend = Coded_URL + _M.token
+local compliance_class = P"1" + P"2" + P"3" + extend
+_M.DAV = comma_sep(compliance_class)
+_M.Depth = P"0" * Cc(0)
+	+ P"1" * Cc(1)
+	+ case_insensitive "infinity" * Cc(math.huge)
+local Simple_ref = uri.absolute_uri + partial_uri
+_M.Destination = Simple_ref
+local State_token = Coded_URL
+local Condition = (case_insensitive("not") * Cc("not"))^-1
+	* _M.OWS * (State_token + P"[" * entity_tag * P"]")
+local List = P"(" * _M.OWS * (Condition * _M.OWS)^1 * P")"
+local No_tag_list = List
+local Resource_Tag = P"<" * Simple_ref * P">"
+local Tagged_list = Resource_Tag * _M.OWS * (List * _M.OWS)^1
+_M.If = (Tagged_list * _M.OWS)^1 + (No_tag_list * _M.OWS)^1
+_M.Lock_Token = Coded_URL
+_M.Overwrite = T_F
+local DAVTimeOutVal = core.DIGIT^1 / tonumber
+local TimeType = case_insensitive "Second-" * DAVTimeOutVal
+	+ case_insensitive "Infinite" * Cc(math.huge)
+_M.TimeOut = comma_sep(TimeType)
+
 -- RFC 6638
 _M.Schedule_Reply = T_F
 _M.Schedule_Tag = opaque_tag
