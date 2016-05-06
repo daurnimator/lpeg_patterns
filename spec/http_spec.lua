@@ -13,7 +13,7 @@ describe("http patterns", function()
 		assert.same({"deny"}, X_Frame_Options:match("deny"))
 		assert.same({"deny"}, X_Frame_Options:match("DENY"))
 		assert.same({"deny"}, X_Frame_Options:match("dEnY"))
-		assert.same({"allow-from", "http://example.com"}, X_Frame_Options:match("Allow-From http://example.com"))
+		assert.same({"http://example.com"}, X_Frame_Options:match("Allow-From http://example.com"))
 	end)
 	it("Splits a request line", function()
 		local request_line = lpeg.Ct(http.request_line) * EOF

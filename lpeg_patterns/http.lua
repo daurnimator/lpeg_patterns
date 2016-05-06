@@ -31,7 +31,7 @@ local function case_insensitive(str)
 		local c = str:sub(i, i)
 		patt = patt * S(c:upper() .. c:lower())
 	end
-	return patt * Cc(str)
+	return patt
 end
 
 -- RFC 7230 Section 3.2.3
@@ -73,8 +73,8 @@ local comma_sep do
 end
 
 -- RFC 7034
-_M.X_Frame_Options = case_insensitive "deny"
-	+ case_insensitive "sameorigin"
+_M.X_Frame_Options = case_insensitive "deny" * Cc("deny")
+	+ case_insensitive "sameorigin" * Cc("sameorigin")
 	+ case_insensitive "allow-from" * _M.RWS * serialized_origin
 
 -- RFC 7230 Section 2.6
