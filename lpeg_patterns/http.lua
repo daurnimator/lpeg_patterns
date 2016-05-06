@@ -53,6 +53,7 @@ local origin_list_or_null = P"null" + origin_list
 _M.Origin = _M.OWS * origin_list_or_null * _M.OWS
 
 -- Analogue to RFC 7320 Section 7's ABNF extension of '#'
+-- Also documented as `#rule` under RFC 2616 Section 2.1
 local comma_sep do
 	local sep = _M.OWS * lpeg.P "," * _M.OWS
 	local optional_sep = (lpeg.P"," + core.SP + core.HTAB)^0
