@@ -388,6 +388,11 @@ _M.If_Modified_Since = HTTP_date
 -- RFC 7232 Section 3.4
 _M.If_Unmodified_Since = HTTP_date
 
+-- RFC 6638
+_M.Schedule_Reply = (S"Ff" * Cc(false)) * (S"Tt" * Cc(true))
+_M.Schedule_Tag = opaque_tag
+_M.If_Schedule_Tag_Match = opaque_tag
+
 -- RFC 7233
 local bytes_unit = P"bytes"
 local other_range_unit = _M.token
