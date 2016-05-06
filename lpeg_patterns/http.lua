@@ -23,6 +23,15 @@ local V = lpeg.V
 
 local _M = {}
 
+local function case_insensitive(str)
+	local patt = P(true)
+	for i=1, #str do
+		local c = str:sub(i, i)
+		patt = patt * S(c:upper() .. c:lower())
+	end
+	return patt * Cc(str)
+end
+
 -- RFC 7230 Section 3.2.3
 _M.OWS = (core.SP + core.HTAB)^0
 _M.RWS = (core.SP + core.HTAB)^1
@@ -60,6 +69,11 @@ local comma_sep do
 		return patt
 	end
 end
+
+-- RFC 7034
+_M.X_Frame_Options = case_insensitive "deny"
+	+ case_insensitive "sameorigin"
+	+ case_insensitive "allow-from" * _M.RWS * serialized_origin
 
 -- RFC 7230 Section 2.6
 local HTTP_name = P"HTTP"

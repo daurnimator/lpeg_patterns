@@ -8,6 +8,13 @@ describe("http patterns", function()
 		assert.same({"http://example.com"}, Origin:match("http://example.com"))
 		assert.same({"http://example.com", "https://foo.org"}, Origin:match("http://example.com https://foo.org"))
 	end)
+	it("Parses an X-Frame-Options header", function()
+		local X_Frame_Options = lpeg.Ct(http.X_Frame_Options) * EOF
+		assert.same({"deny"}, X_Frame_Options:match("deny"))
+		assert.same({"deny"}, X_Frame_Options:match("DENY"))
+		assert.same({"deny"}, X_Frame_Options:match("dEnY"))
+		assert.same({"allow-from", "http://example.com"}, X_Frame_Options:match("Allow-From http://example.com"))
+	end)
 	it("Splits a request line", function()
 		local request_line = lpeg.Ct(http.request_line) * EOF
 		assert.same({"GET", "/", 1.0}, request_line:match("GET / HTTP/1.0\r\n"))
