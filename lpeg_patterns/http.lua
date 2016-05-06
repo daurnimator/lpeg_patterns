@@ -23,6 +23,8 @@ local V = lpeg.V
 
 local _M = {}
 
+local T_F = S"Tt" * Cc(true) + S"Ff" * Cc(false)
+
 local function case_insensitive(str)
 	local patt = P(true)
 	for i=1, #str do
@@ -389,7 +391,7 @@ _M.If_Modified_Since = HTTP_date
 _M.If_Unmodified_Since = HTTP_date
 
 -- RFC 6638
-_M.Schedule_Reply = (S"Ff" * Cc(false)) * (S"Tt" * Cc(true))
+_M.Schedule_Reply = T_F
 _M.Schedule_Tag = opaque_tag
 _M.If_Schedule_Tag_Match = opaque_tag
 
@@ -485,7 +487,7 @@ local protocol_id = _M.token
 _M.ALPN = comma_sep(protocol_id, 1)
 
 -- RFC 7809
-_M.CalDAV_Timezones = P"T" + P"F"
+_M.CalDAV_Timezones = T_F
 
 -- RFC 7838
 local clear = C"clear" -- case-sensitive
