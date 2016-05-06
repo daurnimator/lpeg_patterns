@@ -307,6 +307,9 @@ _M.Allow = comma_sep(method)
 -- RFC 7231 Section 7.4.2
 _M.Server = product * (_M.RWS * (product + _M.comment))^0
 
+-- RFC 5789
+_M.Accept_Patch = comma_sep(media_type, 1)
+
 do -- RFC 6265
 	local cookie_name = _M.token
 	local cookie_octet = S"!" + R("\35\43", "\45\58", "\60\91", "\93\126")
