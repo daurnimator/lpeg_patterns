@@ -66,4 +66,8 @@ describe("language tags", function()
 			assert.falsy(langtag:match "ar-a-aaa-b-bbb-a-ccc") -- two extensions with same single-letter prefix
 		end)
 	end)
+	it("captures whole text when using Language_Tag", function()
+		assert.same("en", Language_Tag:match "en")
+		assert.same("hy-Latn-IT-arevela", Language_Tag:match "hy-Latn-IT-arevela")
+	end)
 end)

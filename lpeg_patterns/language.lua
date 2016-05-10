@@ -75,8 +75,8 @@ local irregular = P"en-GB-oed"
 	+ P"sgn-BE-NL"
 	+ P"sgn-CH-DE"
 
-M.Language_Tag = (M.langtag
+M.Language_Tag = C((M.langtag
 	+ M.privateuse
-	+ irregular) / function() end -- throw away captures
+	+ irregular) / function() end) -- capture the whole tag. throws away decomposition
 
 return M
