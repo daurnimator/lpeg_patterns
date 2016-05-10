@@ -41,7 +41,7 @@ M.privateuse = P"x" * Ct((P"-" * C(alphanum*alphanum^-7))^1)
 M.langtag = language
 	* (P"-" * Cg(script, "script"))^-1
 	* (P"-" * Cg(region, "region"))^-1
-	* Cg(Ct((P"-" * C(variant))^0), "variant")
+	* Cg(Ct((P"-" * C(variant))^1), "variant")^-1
 	* Cg(Cmt(Ct((P"-" * Ct(extension))^1), function(_, _, c)
 		-- Can't use a fold with rawset as we want the pattern to not match if there is a duplicate extension
 		local r = {}

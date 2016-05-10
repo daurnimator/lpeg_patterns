@@ -6,26 +6,26 @@ describe("language tags", function()
 	local Language_Tag = language.Language_Tag * EOF
 	describe("examples from RFC 5646 Appendix A", function()
 		it("Parses Simple language subtag", function()
-			assert.same({language = "de"; variant = {}}, langtag:match "de") -- German
-			assert.same({language = "fr"; variant = {}}, langtag:match "fr") -- French
-			assert.same({language = "ja"; variant = {}}, langtag:match "ja") -- Japanese
+			assert.same({language = "de"}, langtag:match "de") -- German
+			assert.same({language = "fr"}, langtag:match "fr") -- French
+			assert.same({language = "ja"}, langtag:match "ja") -- Japanese
 			assert.truthy(Language_Tag:match "i-enochian") -- example of a grandfathered tag
 		end)
 		it("Parses Language subtag plus Script subtag", function()
-			assert.same({language = "zh"; script = "Hant"; variant = {}}, langtag:match "zh-Hant") -- Chinese written using the Traditional Chinese script
-			assert.same({language = "zh"; script = "Hans"; variant = {}}, langtag:match "zh-Hans") -- Chinese written using the Simplified Chinese script
-			assert.same({language = "sr"; script = "Cyrl"; variant = {}}, langtag:match "sr-Cyrl") -- Serbian written using the Cyrillic script
-			assert.same({language = "sr"; script = "Latn"; variant = {}}, langtag:match "sr-Latn") -- Serbian written using the Latin script
+			assert.same({language = "zh"; script = "Hant"}, langtag:match "zh-Hant") -- Chinese written using the Traditional Chinese script
+			assert.same({language = "zh"; script = "Hans"}, langtag:match "zh-Hans") -- Chinese written using the Simplified Chinese script
+			assert.same({language = "sr"; script = "Cyrl"}, langtag:match "sr-Cyrl") -- Serbian written using the Cyrillic script
+			assert.same({language = "sr"; script = "Latn"}, langtag:match "sr-Latn") -- Serbian written using the Latin script
 		end)
 		it("Parses Extended language subtags and their primary language subtag counterparts", function()
-			assert.same({language = "zh"; extlang = "cmn", script = "Hans"; region = "CN"; variant = {}}, langtag:match "zh-cmn-Hans-CN") -- Chinese, Mandarin, Simplified script, as used in China
-			assert.same({language = "cmn"; script = "Hans"; region = "CN"; variant = {}}, langtag:match "cmn-Hans-CN") -- Mandarin Chinese, Simplified script, as used in China
-			assert.same({language = "zh"; extlang = "yue"; region = "HK"; variant = {}}, langtag:match "zh-yue-HK") -- Chinese, Cantonese, as used in Hong Kong SAR
-			assert.same({language = "yue"; region = "HK"; variant = {}}, langtag:match "yue-HK") -- Cantonese Chinese, as used in Hong Kong SAR
+			assert.same({language = "zh"; extlang = "cmn", script = "Hans"; region = "CN"}, langtag:match "zh-cmn-Hans-CN") -- Chinese, Mandarin, Simplified script, as used in China
+			assert.same({language = "cmn"; script = "Hans"; region = "CN"}, langtag:match "cmn-Hans-CN") -- Mandarin Chinese, Simplified script, as used in China
+			assert.same({language = "zh"; extlang = "yue"; region = "HK"}, langtag:match "zh-yue-HK") -- Chinese, Cantonese, as used in Hong Kong SAR
+			assert.same({language = "yue"; region = "HK"}, langtag:match "yue-HK") -- Cantonese Chinese, as used in Hong Kong SAR
 		end)
 		it("Parses Language-Script-Region", function()
-			assert.same({language = "zh"; script = "Hans"; region = "CN"; variant = {}}, langtag:match "zh-Hans-CN") -- Chinese written using the Simplified script as used in mainland China
-			assert.same({language = "sr"; script = "Latn"; region = "RS"; variant = {}}, langtag:match "sr-Latn-RS") -- Serbian written using the Latin script as used in Serbia
+			assert.same({language = "zh"; script = "Hans"; region = "CN"}, langtag:match "zh-Hans-CN") -- Chinese written using the Simplified script as used in mainland China
+			assert.same({language = "sr"; script = "Latn"; region = "RS"}, langtag:match "sr-Latn-RS") -- Serbian written using the Latin script as used in Serbia
 		end)
 		it("Parses Language-Variant", function()
 			assert.same({language = "sl"; variant = {"rozaj"}}, langtag:match "sl-rozaj") -- Resian dialect of Slovenian
@@ -40,25 +40,25 @@ describe("language tags", function()
 			assert.same({language = "hy"; script = "Latn"; region = "IT"; variant = {"arevela"}}, langtag:match "hy-Latn-IT-arevela") -- Eastern Armenian written in Latin script, as used in Italy
 		end)
 		it("Parses Language-Region", function()
-			assert.same({language = "de"; region = "DE"; variant = {}}, langtag:match "de-DE") -- German for Germany
-			assert.same({language = "en"; region = "US"; variant = {}}, langtag:match "en-US") -- English as used in the United States
-			assert.same({language = "es"; region = "419"; variant = {}}, langtag:match "es-419") -- Spanish appropriate for the Latin America and Caribbean region using the UN region code
+			assert.same({language = "de"; region = "DE"}, langtag:match "de-DE") -- German for Germany
+			assert.same({language = "en"; region = "US"}, langtag:match "en-US") -- English as used in the United States
+			assert.same({language = "es"; region = "419"}, langtag:match "es-419") -- Spanish appropriate for the Latin America and Caribbean region using the UN region code
 		end)
 		it("Parses private use subtags", function()
-			assert.same({language = "de"; region = "CH"; privateuse = {"phonebk"}; variant = {}}, langtag:match "de-CH-x-phonebk")
-			assert.same({language = "az"; script = "Arab"; privateuse = {"AZE", "derbend"}; variant = {}}, langtag:match "az-Arab-x-AZE-derbend")
+			assert.same({language = "de"; region = "CH"; privateuse = {"phonebk"}}, langtag:match "de-CH-x-phonebk")
+			assert.same({language = "az"; script = "Arab"; privateuse = {"AZE", "derbend"}}, langtag:match "az-Arab-x-AZE-derbend")
 		end)
 		it("Parses private use registry values", function()
 			assert.truthy(Language_Tag:match "x-whatever") -- private use using the singleton 'x'
-			assert.same({language = "qaa"; script = "Qaaa"; region = "QM"; privateuse = {"southern"}; variant = {}}, langtag:match "qaa-Qaaa-QM-x-southern") -- all private tags
-			assert.same({language = "de"; script = "Qaaa"; variant = {}}, langtag:match "de-Qaaa") -- German, with a private script
-			assert.same({language = "sr"; script = "Latn"; region = "QM"; variant = {}}, langtag:match "sr-Latn-QM") -- Serbian, Latin script, private region
-			assert.same({language = "sr"; script = "Qaaa"; region = "RS"; variant = {}}, langtag:match "sr-Qaaa-RS") -- Serbian, private script, for Serbia
+			assert.same({language = "qaa"; script = "Qaaa"; region = "QM"; privateuse = {"southern"}}, langtag:match "qaa-Qaaa-QM-x-southern") -- all private tags
+			assert.same({language = "de"; script = "Qaaa"}, langtag:match "de-Qaaa") -- German, with a private script
+			assert.same({language = "sr"; script = "Latn"; region = "QM"}, langtag:match "sr-Latn-QM") -- Serbian, Latin script, private region
+			assert.same({language = "sr"; script = "Qaaa"; region = "RS"}, langtag:match "sr-Qaaa-RS") -- Serbian, private script, for Serbia
 		end)
 		it("Parses tags that use extensions", function()
-			assert.same({language = "en"; region = "US"; variant = {}; extension = { u = {"islamcal"}}}, langtag:match "en-US-u-islamcal")
-			assert.same({language = "zh"; region = "CN"; variant = {}; extension = { a = {"myext"}}; privateuse = {"private"}}, langtag:match "zh-CN-a-myext-x-private")
-			assert.same({language = "en"; variant = {}; extension = { a = {"myext"}, b = {"another"}}}, langtag:match "en-a-myext-b-another")
+			assert.same({language = "en"; region = "US"; extension = { u = {"islamcal"}}}, langtag:match "en-US-u-islamcal")
+			assert.same({language = "zh"; region = "CN"; extension = { a = {"myext"}}; privateuse = {"private"}}, langtag:match "zh-CN-a-myext-x-private")
+			assert.same({language = "en"; extension = { a = {"myext"}, b = {"another"}}}, langtag:match "en-a-myext-b-another")
 		end)
 		it("Rejects Invalid Tags", function()
 			assert.falsy(langtag:match "de-419-DE") -- two region tags
