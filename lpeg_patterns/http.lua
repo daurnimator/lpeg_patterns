@@ -325,7 +325,7 @@ _M.Accept_Patch = comma_sep(media_type, 1)
 local attr_char = core.ALPHA + core.DIGIT + S"!#$&+-.^_`|~"
 local value_chars = Cs((uri.pct_encoded + attr_char)^0)
 local parmname = C(attr_char^1)
-local ext_value = Cg(charset, "charset") * P"'" * P"'" * value_chars -- TODO: Add language.Language_Tag^-1 *
+local ext_value = Cg(charset, "charset") * P"'" * Cg(language.Language_Tag, "language")^-1 * P"'" * value_chars
 
 do -- RFC 5988
 	local ptokenchar = S"!#$%&'()*+-./:<=>?@[]^_`{|}~" + core.DIGIT + core.ALPHA
