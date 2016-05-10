@@ -147,6 +147,16 @@ describe("http patterns", function()
 		assert.falsy(Sec_WebSocket_Version_Client:match"1.2")
 		assert.falsy(Sec_WebSocket_Version_Client:match"090")
 	end)
+	it("Parses a Link header", function()
+		local Link = lpeg.Ct(http.Link) * EOF
+		assert.same({{{host="example.com"}}}, Link:match"<//example.com>")
+		assert.same({{{scheme = "http"; host = "example.com"; path = "/TheBook/chapter2";}; rel = "previous"; title="previous chapter"}},
+			Link:match[[<http://example.com/TheBook/chapter2>; rel="previous"; title="previous chapter"]])
+		assert.same({{{path = "/"}, rel = "http://example.net/foo"}},
+			Link:match[[</>; rel="http://example.net/foo"]])
+		assert.same({{{scheme = "http"; host = "example.org"; path = "/"}, rel = "start http://example.net/relation/other"}},
+			Link:match[[<http://example.org/>; rel="start http://example.net/relation/other"]])
+	end)
 	it("Parses a Set-Cookie header", function()
 		local Set_Cookie = lpeg.Ct(http.Set_Cookie) * EOF
 		assert.same({"SID", "31d4d96e407aad42", {}}, Set_Cookie:match"SID=31d4d96e407aad42")

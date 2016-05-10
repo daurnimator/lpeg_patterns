@@ -317,6 +317,24 @@ _M.Server = product * (_M.RWS * (product + _M.comment))^0
 -- RFC 5789
 _M.Accept_Patch = comma_sep(media_type, 1)
 
+-- RFC 5987
+local attr_char = core.ALPHA + core.DIGIT + S"!#$&+-.^_`|~"
+local value_chars = Cs((uri.pct_encoded + attr_char)^0)
+local parmname = C(attr_char^1)
+local ext_value = Cg(charset, "charset") * P"'" * P"'" * value_chars -- TODO: Add language.Language_Tag^-1 *
+
+do -- RFC 5988
+	local ptokenchar = S"!#$%&'()*+-./:<=>?@[]^_`{|}~" + core.DIGIT + core.ALPHA
+	local ptoken = ptokenchar^1
+	local ext_name_star = parmname * P"*"
+	local link_extension = ext_name_star * P"=" * ext_value
+		+ parmname * (P"=" * (ptoken + _M.quoted_string))^-1
+	-- See https://www.rfc-editor.org/errata_search.php?rfc=5988&eid=3158
+	local link_param = link_extension
+	local link_value = Cf(Ct(P"<" * uri.uri_reference * P">") * (_M.OWS * P";" * _M.OWS * Cg(link_param))^0, rawset)
+	_M.Link = comma_sep(link_value)
+end
+
 do -- RFC 6265
 	local cookie_name = _M.token
 	local cookie_octet = S"!" + R("\35\43", "\45\58", "\60\91", "\93\126")
