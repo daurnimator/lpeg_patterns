@@ -171,10 +171,17 @@ describe("http patterns", function()
 		assert.same({"SID", "31d4d96e407aad42", {Path = "/";}}, Set_Cookie:match"SID=31d4d96e407aad42; Path =/")
 		-- Quoted cookie value
 		assert.same({"SID", "31d4d96e407aad42", {Path = "/";}}, Set_Cookie:match[[SID="31d4d96e407aad42"; Path=/]])
+		-- Quoted cookie value
 	end)
 	it("Parses a Cookie header", function()
 		local Cookie = http.Cookie * EOF
 		assert.same({SID = "31d4d96e407aad42"}, Cookie:match"SID=31d4d96e407aad42")
 		assert.same({SID = "31d4d96e407aad42", lang = "en-US"}, Cookie:match"SID=31d4d96e407aad42; lang=en-US")
+	end)
+	it("Parses a Content_Disposition header", function()
+		local Content_Disposition = lpeg.Ct(http.Content_Disposition) * EOF
+		assert.same({"foo", {}}, Content_Disposition:match"foo")
+		assert.same({"foo", {filename="example"}}, Content_Disposition:match"foo; filename=example")
+		assert.same({"foo", {filename="example"}}, Content_Disposition:match"foo; filename*=UTF-8''example")
 	end)
 end)

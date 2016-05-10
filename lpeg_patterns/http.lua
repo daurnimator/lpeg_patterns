@@ -361,6 +361,17 @@ do -- RFC 6265
 	_M.Cookie = cookie_string
 end
 
+do -- RFC 6266
+	local disp_ext_type = _M.token / string.lower
+	local disposition_type = disp_ext_type
+	local ext_token = C((tchar-P"*"*(-tchar))^1) * P"*" -- can't use 'token' here as we need to not include the "*" at the end
+	local value = _M.token + _M.quoted_string
+	local disp_ext_parm = ext_token * _M.OWS * P"=" * _M.OWS * ext_value
+		+ _M.token * _M.OWS * P"=" * _M.OWS * value
+	local disposition_parm = disp_ext_parm
+	_M.Content_Disposition = disposition_type * Cf(Ct(true) * (_M.OWS * P";" * _M.OWS * Cg(disposition_parm))^0, rawset)
+end
+
 -- RFC 6455
 local base64_character = core.ALPHA + core.DIGIT + S"+/"
 local base64_data = base64_character * base64_character * base64_character * base64_character
