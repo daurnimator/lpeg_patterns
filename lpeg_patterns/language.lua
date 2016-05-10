@@ -21,12 +21,13 @@ local language = Cg(core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA * core.ALP
 	+ Cg(core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA, "language")
 	+ Cg(core.ALPHA * core.ALPHA * core.ALPHA^-1, "language") * (P"-" * Cg(extlang, "extlang"))^-1
 
-local script = core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA * -#alphanum
+local script = core.ALPHA * core.ALPHA * core.ALPHA * core.ALPHA
+	* -#alphanum -- Prevent intepretation of a 'variant'
 
 local region = (
 	core.ALPHA * core.ALPHA
 	+ core.DIGIT * core.DIGIT * core.DIGIT
-) * -#alphanum
+) * -#alphanum -- Prevent intepretation of a 'variant'
 
 local variant = core.DIGIT * alphanum * alphanum * alphanum
 	+ alphanum * alphanum * alphanum * alphanum * alphanum * alphanum^-3
