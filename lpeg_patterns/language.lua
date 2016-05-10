@@ -42,7 +42,7 @@ M.langtag = language
 	* (P"-" * Cg(script, "script"))^-1
 	* (P"-" * Cg(region, "region"))^-1
 	* Cg(Ct((P"-" * C(variant))^0), "variant")
-	* Cg(Cmt(Ct((P"-" * Ct(extension))^0), function(_, _, c)
+	* Cg(Cmt(Ct((P"-" * Ct(extension))^1), function(_, _, c)
 		-- Can't use a fold with rawset as we want the pattern to not match if there is a duplicate extension
 		local r = {}
 		for _, v in ipairs(c) do
@@ -54,7 +54,7 @@ M.langtag = language
 			r[a] = b
 		end
 		return true, r
-	end), "extension")
+	end), "extension")^-1
 	* (P"-" * Cg(M.privateuse, "privateuse"))^-1
 
 local irregular = P"en-GB-oed"
