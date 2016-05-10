@@ -10,6 +10,8 @@ local Cf = lpeg.Cf
 local Cg = lpeg.Cg
 local Ct = lpeg.Ct
 
+local M = {}
+
 local alphanum = core.ALPHA + core.DIGIT
 
 local extlang = core.ALPHA * core.ALPHA * core.ALPHA * -#alphanum
@@ -35,7 +37,7 @@ local extension = C(singleton) * Ct((P"-" * (alphanum*alphanum*alphanum^-6 / str
 
 local privateuse = P"x" * Ct((P"-" * C(alphanum*alphanum^-7))^1)
 
-local langtag = language
+M.langtag = language
 	* (P"-" * Cg(script, "script"))^-1
 	* (P"-" * Cg(region, "region"))^-1
 	* Cg(Ct((P"-" * C(variant))^0), "variant")
@@ -60,22 +62,10 @@ local irregular = P"en-GB-oed"
 	+ P"sgn-BE-NL"
 	+ P"sgn-CH-DE"
 
-local regular = P"art-lojban"
-	+ P"cel-gaulish"
-	+ P"no-bok"
-	+ P"no-nyn"
-	+ P"zh-guoyu"
-	+ P"zh-hakka"
-	+ P"zh-min"
-	+ P"zh-min-nan"
-	+ P"zh-xiang"
+M.privateuse = Cg(privateuse, "privateuse") * Cg(Ct(true), "variant") * Cg(Ct(true), "extension")
 
--- Split up grandfathered so that we match regular before langtag
-local Language_Tag = regular
-	+ langtag
-	+ Cg(privateuse, "privateuse") * Cg(Ct(true), "variant") * Cg(Ct(true), "extension")
-	+ irregular
+M.Language_Tag = (M.langtag
+	+ privateuse
+	+ irregular) / function() end -- throw away captures
 
-return {
-	Language_Tag = Language_Tag;
-}
+return M
