@@ -66,12 +66,12 @@ _M.segment = Cs(segment)
 local segment_nz = pchar^1
 local segment_nz_nc = (pchar - P":")^1
 
-local path_abempty = Cs((P"/" * segment)^0)
+-- an empty path is nil instead of the empty string
+local path_empty    = Cc(nil)
+local path_abempty = Cs((P"/" * segment)^1) + path_empty
 local path_rootless = Cs(segment_nz * (P"/" * segment)^0)
 local path_noscheme = Cs(segment_nz_nc * (P"/" * segment)^0)
 local path_absolute = Cs(P"/" * (segment_nz * (P"/" * segment)^0)^-1)
--- an empty path is nil instead of the empty string
-local path_empty    = Cc(nil)
 
 _M.query = Cs( ( pchar + S"/?" )^0 ) -- 3.4
 _M.fragment = _M.query -- 3.5
