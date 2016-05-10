@@ -6,6 +6,7 @@ https://tools.ietf.org/html/rfc7231
 local lpeg = require "lpeg"
 local core = require "lpeg_patterns.core"
 local email = require "lpeg_patterns.email"
+local language = require "lpeg_patterns.language"
 local uri = require "lpeg_patterns.uri"
 local util = require "lpeg_patterns.util"
 
@@ -188,6 +189,9 @@ local media_type = Cg(type, "type") * P"/" * Cg(subtype, "subtype")
 	* Cg(Cf(Ct(true) * (_M.OWS * P";" * _M.OWS * Cg(parameter))^0, rawset), "parameters")
 local charset = _M.token / string.lower -- case insensitive
 _M.Content_Type = Ct(media_type)
+
+-- RFC 7231 Section 3.1.3
+_M.Content_Language = comma_sep(language.Language_Tag, 1)
 
 -- RFC 7231 Section 3.1.4.2
 _M.Content_Location = uri.absolute_uri + partial_uri
