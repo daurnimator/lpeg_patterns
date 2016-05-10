@@ -24,5 +24,6 @@ build = {
 		["lpeg_patterns.uri"] = "lpeg_patterns/uri.lua";
 		["lpeg_patterns.email"] = "lpeg_patterns/email.lua";
 		["lpeg_patterns.phone"] = "lpeg_patterns/phone.lua";
+		["lpeg_patterns.language"] = "lpeg_patterns/language.lua";
 	};
 }
