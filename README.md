@@ -97,3 +97,19 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
 
   - `phone` (pattern): includes detailed checking for:
       - USA phone numbers using the [NANP](https://en.wikipedia.org/wiki/North_American_Numbering_Plan)
+
+
+### `language`
+
+Patterns for definitions from [RFC-4646 Section 2.1](https://tools.ietf.org/html/rfc4646#section-2.1)
+
+  - `langtag` (pattern): Capture is a table with the language tag decomposed into components:
+      - `language`
+      - `extlang` (optional)
+      - `script` (optional)
+      - `region` (optional)
+      - `variant` (optional): an array
+      - `extension` (optional): a dictionary from singleton to value
+      - `privateuse` (optional): an array
+  - `privateuse` (pattern): an array
+  - `Language_Tag` (pattern): captures the whole language tag
