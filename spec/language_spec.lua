@@ -3,12 +3,13 @@ local EOF = lpeg.P(-1)
 describe("language tags", function()
 	local language = require "lpeg_patterns.language"
 	local langtag = lpeg.Ct(language.langtag) * EOF
+	local Language_Tag = language.Language_Tag * EOF
 	describe("examples from RFC 5646 Appendix A", function()
 		it("Parses Simple language subtag", function()
 			assert.same({language = "de"; variant = {}; extension = {}}, langtag:match "de") -- German
 			assert.same({language = "fr"; variant = {}; extension = {}}, langtag:match "fr") -- French
 			assert.same({language = "ja"; variant = {}; extension = {}}, langtag:match "ja") -- Japanese
-			-- assert.same({language = "i-enochian"; variant = {}; extension = {}}, langtag:match "i-enochian") -- example of a grandfathered tag
+			assert.truthy(Language_Tag:match "i-enochian") -- example of a grandfathered tag
 		end)
 		it("Parses Language subtag plus Script subtag", function()
 			assert.same({language = "zh"; script = "Hant"; variant = {}; extension = {}}, langtag:match "zh-Hant") -- Chinese written using the Traditional Chinese script
@@ -48,7 +49,7 @@ describe("language tags", function()
 			assert.same({language = "az"; script = "Arab"; privateuse = {"AZE", "derbend"}; variant = {}; extension = {}}, langtag:match "az-Arab-x-AZE-derbend")
 		end)
 		it("Parses private use registry values", function()
-			-- assert.same({language = nil; privateuse = {"whatever"}; variant = {}; extension = {}}, langtag:match "x-whatever") -- private use using the singleton 'x'
+			assert.truthy(Language_Tag:match "x-whatever") -- private use using the singleton 'x'
 			assert.same({language = "qaa"; script = "Qaaa"; region = "QM"; privateuse = {"southern"}; variant = {}; extension = {}}, langtag:match "qaa-Qaaa-QM-x-southern") -- all private tags
 			assert.same({language = "de"; script = "Qaaa"; variant = {}; extension = {}}, langtag:match "de-Qaaa") -- German, with a private script
 			assert.same({language = "sr"; script = "Latn"; region = "QM"; variant = {}; extension = {}}, langtag:match "sr-Latn-QM") -- Serbian, Latin script, private region
