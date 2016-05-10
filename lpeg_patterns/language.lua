@@ -60,21 +60,21 @@ local irregular = P"en-GB-oed"
 	+ P"sgn-BE-NL"
 	+ P"sgn-CH-DE"
 
-local regular = P"art" * P"-" * P"lojban"
-	+ P"cel" * P"-" * P"gaulish"
-	+ P"no" * P"-" * P"bok"
-	+ P"no" * P"-" * P"nyn"
-	+ P"zh" * P"-" * P"guoyu"
-	+ P"zh" * P"-" * P"hakka"
-	+ P"zh" * P"-" * P"min"
-	+ P"zh" * P"-" * P"min" * P"-" * P"nan"
-	+ P"zh" * P"-" * P"xiang"
+local regular = P"art-lojban"
+	+ P"cel-gaulish"
+	+ P"no-bok"
+	+ P"no-nyn"
+	+ P"zh-guoyu"
+	+ P"zh-hakka"
+	+ P"zh-min"
+	+ P"zh-min-nan"
+	+ P"zh-xiang"
 
-local grandfathered = irregular + regular
-
-local Language_Tag = langtag
+-- Split up grandfathered so that we match regular before langtag
+local Language_Tag = regular
+	+ langtag
 	+ Cg(privateuse, "privateuse") * Cg(Ct(true), "variant") * Cg(Ct(true), "extension")
-	+ grandfathered
+	+ irregular
 
 return {
 	Language_Tag = Language_Tag;
