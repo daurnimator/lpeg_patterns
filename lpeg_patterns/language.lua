@@ -26,10 +26,8 @@ local region = (
 	+ core.DIGIT * core.DIGIT * core.DIGIT
 ) * -#alphanum
 
-local variant = (
-	core.DIGIT * alphanum * alphanum * alphanum
+local variant = core.DIGIT * alphanum * alphanum * alphanum
 	+ alphanum * alphanum * alphanum * alphanum * alphanum * alphanum^-3
-)-- * -#alphanum
 
 local singleton = core.DIGIT + R("AW", "YZ", "aw", "yz")
 
