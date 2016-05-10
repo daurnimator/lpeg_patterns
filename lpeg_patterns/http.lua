@@ -422,10 +422,10 @@ _M.Memento_Datetime = IMF_fixdate
 _M.Last_Modified = HTTP_date
 
 -- RFC 7232 Section 2.3
-local weak = P"W/"
+local weak = P"W/" -- case sensitive
 local etagc = P"\33" + R"\35\115" + obs_text
 local opaque_tag = core.DQUOTE * etagc^0 * core.DQUOTE
-local entity_tag = weak^-1 * opaque_tag
+local entity_tag = Cg(weak*Cc(true) + Cc(false), "weak") * C(opaque_tag)
 _M.ETag = entity_tag
 
 -- RFC 7232 Section 3.1
