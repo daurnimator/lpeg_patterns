@@ -341,6 +341,8 @@ do -- RFC 5988
 	-- See https://www.rfc-editor.org/errata_search.php?rfc=5988&eid=3158
 	local link_param = link_extension
 	local link_value = Cf(Ct(P"<" * uri.uri_reference * P">") * (_M.OWS * P";" * _M.OWS * Cg(link_param))^0, rawset)
+	-- TODO: handle multiple ext_value variants...
+	-- e.g. server might provide one title in english, one in chinese, client should be able to pick which one to display
 	_M.Link = comma_sep(link_value)
 end
 
