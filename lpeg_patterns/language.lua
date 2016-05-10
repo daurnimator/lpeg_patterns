@@ -35,14 +35,14 @@ local singleton = core.DIGIT + R("AW", "YZ", "aw", "yz")
 
 local extension = C(singleton) * Ct((P"-" * (alphanum*alphanum*alphanum^-6 / string.lower))^1)
 
-local privateuse = P"x" * Ct((P"-" * C(alphanum*alphanum^-7))^1)
+M.privateuse = P"x" * Ct((P"-" * C(alphanum*alphanum^-7))^1)
 
 M.langtag = language
 	* (P"-" * Cg(script, "script"))^-1
 	* (P"-" * Cg(region, "region"))^-1
 	* Cg(Ct((P"-" * C(variant))^0), "variant")
 	* Cg(Cf(Ct(true)*(P"-" * Cg(extension))^0, rawset), "extension")
-	* (P"-" * Cg(privateuse, "privateuse"))^-1
+	* (P"-" * Cg(M.privateuse, "privateuse"))^-1
 
 local irregular = P"en-GB-oed"
 	+ P"i-ami"
@@ -62,10 +62,8 @@ local irregular = P"en-GB-oed"
 	+ P"sgn-BE-NL"
 	+ P"sgn-CH-DE"
 
-M.privateuse = Cg(privateuse, "privateuse") * Cg(Ct(true), "variant") * Cg(Ct(true), "extension")
-
 M.Language_Tag = (M.langtag
-	+ privateuse
+	+ M.privateuse
 	+ irregular) / function() end -- throw away captures
 
 return M
