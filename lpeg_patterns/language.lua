@@ -6,9 +6,9 @@ local core = require "lpeg_patterns.core"
 local C = lpeg.C
 local P = lpeg.P
 local R = lpeg.R
-local Cf = lpeg.Cf
 local Cg = lpeg.Cg
 local Ct = lpeg.Ct
+local Cmt = lpeg.Cmt
 
 local M = {}
 
@@ -42,7 +42,19 @@ M.langtag = language
 	* (P"-" * Cg(script, "script"))^-1
 	* (P"-" * Cg(region, "region"))^-1
 	* Cg(Ct((P"-" * C(variant))^0), "variant")
-	* Cg(Cf(Ct(true)*(P"-" * Cg(extension))^0, rawset), "extension")
+	* Cg(Cmt(Ct((P"-" * Ct(extension))^0), function(_, _, c)
+		-- Can't use a fold with rawset as we want the pattern to not match if there is a duplicate extension
+		local r = {}
+		for _, v in ipairs(c) do
+			local a, b = v[1], v[2]
+			if r[a] then
+				-- duplicate extension
+				return false
+			end
+			r[a] = b
+		end
+		return true, r
+	end), "extension")
 	* (P"-" * Cg(M.privateuse, "privateuse"))^-1
 
 local irregular = P"en-GB-oed"

@@ -63,7 +63,7 @@ describe("language tags", function()
 		it("Rejects Invalid Tags", function()
 			assert.falsy(langtag:match "de-419-DE") -- two region tags
 			assert.falsy(langtag:match "a-DE") -- use of a single-character subtag in primary position; note that there are a few grandfathered tags that start with "i-" that are valid
-			-- assert.falsy(langtag:match "ar-a-aaa-b-bbb-a-ccc") -- two extensions with same single-letter prefix
+			assert.falsy(langtag:match "ar-a-aaa-b-bbb-a-ccc") -- two extensions with same single-letter prefix
 		end)
 	end)
 end)
