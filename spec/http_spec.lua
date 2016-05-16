@@ -176,7 +176,6 @@ describe("http patterns", function()
 		assert.same({"SID", "31d4d96e407aad42", {Path = "/";}}, Set_Cookie:match"SID=31d4d96e407aad42; Path =/")
 		-- Quoted cookie value
 		assert.same({"SID", "31d4d96e407aad42", {Path = "/";}}, Set_Cookie:match[[SID="31d4d96e407aad42"; Path=/]])
-		-- Quoted cookie value
 	end)
 	it("Parses a Cookie header", function()
 		local Cookie = http.Cookie * EOF
