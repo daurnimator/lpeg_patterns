@@ -27,7 +27,7 @@ _M.pct_encoded = P"%" * C(HEXDIG * HEXDIG) / util.read_hex / string.char -- 2.1
 local sub_delims  = S"!$&'()*+,;=" -- 2.2
 local unreserved  = ALPHA + DIGIT + S"-._~" -- 2.3
 
-_M.scheme = C(ALPHA * (ALPHA + DIGIT + S"+-.")^0) -- 3.1
+_M.scheme = ALPHA * (ALPHA + DIGIT + S"+-.")^0 / string.lower -- 3.1
 
 _M.userinfo = Cs((unreserved + _M.pct_encoded + sub_delims + P":")^0) -- 3.2.1
 

@@ -23,6 +23,10 @@ describe("URI", function()
 		assert.same({scheme="scheme"},
 			uri:match "scheme://")
 	end)
+	it("Normalises to lower case scheme", function()
+		assert.same({scheme="scheme"}, uri:match "Scheme://")
+		assert.same({scheme="scheme"}, uri:match "SCHEME://")
+	end)
 	it("shouldn't allow fragments when using absolute_uri", function()
 		assert.falsy(absolute_uri:match "scheme://userinfo@host:1234/path?query#fragment")
 		assert.same({scheme="scheme", userinfo="userinfo", host="host", port=1234, path="/path", query="query"},
