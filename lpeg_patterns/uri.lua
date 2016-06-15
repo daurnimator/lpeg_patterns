@@ -40,7 +40,7 @@ end
 local function new_IPvFuture(version, string)
 	return setmetatable({version=version, string=string}, IPvFuture_mt)
 end
-local IPvFuture = P"v" * (HEXDIG^1/util.read_hex) * P"." * C((unreserved+sub_delims+P":")^1) / new_IPvFuture
+local IPvFuture = S"vV" * (HEXDIG^1/util.read_hex) * P"." * C((unreserved+sub_delims+P":")^1) / new_IPvFuture
 
 -- RFC 6874
 local ZoneID = Cs((unreserved + _M.pct_encoded)^1)
