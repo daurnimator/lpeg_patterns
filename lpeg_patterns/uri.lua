@@ -51,7 +51,7 @@ end
 
 local IP_literal  = P"[" * ( IPv6addrz + IPvFuture ) * P"]"
 local IP_host     = ( IP_literal + IPv4address ) / tostring
-local host_char   = unreserved + _M.pct_encoded --+ sub_delims
+local host_char   = unreserved / string.lower + _M.pct_encoded --+ sub_delims
 local reg_name    = Cs ( host_char^1 ) + Cc ( nil )
 _M.host = IP_host + reg_name
 
