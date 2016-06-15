@@ -1,9 +1,6 @@
 -- URI
 -- RFC 3986
 
-local tonumber = tonumber
-local strchar  = string.char
-
 local lpeg = require "lpeg"
 local P = lpeg.P
 local S = lpeg.S
@@ -25,7 +22,8 @@ local IPv6address = require "lpeg_patterns.IPv6".IPv6address
 
 local _M = {}
 
-_M.pct_encoded = P"%" * C(HEXDIG * HEXDIG) / util.read_hex / strchar -- 2.1
+_M.pct_encoded = P"%" * C(HEXDIG * HEXDIG) / util.read_hex / string.char -- 2.1
+
 local sub_delims  = S"!$&'()*+,;=" -- 2.2
 local unreserved  = ALPHA + DIGIT + S"-._~" -- 2.3
 
