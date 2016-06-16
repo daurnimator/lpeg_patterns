@@ -22,10 +22,18 @@ local IPv6address = require "lpeg_patterns.IPv6".IPv6address
 
 local _M = {}
 
-_M.pct_encoded = P"%" * C(HEXDIG * HEXDIG) / util.read_hex / string.char -- 2.1
-
 local sub_delims  = S"!$&'()*+,;=" -- 2.2
 local unreserved  = ALPHA + DIGIT + S"-._~" -- 2.3
+_M.pct_encoded = P"%" * (HEXDIG * HEXDIG / util.read_hex) / function(n)
+	local c = string.char(n)
+	if unreserved:match(c) then
+		-- always decode unreserved characters (2.3)
+		return c
+	else
+		-- normalise to upper-case (6.2.2.1)
+		return string.format("%%%02X", n)
+	end
+end -- 2.1
 
 _M.scheme = ALPHA * (ALPHA + DIGIT + S"+-.")^0 / string.lower -- 3.1
 
