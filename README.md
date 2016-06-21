@@ -83,7 +83,7 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
     e.g. uris without a hostname
   - `sane_host` (pattern): a variant that shouldn't match things that people would not normally consider valid hosts.
   - `sane_authority` (pattern): a variant that shouldn't match things that people would not normally consider valid hosts.
-  - `pct_encoded` (pattern): matches a percent encoded octet, produces a of the normalised form.
+  - `pct_encoded` (pattern): matches a percent encoded octet, produces a capture of the normalised form.
 
 
 ### `email`
