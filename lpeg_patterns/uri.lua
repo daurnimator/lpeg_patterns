@@ -59,7 +59,7 @@ end
 
 local IP_literal  = P"[" * ( IPv6addrz + IPvFuture ) * P"]"
 local IP_host     = ( IP_literal + IPv4address ) / tostring
-local host_char   = unreserved / string.lower + _M.pct_encoded --+ sub_delims
+local host_char = unreserved / string.lower + _M.pct_encoded + sub_delims
 local reg_name    = Cs ( host_char^1 ) + Cc ( nil )
 _M.host = IP_host + reg_name
 
@@ -120,7 +120,8 @@ _M.path = path_abempty + path_absolute + path_noscheme + path_rootless + path_em
 -- the "//" isn't required
 	-- if missing, the host needs to at least have a "." and end in two alpha characters
 -- an authority is always required
-local hostsegment = (host_char-P".")^1
+local sane_host_char = unreserved / string.lower
+local hostsegment = (sane_host_char - P".")^1
 local dns_entry   = Cs ( ( hostsegment * P"." )^1 * ALPHA^2 )
 _M.sane_host = IP_host + dns_entry
 _M.sane_authority = ( Cg(_M.userinfo, "userinfo") * P"@" )^-1
