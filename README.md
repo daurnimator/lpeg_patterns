@@ -101,6 +101,209 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `domain_nocfws` (pattern):  the bit after the `@` in an email address; no comments or folding whitespace allowed.
 
 
+### `http`
+
+#### RFC 4918
+
+  - `DAV` (pattern)
+  - `Depth` (pattern)
+  - `Destination` (pattern)
+  - `If` (pattern)
+  - `Lock_Token` (pattern)
+  - `Overwrite` (pattern)
+  - `TimeOut` (pattern)
+
+
+#### RFC 5023
+
+  - `SLUG` (pattern)
+
+
+#### RFC 5323
+
+  - `DASL` (pattern)
+
+
+#### RFC 5789
+
+  - `Accept_Patch` (pattern)
+
+
+#### RFC 5988
+
+  - `Link` (pattern)
+
+
+#### RFC 6265
+
+  - `Set_Cookie` (pattern)
+  - `Cookie` (pattern)
+
+
+#### RFC 6266
+
+  - `Content_Disposition` (pattern)
+
+
+#### RFC 6454
+
+  - `Origin` (pattern)
+
+
+#### RFC 6455
+
+  - `Sec_WebSocket_Accept` (pattern)
+  - `Sec_WebSocket_Key` (pattern)
+  - `Sec_WebSocket_Extensions` (pattern)
+  - `Sec_WebSocket_Protocol_Client` (pattern)
+  - `Sec_WebSocket_Protocol_Server` (pattern)
+  - `Sec_WebSocket_Version_Client` (pattern)
+  - `Sec_WebSocket_Version_Server` (pattern)
+
+
+#### RFC 6638
+
+  - `Schedule_Reply` (pattern)
+  - `Schedule_Tag` (pattern)
+  - `If_Schedule_Tag_Match` (pattern)
+
+
+#### RFC 6797
+
+  - `Strict_Transport_Security` (pattern)
+
+
+#### RFC 7034
+
+  - `X_Frame_Options` (pattern)
+
+
+#### RFC 7089
+
+  - `Accept_Datetime` (pattern)
+  - `Memento_Datetime` (pattern)
+
+
+#### RFC 7230
+
+  - `request_line` (pattern)
+  - `field_name` (pattern)
+  - `field_value` (pattern)
+  - `header_field` (pattern)
+  - `OWS` (pattern)
+  - `RWS` (pattern)
+  - `BWS` (pattern)
+  - `token` (pattern)
+  - `qdtext` (pattern)
+  - `quoted_string` (pattern)
+  - `comment` (pattern)
+  - `Content_Length` (pattern)
+  - `Transfer_Encoding` (pattern)
+  - `chunk_ext` (pattern)
+  - `TE` (pattern)
+  - `Trailer` (pattern)
+  - `request_target` (pattern)
+  - `Host` (pattern)
+  - `Via` (pattern)
+  - `Connection` (pattern)
+  - `Upgrade` (pattern)
+
+
+#### RFC 7231
+
+  - `Content_Encoding` (pattern)
+  - `Content_Type` (pattern)
+  - `Content_Language` (pattern)
+  - `Content_Location` (pattern)
+  - `Expect` (pattern)
+  - `Max_Forwards` (pattern)
+  - `Accept` (pattern)
+  - `Accept_Charset` (pattern)
+  - `Accept_Encoding` (pattern)
+  - `Accept_Language` (pattern)
+  - `From` (pattern)
+  - `Referer` (pattern)
+  - `User_Agent` (pattern)
+  - `Date` (pattern)
+  - `Location` (pattern)
+  - `Retry_After` (pattern)
+  - `Vary` (pattern)
+  - `Allow` (pattern)
+  - `Server` (pattern)
+
+
+#### RFC 7232
+
+  - `Last_Modified` (pattern)
+  - `ETag` (pattern)
+  - `If_Match` (pattern)
+  - `If_None_Match` (pattern)
+  - `If_Modified_Since` (pattern)
+  - `If_Unmodified_Since` (pattern)
+
+
+#### RFC 7233
+
+  - `Accept_Ranges` (pattern)
+  - `Range` (pattern)
+  - `If_Range` (pattern)
+  - `Content_Range` (pattern)
+
+
+#### RFC 7234
+
+  - `Age` (pattern)
+  - `Cache_Control` (pattern)
+  - `Expires` (pattern)
+  - `Pragma` (pattern)
+  - `Warning` (pattern)
+
+
+#### RFC 7235
+
+  - `WWW_Authenticate` (pattern)
+  - `Authorization` (pattern)
+  - `Proxy_Authenticate` (pattern)
+  - `Proxy_Authorization` (pattern)
+
+
+#### RFC 7239
+
+  - `Forwarded` (pattern)
+
+
+#### RFC 7469
+
+  - `Public_Key_Pins` (pattern)
+  - `Public_Key_Pins_Report_Only` (pattern)
+
+
+#### RFC 7486
+
+  - `Hobareg` (pattern)
+
+
+#### RFC 7615
+
+  - `Authentication_Info` (pattern)
+  - `Proxy_Authentication_Info` (pattern)
+
+
+#### RFC 7639
+
+  - `ALPN` (pattern)
+
+
+#### RFC 7809
+
+  - `CalDAV_Timezones` (pattern)
+
+
+#### RFC 7838
+
+  - `Alt_Svc` (pattern)
+  - `Alt_Used` (pattern)
+
 
 ### `phone`
 
