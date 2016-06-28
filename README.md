@@ -120,5 +120,5 @@ Patterns for definitions from [RFC-4646 Section 2.1](https://tools.ietf.org/html
       - `variant` (optional): an array
       - `extension` (optional): a dictionary from singleton to value
       - `privateuse` (optional): an array
-  - `privateuse` (pattern): an array
+  - `privateuse` (pattern): captures an array
   - `Language_Tag` (pattern): captures the whole language tag
