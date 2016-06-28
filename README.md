@@ -224,9 +224,9 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `From` (pattern)
   - `Referer` (pattern)
   - `User_Agent` (pattern)
-  - `Date` (pattern)
+  - `Date` (pattern): capture is a table in the same format as used by [`os.time`](http://www.lua.org/manual/5.3/manual.html#pdf-os.time)
   - `Location` (pattern)
-  - `Retry_After` (pattern)
+  - `Retry_After` (pattern): capture is either a table describing an absolute time in the same format as used by [`os.time`](http://www.lua.org/manual/5.3/manual.html#pdf-os.time), or a relative time as a number of seconds
   - `Vary` (pattern)
   - `Allow` (pattern)
   - `Server` (pattern)
@@ -234,19 +234,19 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
 
 #### RFC 7232
 
-  - `Last_Modified` (pattern)
+  - `Last_Modified` (pattern): capture is a table in the same format as used by [`os.time`](http://www.lua.org/manual/5.3/manual.html#pdf-os.time)
   - `ETag` (pattern)
   - `If_Match` (pattern)
   - `If_None_Match` (pattern)
-  - `If_Modified_Since` (pattern)
-  - `If_Unmodified_Since` (pattern)
+  - `If_Modified_Since` (pattern): capture is a table in the same format as used by [`os.time`](http://www.lua.org/manual/5.3/manual.html#pdf-os.time)
+  - `If_Unmodified_Since` (pattern): capture is a table in the same format as used by [`os.time`](http://www.lua.org/manual/5.3/manual.html#pdf-os.time)
 
 
 #### RFC 7233
 
   - `Accept_Ranges` (pattern)
   - `Range` (pattern)
-  - `If_Range` (pattern)
+  - `If_Range` (pattern): capture is either an `entity_tag` or a table in the same format as used by [`os.time`](http://www.lua.org/manual/5.3/manual.html#pdf-os.time)
   - `Content_Range` (pattern)
 
 
@@ -254,7 +254,7 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
 
   - `Age` (pattern)
   - `Cache_Control` (pattern)
-  - `Expires` (pattern)
+  - `Expires` (pattern): capture is a table in the same format as used by [`os.time`](http://www.lua.org/manual/5.3/manual.html#pdf-os.time)
   - `Pragma` (pattern)
   - `Warning` (pattern)
 
