@@ -2,7 +2,7 @@ A collection of [LPEG](http://www.inf.puc-rio.br/~roberto/lpeg/lpeg.html) patter
 
 ## Use cases
 
-  - Strict validatation of user input
+  - Strict validation of user input
   - Searching free-form input
 
 
