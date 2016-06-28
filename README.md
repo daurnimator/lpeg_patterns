@@ -59,7 +59,7 @@ IPv4 "dotted decimal notation" in this document refers to "strict" form (see [RF
 
 Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
 
-  - `uri` (pattern): on success, returns a table with fields: (similar to [luasocket](http://w3.impa.br/~diego/software/luasocket/url.html))
+  - `uri` (pattern): on success, returns a table with fields: (similar to [luasocket](http://w3.impa.br/~diego/software/luasocket/url.html#parse))
       - `scheme`
       - `userinfo`
       - `host`
