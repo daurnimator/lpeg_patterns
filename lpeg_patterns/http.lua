@@ -553,13 +553,13 @@ local forwarded_pair = _M.token * P"=" * value
 local forwarded_element = forwarded_pair^-1 * (P";" * forwarded_pair^-1)^0
 _M.Forwarded = comma_sep(forwarded_element)
 
--- RFC 7486
-_M.Hobareg = C"regok" + C"reginwork"
-
 -- RFC 7469
 local Public_Key_Directives = directive * (_M.OWS * P";" * _M.OWS * directive)^0
 _M.Public_Key_Pins = Public_Key_Directives
 _M.Public_Key_Pins_Report_Only = Public_Key_Directives
+
+-- RFC 7486
+_M.Hobareg = C"regok" + C"reginwork"
 
 -- RFC 7615
 _M.Authentication_Info = comma_sep(auth_param)
