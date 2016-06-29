@@ -103,7 +103,7 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
 
 ### `http`
 
-#### RFC 4918
+#### [RFC 4918](https://tools.ietf.org/html/rfc4918)
 
   - `DAV` (pattern)
   - `Depth` (pattern)
@@ -114,43 +114,43 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `TimeOut` (pattern)
 
 
-#### RFC 5023
+#### [RFC 5023](https://tools.ietf.org/html/rfc5023)
 
   - `SLUG` (pattern)
 
 
-#### RFC 5323
+#### [RFC 5323](https://tools.ietf.org/html/rfc5323)
 
   - `DASL` (pattern)
 
 
-#### RFC 5789
+#### [RFC 5789](https://tools.ietf.org/html/rfc5789)
 
   - `Accept_Patch` (pattern)
 
 
-#### RFC 5988
+#### [RFC 5988](https://tools.ietf.org/html/rfc5988)
 
   - `Link` (pattern)
 
 
-#### RFC 6265
+#### [RFC 6265](https://tools.ietf.org/html/rfc6265)
 
   - `Set_Cookie` (pattern)
   - `Cookie` (pattern)
 
 
-#### RFC 6266
+#### [RFC 6266](https://tools.ietf.org/html/rfc6266)
 
   - `Content_Disposition` (pattern)
 
 
-#### RFC 6454
+#### [RFC 6454](https://tools.ietf.org/html/rfc6454)
 
   - `Origin` (pattern)
 
 
-#### RFC 6455
+#### [RFC 6455](https://tools.ietf.org/html/rfc6455)
 
   - `Sec_WebSocket_Accept` (pattern)
   - `Sec_WebSocket_Key` (pattern)
@@ -161,30 +161,30 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `Sec_WebSocket_Version_Server` (pattern)
 
 
-#### RFC 6638
+#### [RFC 6638](https://tools.ietf.org/html/rfc6638)
 
   - `Schedule_Reply` (pattern)
   - `Schedule_Tag` (pattern)
   - `If_Schedule_Tag_Match` (pattern)
 
 
-#### RFC 6797
+#### [RFC 6797](https://tools.ietf.org/html/rfc6797)
 
   - `Strict_Transport_Security` (pattern)
 
 
-#### RFC 7034
+#### [RFC 7034](https://tools.ietf.org/html/rfc7034)
 
   - `X_Frame_Options` (pattern)
 
 
-#### RFC 7089
+#### [RFC 7089](https://tools.ietf.org/html/rfc7089)
 
   - `Accept_Datetime` (pattern)
   - `Memento_Datetime` (pattern)
 
 
-#### RFC 7230
+#### [RFC 7230](https://tools.ietf.org/html/rfc7230)
 
   - `request_line` (pattern)
   - `field_name` (pattern)
@@ -209,7 +209,7 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `Upgrade` (pattern)
 
 
-#### RFC 7231
+#### [RFC 7231](https://tools.ietf.org/html/rfc7231)
 
   - `Content_Encoding` (pattern)
   - `Content_Type` (pattern)
@@ -232,7 +232,7 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `Server` (pattern)
 
 
-#### RFC 7232
+#### [RFC 7232](https://tools.ietf.org/html/rfc7232)
 
   - `Last_Modified` (pattern): capture is a table in the same format as used by [`os.time`](http://www.lua.org/manual/5.3/manual.html#pdf-os.time)
   - `ETag` (pattern)
@@ -242,7 +242,7 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `If_Unmodified_Since` (pattern): capture is a table in the same format as used by [`os.time`](http://www.lua.org/manual/5.3/manual.html#pdf-os.time)
 
 
-#### RFC 7233
+#### [RFC 7233](https://tools.ietf.org/html/rfc7233)
 
   - `Accept_Ranges` (pattern)
   - `Range` (pattern)
@@ -250,7 +250,7 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `Content_Range` (pattern)
 
 
-#### RFC 7234
+#### [RFC 7234](https://tools.ietf.org/html/rfc7234)
 
   - `Age` (pattern)
   - `Cache_Control` (pattern)
@@ -259,7 +259,7 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `Warning` (pattern)
 
 
-#### RFC 7235
+#### [RFC 7235](https://tools.ietf.org/html/rfc7235)
 
   - `WWW_Authenticate` (pattern)
   - `Authorization` (pattern)
@@ -267,39 +267,39 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `Proxy_Authorization` (pattern)
 
 
-#### RFC 7239
+#### [RFC 7239](https://tools.ietf.org/html/rfc7239)
 
   - `Forwarded` (pattern)
 
 
-#### RFC 7469
+#### [RFC 7469](https://tools.ietf.org/html/rfc7469)
 
   - `Public_Key_Pins` (pattern)
   - `Public_Key_Pins_Report_Only` (pattern)
 
 
-#### RFC 7486
+#### [RFC 7486](https://tools.ietf.org/html/rfc7486)
 
   - `Hobareg` (pattern)
 
 
-#### RFC 7615
+#### [RFC 7615](https://tools.ietf.org/html/rfc7615)
 
   - `Authentication_Info` (pattern)
   - `Proxy_Authentication_Info` (pattern)
 
 
-#### RFC 7639
+#### [RFC 7639](https://tools.ietf.org/html/rfc7639)
 
   - `ALPN` (pattern)
 
 
-#### RFC 7809
+#### [RFC 7809](https://tools.ietf.org/html/rfc7809)
 
   - `CalDAV_Timezones` (pattern)
 
 
-#### RFC 7838
+#### [RFC 7838](https://tools.ietf.org/html/rfc7838)
 
   - `Alt_Svc` (pattern)
   - `Alt_Used` (pattern)
