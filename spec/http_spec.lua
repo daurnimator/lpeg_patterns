@@ -25,6 +25,7 @@ describe("http patterns", function()
 	it("Splits a request line", function()
 		local request_line = lpeg.Ct(http.request_line) * EOF
 		assert.same({"GET", "/", 1.0}, request_line:match("GET / HTTP/1.0\r\n"))
+		assert.same({"GET", "http://foo.com/", 1.0}, request_line:match("GET http://foo.com/ HTTP/1.0\r\n"))
 		assert.same({"OPTIONS", "*", 1.1}, request_line:match("OPTIONS * HTTP/1.1\r\n"))
 	end)
 	it("Splits a Connection header", function()

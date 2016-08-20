@@ -26,6 +26,10 @@ local _M = {}
 
 local T_F = S"Tt" * Cc(true) + S"Ff" * Cc(false)
 
+local function no_rich_capture(patt)
+	return C(patt) / function(a) return a end
+end
+
 local function case_insensitive(str)
 	local patt = P(true)
 	for i=1, #str do
@@ -148,8 +152,8 @@ _M.Trailer = comma_sep(_M.field_name, 1)
 
 -- RFC 7230 Section 5.3
 local origin_form = Cs(absolute_path * (P"?" * uri.query)^-1)
-local absolute_form = uri.absolute_uri
-local authority_form = uri.authority
+local absolute_form = no_rich_capture(uri.absolute_uri)
+local authority_form = no_rich_capture(uri.authority)
 local asterisk_form = C"*"
 _M.request_target = asterisk_form + origin_form + absolute_form + authority_form
 
