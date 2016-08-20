@@ -323,7 +323,9 @@ _M.Accept_Patch = comma_sep(media_type, 1)
 
 -- RFC 5987
 local attr_char = core.ALPHA + core.DIGIT + S"!#$&+-.^_`|~"
-local value_chars = Cs((uri.pct_encoded + attr_char)^0)
+-- can't use uri.pct_encoded, as it doesn't decode all characters
+local pct_encoded = P"%" * (core.HEXDIG * core.HEXDIG / util.read_hex) / string.char
+local value_chars = Cs((pct_encoded + attr_char)^0)
 local parmname = C(attr_char^1)
 local ext_value do
 	-- ext-value uses charset from RFC 5987 instead
