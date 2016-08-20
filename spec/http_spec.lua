@@ -28,6 +28,15 @@ describe("http patterns", function()
 		assert.same({"GET", "http://foo.com/", 1.0}, request_line:match("GET http://foo.com/ HTTP/1.0\r\n"))
 		assert.same({"OPTIONS", "*", 1.1}, request_line:match("OPTIONS * HTTP/1.1\r\n"))
 	end)
+	it("Handles folding whitespace in field_value", function()
+		local field_value = http.field_value * EOF
+		assert.same("Foo", field_value:match("Foo"))
+		-- doesn't remove repeated whitespace
+		assert.same("Foo  Bar", field_value:match("Foo  Bar"))
+		-- unfolds whitespace broken over multiple lines
+		assert.same("Foo Bar", field_value:match("Foo\r\n Bar"))
+		assert.same("Foo Bar", field_value:match("Foo \r\n Bar"))
+	end)
 	it("Splits a Connection header", function()
 		local Connection = lpeg.Ct(http.Connection) * EOF
 		assert.same({}, Connection:match(" "))

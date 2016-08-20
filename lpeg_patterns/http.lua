@@ -112,7 +112,7 @@ _M.comment = P { P"(" * ( ctext + quoted_pair + V(1) )^0 * P")" }
 _M.field_name = _M.token / string.lower -- case insensitive
 local field_vchar = core.VCHAR + obs_text
 local field_content = field_vchar * (( core.SP + core.HTAB )^1 * field_vchar)^-1
-local obs_fold = core.CRLF * ( core.SP + core.HTAB )^1 / " "
+local obs_fold = ( core.SP + core.HTAB )^0 * core.CRLF * ( core.SP + core.HTAB )^1 / " "
 -- field_value is not correct, see Errata: https://www.rfc-editor.org/errata_search.php?rfc=7230&eid=4189
 _M.field_value = Cs((field_content + obs_fold)^0)
 _M.header_field = _M.field_name * P":" * _M.OWS * _M.field_value * _M.OWS
