@@ -103,6 +103,8 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
 
 ### `http`
 
+These patterns should be considered to have non stable APIs.
+
 #### [RFC 4918](https://tools.ietf.org/html/rfc4918)
 
   - `DAV` (pattern)
