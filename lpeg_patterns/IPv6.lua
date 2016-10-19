@@ -4,6 +4,7 @@ local unpack = table.unpack or unpack -- luacheck: ignore 113
 
 local lpeg = require "lpeg"
 local P = lpeg.P
+local V = lpeg.V
 local Cc = lpeg.Cc
 local Cg = lpeg.Cg
 
@@ -57,69 +58,77 @@ function IPv6_mt:__tostring()
 end
 
 -- RFC 3986 Section 3.2.2
-local h16 = HEXDIG * HEXDIG^-3 / util.read_hex
-local h16c = h16 * P":"
-local ls32 = ( h16c * h16 ) + IPv4address / function ( ipv4 )
-	local o1, o2, o3, o4 = ipv4:unpack()
-	return o1*2^8 + o2 , o3*2^8 + o4
-end
-local function mh16c(n)
-	local acc = P(true)
-	for _=1, n do
-		acc = acc * h16c
-	end
-	return acc
-end
-local function mh16(n)
-	return mh16c(n-1) * h16
-end
-local function mcc(n)
-	local t = {}
-	for i=1, n do
-		t[i] = 0
-	end
-	return P"::" * Cc(unpack(t,1,n))
-end
+-- This is written as a grammar to reduce memory usage
+local raw_IPv6address = Cg(P{
+	h16 = HEXDIG * HEXDIG^-3 / util.read_hex;
+	h16c = V"h16" * P":";
+	ls32 = ( V"h16c" * V"h16" ) + IPv4address / function ( ipv4 )
+		local o1, o2, o3, o4 = ipv4:unpack()
+		return o1*2^8 + o2 , o3*2^8 + o4
+	end;
 
-local raw_IPv6address = Cg(
-	                      mh16c(6) * ls32
-     +           mcc(1) * mh16c(5) * ls32
-     +           mcc(2) * mh16c(4) * ls32
-     + h16     * mcc(1) * mh16c(4) * ls32
-     +           mcc(3) * mh16c(3) * ls32
-     + h16     * mcc(2) * mh16c(3) * ls32
-     + mh16(2) * mcc(1) * mh16c(3) * ls32
-     +           mcc(4) * mh16c(2) * ls32
-     + h16     * mcc(3) * mh16c(2) * ls32
-     + mh16(2) * mcc(2) * mh16c(2) * ls32
-     + mh16(3) * mcc(1) * mh16c(2) * ls32
-     +           mcc(5) * h16c     * ls32
-     + h16     * mcc(4) * h16c     * ls32
-     + mh16(2) * mcc(3) * h16c     * ls32
-     + mh16(3) * mcc(2) * h16c     * ls32
-     + mh16(4) * mcc(1) * h16c     * ls32
-     +           mcc(6)            * ls32
-     + h16     * mcc(5)            * ls32
-     + mh16(2) * mcc(4)            * ls32
-     + mh16(3) * mcc(3)            * ls32
-     + mh16(4) * mcc(2)            * ls32
-     + mh16(5) * mcc(1)            * ls32
-     +           mcc(7) * h16
-     + h16     * mcc(6) * h16
-     + mh16(2) * mcc(5) * h16
-     + mh16(3) * mcc(4) * h16
-     + mh16(4) * mcc(3) * h16
-     + mh16(5) * mcc(2) * h16
-     + mh16(6) * mcc(1) * h16
-     +           mcc(8)
-     + mh16(1) * mcc(7)
-     + mh16(2) * mcc(6)
-     + mh16(3) * mcc(5)
-     + mh16(4) * mcc(4)
-     + mh16(5) * mcc(3)
-     + mh16(6) * mcc(2)
-     + mh16(7) * mcc(1)
-)
+	mh16c_1 = V"h16c";
+	mh16c_2 = V"h16c" * V"h16c";
+	mh16c_3 = V"h16c" * V"h16c" * V"h16c";
+	mh16c_4 = V"h16c" * V"h16c" * V"h16c" * V"h16c";
+	mh16c_5 = V"h16c" * V"h16c" * V"h16c" * V"h16c" * V"h16c";
+	mh16c_6 = V"h16c" * V"h16c" * V"h16c" * V"h16c" * V"h16c" * V"h16c";
+
+	mcc_1 = P"::" * Cc(0);
+	mcc_2 = P"::" * Cc(0, 0);
+	mcc_3 = P"::" * Cc(0, 0, 0);
+	mcc_4 = P"::" * Cc(0, 0, 0, 0);
+	mcc_5 = P"::" * Cc(0, 0, 0, 0, 0);
+	mcc_6 = P"::" * Cc(0, 0, 0, 0, 0, 0);
+	mcc_7 = P"::" * Cc(0, 0, 0, 0, 0, 0, 0);
+	mcc_8 = P"::" * Cc(0, 0, 0, 0, 0, 0, 0, 0);
+
+	mh16_1 = V"h16";
+	mh16_2 = V"mh16c_1" * V"h16";
+	mh16_3 = V"mh16c_2" * V"h16";
+	mh16_4 = V"mh16c_3" * V"h16";
+	mh16_5 = V"mh16c_4" * V"h16";
+	mh16_6 = V"mh16c_5" * V"h16";
+	mh16_7 = V"mh16c_6" * V"h16";
+
+	                          V"mh16c_6" * V"ls32"
+     +             V"mcc_1" * V"mh16c_5" * V"ls32"
+     +             V"mcc_2" * V"mh16c_4" * V"ls32"
+     + V"h16"    * V"mcc_1" * V"mh16c_4" * V"ls32"
+     +             V"mcc_3" * V"mh16c_3" * V"ls32"
+     + V"h16"    * V"mcc_2" * V"mh16c_3" * V"ls32"
+     + V"mh16_2" * V"mcc_1" * V"mh16c_3" * V"ls32"
+     +             V"mcc_4" * V"mh16c_2" * V"ls32"
+     + V"h16"    * V"mcc_3" * V"mh16c_2" * V"ls32"
+     + V"mh16_2" * V"mcc_2" * V"mh16c_2" * V"ls32"
+     + V"mh16_3" * V"mcc_1" * V"mh16c_2" * V"ls32"
+     +             V"mcc_5" * V"h16c"    * V"ls32"
+     + V"h16"    * V"mcc_4" * V"h16c"    * V"ls32"
+     + V"mh16_2" * V"mcc_3" * V"h16c"    * V"ls32"
+     + V"mh16_3" * V"mcc_2" * V"h16c"    * V"ls32"
+     + V"mh16_4" * V"mcc_1" * V"h16c"    * V"ls32"
+     +             V"mcc_6"              * V"ls32"
+     + V"h16"    * V"mcc_5"              * V"ls32"
+     + V"mh16_2" * V"mcc_4"              * V"ls32"
+     + V"mh16_3" * V"mcc_3"              * V"ls32"
+     + V"mh16_4" * V"mcc_2"              * V"ls32"
+     + V"mh16_5" * V"mcc_1"              * V"ls32"
+     +             V"mcc_7" * V"h16"
+     + V"h16"    * V"mcc_6" * V"h16"
+     + V"mh16_2" * V"mcc_5" * V"h16"
+     + V"mh16_3" * V"mcc_4" * V"h16"
+     + V"mh16_4" * V"mcc_3" * V"h16"
+     + V"mh16_5" * V"mcc_2" * V"h16"
+     + V"mh16_6" * V"mcc_1" * V"h16"
+     +             V"mcc_8"
+     + V"mh16_1" * V"mcc_7"
+     + V"mh16_2" * V"mcc_6"
+     + V"mh16_3" * V"mcc_5"
+     + V"mh16_4" * V"mcc_4"
+     + V"mh16_5" * V"mcc_3"
+     + V"mh16_6" * V"mcc_2"
+     + V"mh16_7" * V"mcc_1"
+})
 
 local IPv6address = raw_IPv6address / new_IPv6
 
