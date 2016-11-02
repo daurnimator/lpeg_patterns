@@ -276,7 +276,7 @@ local hour = Cg(core.DIGIT * core.DIGIT / tonumber, "hour")
 -- XXX only match 00:00:00 - 23:59:60 (leap second)?
 
 local time_of_day = hour * P":" * minute * P":" * second
-local IMF_fixdate = Ct(day_name * P"," * core.SP * date1 * core.SP * time_of_day * core.SP * GMT)
+_M.IMF_fixdate = Ct(day_name * P"," * core.SP * date1 * core.SP * time_of_day * core.SP * GMT)
 
 local date2 do
 	local year_barrier = 70
@@ -303,7 +303,7 @@ local date3 = month * core.SP * (day + Cg(core.SP * core.DIGIT / tonumber, "day"
 local asctime_date = Ct(day_name * core.SP * date3 * core.SP * time_of_day * core.SP * year)
 local obs_date = rfc850_date + asctime_date
 
-local HTTP_date = IMF_fixdate + obs_date
+local HTTP_date = _M.IMF_fixdate + obs_date
 _M.Date = HTTP_date
 
 -- RFC 7231 Section 7.1.2
@@ -421,8 +421,8 @@ local directive = Cg(directive_name * ((P"=" * directive_value) + Cc(true)))
 _M.Strict_Transport_Security = directive^-1 * (_M.OWS * P";" * _M.OWS * directive^-1)^0
 
 -- RFC 7089
-_M.Accept_Datetime = IMF_fixdate
-_M.Memento_Datetime = IMF_fixdate
+_M.Accept_Datetime = _M.IMF_fixdate
+_M.Memento_Datetime = _M.IMF_fixdate
 
 -- RFC 7232 Section 2.2
 _M.Last_Modified = HTTP_date

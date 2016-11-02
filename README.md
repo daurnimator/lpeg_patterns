@@ -213,6 +213,7 @@ These patterns should be considered to have non stable APIs.
 
 #### [RFC 7231](https://tools.ietf.org/html/rfc7231)
 
+  - `IMF_fixdate` (pattern)
   - `Content_Encoding` (pattern)
   - `Content_Type` (pattern)
   - `Content_Language` (pattern)
