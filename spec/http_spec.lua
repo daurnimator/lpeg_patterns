@@ -186,6 +186,9 @@ describe("http patterns", function()
 		assert.same({"SID", "31d4d96e407aad42", {Path = "/";}}, Set_Cookie:match"SID=31d4d96e407aad42; Path =/")
 		-- Quoted cookie value
 		assert.same({"SID", "31d4d96e407aad42", {Path = "/";}}, Set_Cookie:match[[SID="31d4d96e407aad42"; Path=/]])
+		-- Crazy whitespace
+		assert.same({"SID", "31d4d96e407aad42", {Path = "/";}}, Set_Cookie:match"SID  =   31d4d96e407aad42  ;   Path  =  /   ")
+		assert.same({"SID", "31d4d96e407aad42", {["foo  bar"] = true;}}, Set_Cookie:match"SID  =   31d4d96e407aad42  ;  foo  bar   ")
 	end)
 	it("Parses a Cookie header", function()
 		local Cookie = http.Cookie * EOF
