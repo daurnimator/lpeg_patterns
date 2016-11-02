@@ -361,9 +361,9 @@ do -- RFC 6265
 	local ext_char = core.CHAR - core.CTL - S";"
 	ext_char = ext_char - core.WSP + core.WSP * #(core.WSP^0 * ext_char) -- No trailing whitespace
 	-- Complexity is to make sure whitespace before an `=` isn't captured
-	local extension_av = C(((ext_char - S"=" - core.WSP) + core.WSP^1 * #(1-S"="))^0)
+	local extension_av = ((ext_char - S"=" - core.WSP) + core.WSP^1 * #(1-S"="))^0 / string.lower
 			* _M.BWS * P"=" * _M.BWS * C(ext_char^0)
-		+ C((ext_char)^0) * Cc(true)
+		+ (ext_char)^0 / string.lower * Cc(true)
 	local cookie_av = extension_av
 	local set_cookie_string = cookie_pair * Cf(Ct(true) * (P";" * _M.OWS * Cg(cookie_av) * _M.OWS)^0, rawset)
 	_M.Set_Cookie = set_cookie_string
