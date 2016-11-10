@@ -211,4 +211,13 @@ describe("http patterns", function()
 		assert.same({["max-age"] = "0"; includesubdomains = true}, sts_patt:match("max-age=0;includeSubdomains"))
 		assert.same({["max-age"] = "0"; includesubdomains = true}, sts_patt:match("max-age=0 ; includeSubdomains"))
 	end)
+	it("Parses a HPKP header", function()
+		-- Example from RFC 7469 2.1.5
+		local pkp_patt = lpeg.Cf(lpeg.Ct(true) * http.Public_Key_Pins, function(t, k, v) table.insert(t, {k,v}) return t end) * EOF
+		assert.same({
+			{ "max-age", "3000" };
+			{ "pin-sha256", "d6qzRu9zOECb90Uez27xWltNsj0e1Md7GkYYkVoZWmM=" };
+			{ "pin-sha256", "E9CZ9INDbd+2eRQozYqqbQ2yXLVKB9+xcprMF+44U1g=" };
+		}, pkp_patt:match([[max-age=3000; pin-sha256="d6qzRu9zOECb90Uez27xWltNsj0e1Md7GkYYkVoZWmM="; pin-sha256="E9CZ9INDbd+2eRQozYqqbQ2yXLVKB9+xcprMF+44U1g="]]))
+	end)
 end)
