@@ -175,6 +175,7 @@ describe("http patterns", function()
 	it("Parses a Set-Cookie header", function()
 		local Set_Cookie = lpeg.Ct(http.Set_Cookie) * EOF
 		assert.same({"SID", "31d4d96e407aad42", {}}, Set_Cookie:match"SID=31d4d96e407aad42")
+		assert.same({"SID", "", {}}, Set_Cookie:match"SID=")
 		assert.same({"SID", "31d4d96e407aad42", {path="/"; domain="example.com"}}, Set_Cookie:match"SID=31d4d96e407aad42; Path=/; Domain=example.com")
 		assert.same({"SID", "31d4d96e407aad42", {
 			path = "/";
@@ -187,15 +188,16 @@ describe("http patterns", function()
 		-- Quoted cookie value
 		assert.same({"SID", "31d4d96e407aad42", {path = "/";}}, Set_Cookie:match[[SID="31d4d96e407aad42"; Path=/]])
 		-- Crazy whitespace
-		assert.same({"SID", "31d4d96e407aad42", {path = "/";}}, Set_Cookie:match"SID  =   31d4d96e407aad42  ;   Path  =  /   ")
-		assert.same({"SID", "31d4d96e407aad42", {["foo  bar"] = true;}}, Set_Cookie:match"SID  =   31d4d96e407aad42  ;  foo  bar   ")
+		assert.same({"SID", "31d4d96e407aad42", {path = "/";}}, Set_Cookie:match"SID  =   31d4d96e407aad42  ;   Path  =  /")
+		assert.same({"SID", "31d4d96e407aad42", {["foo  bar"] = true;}}, Set_Cookie:match"SID  =   31d4d96e407aad42  ;  foo  bar")
 	end)
 	it("Parses a Cookie header", function()
 		local Cookie = http.Cookie * EOF
 		assert.same({SID = "31d4d96e407aad42"}, Cookie:match"SID=31d4d96e407aad42")
+		assert.same({SID = "31d4d96e407aad42"}, Cookie:match"SID = 31d4d96e407aad42")
 		assert.same({SID = "31d4d96e407aad42", lang = "en-US"}, Cookie:match"SID=31d4d96e407aad42; lang=en-US")
 	end)
-	it("Parses a Content_Disposition header", function()
+	it("Parses a Content-Disposition header", function()
 		local Content_Disposition = lpeg.Ct(http.Content_Disposition) * EOF
 		assert.same({"foo", {}}, Content_Disposition:match"foo")
 		assert.same({"foo", {filename="example"}}, Content_Disposition:match"foo; filename=example")

@@ -365,7 +365,7 @@ do -- RFC 6265
 			* _M.BWS * P"=" * _M.BWS * C(ext_char^0)
 		+ (ext_char)^0 / string.lower * Cc(true)
 	local cookie_av = extension_av
-	local set_cookie_string = cookie_pair * Cf(Ct(true) * (P";" * _M.OWS * Cg(cookie_av) * _M.OWS)^0, rawset)
+	local set_cookie_string = cookie_pair * Cf(Ct(true) * (P";" * _M.OWS * Cg(cookie_av))^0, rawset)
 	_M.Set_Cookie = set_cookie_string
 
 	local cookie_string = Cf(Ct(true) * Cg(cookie_pair) * (P";" * _M.OWS * Cg(cookie_pair))^0, rawset)
