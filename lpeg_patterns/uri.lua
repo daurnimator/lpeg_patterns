@@ -22,7 +22,7 @@ local IPv6address = require "lpeg_patterns.IPv6".IPv6address
 
 local _M = {}
 
-local sub_delims  = S"!$&'()*+,;=" -- 2.2
+_M.sub_delims = S"!$&'()*+,;=" -- 2.2
 local unreserved  = ALPHA + DIGIT + S"-._~" -- 2.3
 _M.pct_encoded = P"%" * (HEXDIG * HEXDIG / util.read_hex) / function(n)
 	local c = string.char(n)
@@ -37,7 +37,7 @@ end -- 2.1
 
 _M.scheme = ALPHA * (ALPHA + DIGIT + S"+-.")^0 / string.lower -- 3.1
 
-_M.userinfo = Cs((unreserved + _M.pct_encoded + sub_delims + P":")^0) -- 3.2.1
+_M.userinfo = Cs((unreserved + _M.pct_encoded + _M.sub_delims + P":")^0) -- 3.2.1
 
 -- Host 3.2.2
 
@@ -48,7 +48,7 @@ end
 local function new_IPvFuture(version, string)
 	return setmetatable({version=version, string=string}, IPvFuture_mt)
 end
-local IPvFuture = S"vV" * (HEXDIG^1/util.read_hex) * P"." * C((unreserved+sub_delims+P":")^1) / new_IPvFuture
+local IPvFuture = S"vV" * (HEXDIG^1/util.read_hex) * P"." * C((unreserved+_M.sub_delims+P":")^1) / new_IPvFuture
 
 -- RFC 6874
 local ZoneID = Cs((unreserved + _M.pct_encoded)^1)
@@ -59,14 +59,14 @@ end
 
 local IP_literal  = P"[" * ( IPv6addrz + IPvFuture ) * P"]"
 local IP_host     = ( IP_literal + IPv4address ) / tostring
-local host_char = unreserved / string.lower + _M.pct_encoded + sub_delims
+local host_char = unreserved / string.lower + _M.pct_encoded + _M.sub_delims
 local reg_name    = Cs ( host_char^1 ) + Cc ( nil )
 _M.host = IP_host + reg_name
 
 _M.port = DIGIT^0 / tonumber -- 3.2.3
 
 -- Path 3.3
-local pchar = unreserved + _M.pct_encoded + sub_delims + S":@"
+local pchar = unreserved + _M.pct_encoded + _M.sub_delims + S":@"
 local segment = pchar^0
 _M.segment = Cs(segment)
 local segment_nz = pchar^1
