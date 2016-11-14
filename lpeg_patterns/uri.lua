@@ -59,8 +59,11 @@ end
 
 local IP_literal  = P"[" * ( IPv6addrz + IPvFuture ) * P"]"
 local IP_host     = ( IP_literal + IPv4address ) / tostring
-local host_char = unreserved / string.lower + _M.pct_encoded + _M.sub_delims
-local reg_name    = Cs ( host_char^1 ) + Cc ( nil )
+local reg_name = Cs((
+	unreserved / string.lower
+	+ _M.pct_encoded / function(s) return s:sub(1,1) == "%" and s or string.lower(s) end
+	+ _M.sub_delims
+)^1) + Cc(nil)
 _M.host = IP_host + reg_name
 
 _M.port = DIGIT^0 / tonumber -- 3.2.3
