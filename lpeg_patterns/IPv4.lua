@@ -16,6 +16,7 @@ local dec_octet = (
 
 local IPv4_methods = {}
 local IPv4_mt = {
+	__name = "lpeg_patterns.IPv4";
 	__index = IPv4_methods;
 }
 

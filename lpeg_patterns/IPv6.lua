@@ -17,6 +17,7 @@ local IPv4address = require "lpeg_patterns.IPv4".IPv4address
 
 local IPv6_methods = {}
 local IPv6_mt = {
+	__name = "lpeg_patterns.IPv6";
 	__index = IPv6_methods;
 }
 

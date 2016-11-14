@@ -41,7 +41,9 @@ _M.userinfo = Cs((unreserved + _M.pct_encoded + _M.sub_delims + P":")^0) -- 3.2.
 
 -- Host 3.2.2
 
-local IPvFuture_mt = {}
+local IPvFuture_mt = {
+	__name = "lpeg_patterns.IPvFuture";
+}
 function IPvFuture_mt:__tostring()
 	return string.format("v%x.%s", self.version, self.string)
 end
