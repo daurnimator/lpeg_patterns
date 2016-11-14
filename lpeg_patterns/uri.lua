@@ -57,8 +57,8 @@ local IPv6addrz   = IPv6address * (P"%25" * ZoneID)^-1 / function(IPv6, zoneid)
 	return IPv6
 end
 
-local IP_literal  = P"[" * ( IPv6addrz + IPvFuture ) * P"]"
-local IP_host     = ( IP_literal + IPv4address ) / tostring
+_M.IP_literal = P"[" * (IPv6addrz + IPvFuture) * P"]"
+local IP_host = (_M.IP_literal + IPv4address) / tostring
 local reg_name = Cs((
 	unreserved / string.lower
 	+ _M.pct_encoded / function(s) return s:sub(1,1) == "%" and s or string.lower(s) end

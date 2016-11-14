@@ -73,6 +73,7 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `scheme` (pattern): matches the scheme portion of a URI
   - `userinfo` (pattern): matches the userinfo portion of a URI
   - `host` (pattern): matches the host portion of a URI
+  - `IP_literal` (pattern): matches an IP based host portion of a URI. Capture is an [IPv4](#IPv4), [IPv6](#IPv6) or IPvFuture object
   - `port` (pattern): matches the port portion of a URI
   - `authority` (pattern): matches the authority portion of a URI; data is held in named group captures of `"userinfo"`, `"host"`, `"port"`
   - `path` (pattern): matches the path portion of a URI. Captures `nil` for the empty path.
