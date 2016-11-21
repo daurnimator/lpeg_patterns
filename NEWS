@@ -1,0 +1,33 @@
+UNRELEASED - 2016-11-22
+
+  - Reduce memory usage by refactoring IPv6 pattern
+    Also fixes lpeg 0.10 compatability
+  - http: case-normalise cookie attribute names
+  - http: fixes some whitespace rules
+  - uri: fix missing case-normalisation for percent encoded characters in hostnames
+  - uri: export IP_literal and sub_delims patterns
+
+
+0.3 - 2016-08-21
+
+  - New http module
+    Includes parsers for almost every HTTP header.
+    Expect this API to be unstable, it's a significant amount of new code
+  - New language module that parses language codes e.g. "zh-Hans-CN"
+  - New email.mailbox pattern (name + email like: "Bob <bob@smith.com>")
+  - New uri.absolute_uri pattern that does not allow fragments
+  - Expose some previously internal uri patterns
+  - Fix: Don't percent decode in URIs when it could introduce ambiguity (thanks @torhve)
+
+
+0.2 - 2015-12-14
+
+  - Fixed parsing of IPv6 addresses (thanks Sean Conner)
+  - IPv6 zone support
+  - Stricter uri matching (scheme is now compulsory)
+  - "reference" (i.e. relative) URI matching
+
+
+0.1 - 2015-01-29
+
+  - First release
