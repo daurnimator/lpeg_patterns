@@ -57,9 +57,9 @@ local origin_list = serialized_origin * (core.SP * serialized_origin)^0
 local origin_list_or_null = P"null" + origin_list
 _M.Origin = _M.OWS * origin_list_or_null * _M.OWS
 
--- Analogue to RFC 7320 Section 7's ABNF extension of '#'
+-- Analogue to RFC 7230 Section 7's ABNF extension of '#'
 -- Also documented as `#rule` under RFC 2616 Section 2.1
-local comma_sep do
+local comma_sep, comma_sep_trim do
 	local sep = _M.OWS * lpeg.P "," * _M.OWS
 	local optional_sep = (lpeg.P"," + core.SP + core.HTAB)^0
 	comma_sep = function(element, min, max)
@@ -79,8 +79,11 @@ local comma_sep do
 		else
 			patt = patt * extra^0
 		end
-		patt = optional_sep * patt * optional_sep -- allow leading + trailing
 		return patt
+	end
+	-- allows leading + trailing
+	comma_sep_trim = function (...)
+		return optional_sep * comma_sep(...) * optional_sep
 	end
 end
 
@@ -128,7 +131,7 @@ local transfer_extension = Cf(Ct(_M.token / string.lower) -- case insensitive
 local transfer_coding = transfer_extension
 
 -- RFC 7230 Section 3.3.1
-_M.Transfer_Encoding = comma_sep(transfer_coding, 1)
+_M.Transfer_Encoding = comma_sep_trim(transfer_coding, 1)
 
 -- RFC 7230 Section 4.1.1
 local chunk_ext_name = _M.token
@@ -145,10 +148,10 @@ local t_codings = (transfer_coding * t_ranking^-1) / function(t, q)
 	end
 	return t
 end
-_M.TE = comma_sep(t_codings)
+_M.TE = comma_sep_trim(t_codings)
 
 -- RFC 7230 Section 4.4
-_M.Trailer = comma_sep(_M.field_name, 1)
+_M.Trailer = comma_sep_trim(_M.field_name, 1)
 
 -- RFC 7230 Section 5.3
 local origin_form = Cs(absolute_path * (P"?" * uri.query)^-1)
@@ -168,22 +171,22 @@ _M.Host = uri.host * (P":" * uri.port)^-1
 local protocol_name = _M.token
 local protocol_version = _M.token
 local protocol = protocol_name * (P"/" * protocol_version)^-1 / "%0"
-_M.Upgrade = comma_sep(protocol)
+_M.Upgrade = comma_sep_trim(protocol)
 
 -- RFC 7230 Section 5.7.1
 local received_protocol = (protocol_name * P"/" + Cc("HTTP")) * protocol_version / "%1/%2"
 local pseudonym = _M.token
 -- workaround for https://lists.w3.org/Archives/Public/ietf-http-wg/2016OctDec/0527.html
 local received_by = uri.host * ((P":" * uri.port) + -lpeg.B(",")) / "%0" + pseudonym
-_M.Via = comma_sep(Ct(Cg(received_protocol, "protocol") * _M.RWS * Cg(received_by, "by") * (_M.RWS * Cg(_M.comment, "comment"))^-1), 1)
+_M.Via = comma_sep_trim(Ct(Cg(received_protocol, "protocol") * _M.RWS * Cg(received_by, "by") * (_M.RWS * Cg(_M.comment, "comment"))^-1), 1)
 
 -- RFC 7230 Section 6.1
 local connection_option = _M.token / string.lower -- case insensitive
-_M.Connection = comma_sep(connection_option)
+_M.Connection = comma_sep_trim(connection_option)
 
 -- RFC 7231 Section 3.1.1
 local content_coding = _M.token / string.lower -- case insensitive
-_M.Content_Encoding = comma_sep(content_coding, 1)
+_M.Content_Encoding = comma_sep_trim(content_coding, 1)
 
 -- RFC 7231 Section 3.1.2
 local type = _M.token / string.lower -- case insensitive
@@ -196,7 +199,7 @@ local charset = _M.token / string.lower -- case insensitive
 _M.Content_Type = Ct(media_type)
 
 -- RFC 7231 Section 3.1.3
-_M.Content_Language = comma_sep(language.Language_Tag, 1)
+_M.Content_Language = comma_sep_trim(language.Language_Tag, 1)
 
 -- RFC 7231 Section 3.1.4.2
 _M.Content_Location = uri.absolute_uri + partial_uri
@@ -218,20 +221,20 @@ local media_range = (P"*/*"
 ) * Cg(Cf(Ct(true) * (_M.OWS * ";" * _M.OWS * Cg(parameter) - weight)^0, rawset), "parameters")
 local accept_ext = _M.OWS * P";" * _M.OWS * _M.token * (P"=" * (_M.token + _M.quoted_string))^-1
 local accept_params = Cg(weight, "q") * Cg(Cf(Ct(true) * Cg(accept_ext)^0, rawset), "extensions")
-_M.Accept = comma_sep(Ct(media_range * (accept_params+Cg(Ct(true), "extensions"))))
+_M.Accept = comma_sep_trim(Ct(media_range * (accept_params+Cg(Ct(true), "extensions"))))
 
 -- RFC 7231 Section 5.3.3
-_M.Accept_Charset = comma_sep((charset + P"*") * weight^-1, 1)
+_M.Accept_Charset = comma_sep_trim((charset + P"*") * weight^-1, 1)
 
 -- RFC 7231 Section 5.3.4
 local codings = content_coding + "*"
-_M.Accept_Encoding = comma_sep(codings * weight^-1)
+_M.Accept_Encoding = comma_sep_trim(codings * weight^-1)
 
 -- RFC 4647 Section 2.1
 local alphanum = core.ALPHA + core.DIGIT
 local language_range = (core.ALPHA * core.ALPHA^-7 * (P"-" * alphanum * alphanum^-7)^0) + P"*"
 -- RFC 7231 Section 5.3.5
-_M.Accept_Language = comma_sep(language_range * weight^-1, 1 )
+_M.Accept_Language = comma_sep_trim(language_range * weight^-1, 1)
 
 -- RFC 7231 Section 5.5.1
 _M.From = email.mailbox
@@ -318,13 +321,13 @@ _M.Retry_After = HTTP_date + delay_seconds
 _M.Vary = P"*" + comma_sep(_M.field_name, 1)
 
 -- RFC 7231 Section 7.4.1
-_M.Allow = comma_sep(method)
+_M.Allow = comma_sep_trim(method)
 
 -- RFC 7231 Section 7.4.2
 _M.Server = product * (_M.RWS * (product + _M.comment))^0
 
 -- RFC 5789
-_M.Accept_Patch = comma_sep(media_type, 1)
+_M.Accept_Patch = comma_sep_trim(media_type, 1)
 
 -- RFC 5987
 local attr_char = core.ALPHA + core.DIGIT + S"!#$&+-.^_`|~"
@@ -350,7 +353,7 @@ do -- RFC 5988
 	local link_value = Cf(Ct(P"<" * uri.uri_reference * P">") * (_M.OWS * P";" * _M.OWS * Cg(link_param))^0, rawset)
 	-- TODO: handle multiple ext_value variants...
 	-- e.g. server might provide one title in english, one in chinese, client should be able to pick which one to display
-	_M.Link = comma_sep(link_value)
+	_M.Link = comma_sep_trim(link_value)
 end
 
 do -- RFC 6265
@@ -404,9 +407,9 @@ local extension_param do
 	extension_param = _M.token * ((P"=" * (_M.token + quoted_token)) + Cc(true))
 end
 local extension = extension_token * Cg(Cf(Ct(true) * (P";" * Cg(extension_param))^0, rawset), "parameters")
-local extension_list = comma_sep(Ct(extension))
+local extension_list = comma_sep_trim(Ct(extension))
 _M.Sec_WebSocket_Extensions = extension_list
-_M.Sec_WebSocket_Protocol_Client = comma_sep(_M.token)
+_M.Sec_WebSocket_Protocol_Client = comma_sep_trim(_M.token)
 _M.Sec_WebSocket_Protocol_Server = _M.token
 local NZDIGIT =  S"123456789"
 -- Limited to 0-255 range, with no leading zeros
@@ -416,7 +419,7 @@ local version = (
 	+ NZDIGIT * core.DIGIT^-1
 ) / tonumber
 _M.Sec_WebSocket_Version_Client = version
-_M.Sec_WebSocket_Version_Server = comma_sep(version)
+_M.Sec_WebSocket_Version_Server = comma_sep_trim(version)
 
 -- RFC 6797
 local directive_name = _M.token / string.lower
@@ -454,7 +457,7 @@ _M.If_Unmodified_Since = HTTP_date
 local Coded_URL = P"<" * uri.absolute_uri * P">"
 local extend = Coded_URL + _M.token
 local compliance_class = P"1" + P"2" + P"3" + extend
-_M.DAV = comma_sep(compliance_class)
+_M.DAV = comma_sep_trim(compliance_class)
 _M.Depth = P"0" * Cc(0)
 	+ P"1" * Cc(1)
 	+ case_insensitive "infinity" * Cc(math.huge)
@@ -473,10 +476,10 @@ _M.Overwrite = T_F
 local DAVTimeOutVal = core.DIGIT^1 / tonumber
 local TimeType = case_insensitive "Second-" * DAVTimeOutVal
 	+ case_insensitive "Infinite" * Cc(math.huge)
-_M.TimeOut = comma_sep(TimeType)
+_M.TimeOut = comma_sep_trim(TimeType)
 
 -- RFC 5323
-_M.DASL = comma_sep(Coded_URL, 1)
+_M.DASL = comma_sep_trim(Coded_URL, 1)
 
 -- RFC 6638
 _M.Schedule_Reply = T_F
@@ -497,7 +500,7 @@ local byte_range_set = comma_sep(byte_range_spec + suffix_byte_range_spec, 1)
 local byte_ranges_specifier = bytes_unit * P"=" * byte_range_set
 
 -- RFC 7233 Section 2.3
-local acceptable_ranges = comma_sep(range_unit, 1) + P"none"
+local acceptable_ranges = comma_sep_trim(range_unit, 1) + P"none"
 _M.Accept_Ranges = acceptable_ranges
 
 -- RFC 7233 Section 3.1
@@ -526,7 +529,7 @@ _M.Age = delta_seconds
 
 -- RFC 7234 Section 5.2
 local cache_directive = _M.token * (P"=" * (_M.token + _M.quoted_string))^-1
-_M.Cache_Control = comma_sep(cache_directive, 1)
+_M.Cache_Control = comma_sep_trim(cache_directive, 1)
 
 -- RFC 7234 Section 5.3
 _M.Expires = HTTP_date
@@ -534,7 +537,7 @@ _M.Expires = HTTP_date
 -- RFC 7234 Section 5.4
 local extension_pragma = _M.token * (P"=" * (_M.token + _M.quoted_string))^-1
 local pragma_directive = "no_cache" + extension_pragma
-_M.Pragma = comma_sep(pragma_directive, 1)
+_M.Pragma = comma_sep_trim(pragma_directive, 1)
 
 -- RFC 7234 Section 5.5
 local warn_code = core.DIGIT * core.DIGIT * core.DIGIT
@@ -542,7 +545,7 @@ local warn_agent = (uri.host * (P":" * uri.port)^-1) + pseudonym
 local warn_text = _M.quoted_string
 local warn_date = core.DQUOTE * HTTP_date * core.DQUOTE
 local warning_value = warn_code * core.SP * warn_agent * core.SP * warn_text * (core.SP * warn_date)^-1
-_M.Warning = comma_sep(warning_value, 1)
+_M.Warning = comma_sep_trim(warning_value, 1)
 
 -- RFC 7235 Section 2
 local auth_scheme = _M.token
@@ -552,16 +555,16 @@ local challenge = auth_scheme * (core.SP^1 * (token68 + comma_sep(auth_param)))^
 local credentials = auth_scheme * (core.SP^1 * (token68 + comma_sep(auth_param)))^-1
 
 -- RFC 7235 Section 4
-_M.WWW_Authenticate = comma_sep(challenge, 1)
+_M.WWW_Authenticate = comma_sep_trim(Ct(challenge), 1)
 _M.Authorization = credentials
-_M.Proxy_Authenticate = comma_sep(challenge, 1)
+_M.Proxy_Authenticate = comma_sep_trim(Ct(challenge), 1)
 _M.Proxy_Authorization = credentials
 
 -- RFC 7239 Section 4
 local value = _M.token + _M.quoted_string
 local forwarded_pair = _M.token * P"=" * value
 local forwarded_element = forwarded_pair^-1 * (P";" * forwarded_pair^-1)^0
-_M.Forwarded = comma_sep(forwarded_element)
+_M.Forwarded = comma_sep_trim(forwarded_element)
 
 -- RFC 7469
 local Public_Key_Directives = directive * (_M.OWS * P";" * _M.OWS * directive)^0
@@ -572,12 +575,12 @@ _M.Public_Key_Pins_Report_Only = Public_Key_Directives
 _M.Hobareg = C"regok" + C"reginwork"
 
 -- RFC 7615
-_M.Authentication_Info = comma_sep(auth_param)
-_M.Proxy_Authentication_Info = comma_sep(auth_param)
+_M.Authentication_Info = comma_sep_trim(auth_param)
+_M.Proxy_Authentication_Info = comma_sep_trim(auth_param)
 
 -- RFC 7639
 local protocol_id = _M.token
-_M.ALPN = comma_sep(protocol_id, 1)
+_M.ALPN = comma_sep_trim(protocol_id, 1)
 
 -- RFC 7809
 _M.CalDAV_Timezones = T_F
@@ -587,7 +590,7 @@ local clear = C"clear" -- case-sensitive
 local alt_authority = _M.quoted_string -- containing [ uri_host ] ":" port
 local alternative = protocol_id * P"=" * alt_authority
 local alt_value = alternative * (_M.OWS * P";" * _M.OWS * parameter)^0
-_M.Alt_Svc = clear + comma_sep(alt_value, 1)
+_M.Alt_Svc = clear + comma_sep_trim(alt_value, 1)
 _M.Alt_Used = uri.host * (P":" * uri.port)^-1
 
 return _M
