@@ -28,6 +28,25 @@ describe("http patterns", function()
 		assert.same({"GET", "http://foo.com/", 1.0}, request_line:match("GET http://foo.com/ HTTP/1.0\r\n"))
 		assert.same({"OPTIONS", "*", 1.1}, request_line:match("OPTIONS * HTTP/1.1\r\n"))
 	end)
+	it("Splits a Via header", function()
+		local Via = lpeg.Ct(http.Via) * EOF
+		assert.same({{protocol="HTTP/1.0", by="fred"}}, Via:match("1.0 fred"))
+		assert.same({{protocol="HTTP/1.0", by="fred"}}, Via:match("HTTP/1.0 fred"))
+		assert.same({{protocol="Other/myversion", by="fred"}}, Via:match("Other/myversion fred"))
+		assert.same({{protocol="HTTP/1.1", by="p.example.net"}}, Via:match("1.1 p.example.net"))
+		assert.same({
+			{protocol="HTTP/1.0", by="fred"},
+			{protocol="HTTP/1.1", by="p.example.net"}
+		}, Via:match("1.0 fred, 1.1 p.example.net"))
+		assert.same({
+			{protocol="HTTP/1.0", by="my.host:80"},
+			{protocol="HTTP/1.1", by="my.other.host"}
+		}, Via:match("1.0 my.host:80, 1.1 my.other.host"))
+		assert.same({
+			{protocol="HTTP/1.0", by="fred"},
+			{protocol="HTTP/1.1", by="p.example.net"}
+		}, Via:match(",,,1.0 fred ,  ,,, 1.1 p.example.net,,,"))
+	end)
 	it("Handles folding whitespace in field_value", function()
 		local field_value = http.field_value * EOF
 		assert.same("Foo", field_value:match("Foo"))

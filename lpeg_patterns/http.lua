@@ -171,10 +171,11 @@ local protocol = protocol_name * (P"/" * protocol_version)^-1
 _M.Upgrade = comma_sep(protocol)
 
 -- RFC 7230 Section 5.7.1
-local received_protocol = (protocol_name * P"/")^-1 * protocol_version
+local received_protocol = (protocol_name * P"/" + Cc("HTTP")) * protocol_version / "%1/%2"
 local pseudonym = _M.token
-local received_by = uri.host * (P":" * uri.port)^-1 + pseudonym
-_M.Via = comma_sep(received_protocol * _M.RWS * received_by * (_M.RWS * _M.comment)^-1, 1)
+-- workaround for https://lists.w3.org/Archives/Public/ietf-http-wg/2016OctDec/0527.html
+local received_by = uri.host * ((P":" * uri.port) + -lpeg.B(",")) / "%0" + pseudonym
+_M.Via = comma_sep(Ct(Cg(received_protocol, "protocol") * _M.RWS * Cg(received_by, "by") * (_M.RWS * Cg(_M.comment, "comment"))^-1), 1)
 
 -- RFC 7230 Section 6.1
 local connection_option = _M.token / string.lower -- case insensitive

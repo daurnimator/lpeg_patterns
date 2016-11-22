@@ -208,7 +208,7 @@ These patterns should be considered to have non stable APIs.
   - `Trailer` (pattern)
   - `request_target` (pattern)
   - `Host` (pattern)
-  - `Via` (pattern)
+  - `Via` (pattern): captures are a list of tables with fields `.protocol`, `.by` and `.comment`
   - `Connection` (pattern)
   - `Upgrade` (pattern)
 

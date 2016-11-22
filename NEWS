@@ -3,6 +3,7 @@ UNRELEASED - 2016-11-22
   - Reduce memory usage by refactoring IPv6 pattern
     Also fixes lpeg 0.10 compatability
   - http: case-normalise cookie attribute names
+  - http: fix captures of Via header
   - http: fixes some whitespace rules
   - uri: fix missing case-normalisation for percent encoded characters in hostnames
   - uri: export IP_literal and sub_delims patterns
