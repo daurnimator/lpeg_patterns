@@ -236,6 +236,15 @@ describe("http patterns", function()
 		assert.same({["max-age"] = "0"; includesubdomains = true}, sts_patt:match("max-age=0;includeSubdomains"))
 		assert.same({["max-age"] = "0"; includesubdomains = true}, sts_patt:match("max-age=0 ; includeSubdomains"))
 	end)
+	it("Parses an WWW_Authenticate header", function()
+		local WWW_Authenticate = lpeg.Ct(http.WWW_Authenticate) * EOF
+		assert.same({{"Newauth"}}, WWW_Authenticate:match"Newauth")
+		assert.same({{"Newauth", {realm = "apps"}}}, WWW_Authenticate:match[[Newauth realm="apps"]])
+		assert.same({{"Newauth", {realm = "apps"}}}, WWW_Authenticate:match[[Newauth ReaLm="apps"]])
+		assert.same({{"Newauth"}, {"Basic"}}, WWW_Authenticate:match"Newauth, Basic")
+		assert.same({{"Newauth", {realm = "apps", type="1", title="Login to \"apps\""}}, {"Basic", {realm="simple"}}},
+			WWW_Authenticate:match[[Newauth realm="apps", type=1, title="Login to \"apps\"", Basic realm="simple"]])
+	end)
 	it("Parses a HPKP header", function()
 		-- Example from RFC 7469 2.1.5
 		local pkp_patt = lpeg.Cf(lpeg.Ct(true) * http.Public_Key_Pins, function(t, k, v) table.insert(t, {k,v}) return t end) * EOF

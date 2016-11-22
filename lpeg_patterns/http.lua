@@ -549,16 +549,17 @@ _M.Warning = comma_sep_trim(warning_value, 1)
 
 -- RFC 7235 Section 2
 local auth_scheme = _M.token
-local auth_param = _M.token * _M.BWS * P"=" * _M.BWS * (_M.token + _M.quoted_string)
-local token68 = (core.ALPHA + core.DIGIT + P"-" + P"." + P"_" + P"~" + P"+" + P"/" )^1 * (P"=")^0
-local challenge = auth_scheme * (core.SP^1 * (token68 + comma_sep(auth_param)))^-1
-local credentials = auth_scheme * (core.SP^1 * (token68 + comma_sep(auth_param)))^-1
+local auth_param = Cg(_M.token / string.lower * _M.BWS * P"=" * _M.BWS * (_M.token + _M.quoted_string))
+local token68 = C((core.ALPHA + core.DIGIT + P"-" + P"." + P"_" + P"~" + P"+" + P"/" )^1 * (P"=")^0)
+-- TODO: each parameter name MUST only occur once per challenge
+local challenge = auth_scheme * (core.SP^1 * (Cf(Ct(true) * comma_sep(auth_param), rawset) + token68))^-1
+local credentials = challenge
 
 -- RFC 7235 Section 4
 _M.WWW_Authenticate = comma_sep_trim(Ct(challenge), 1)
 _M.Authorization = credentials
-_M.Proxy_Authenticate = comma_sep_trim(Ct(challenge), 1)
-_M.Proxy_Authorization = credentials
+_M.Proxy_Authenticate = _M.WWW_Authenticate
+_M.Proxy_Authorization = _M.Proxy_Authorization
 
 -- RFC 7239 Section 4
 local value = _M.token + _M.quoted_string
