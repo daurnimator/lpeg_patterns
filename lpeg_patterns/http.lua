@@ -167,7 +167,7 @@ _M.Host = uri.host * (P":" * uri.port)^-1
 -- RFC 7230 Section 6.7
 local protocol_name = _M.token
 local protocol_version = _M.token
-local protocol = protocol_name * (P"/" * protocol_version)^-1
+local protocol = protocol_name * (P"/" * protocol_version)^-1 / "%0"
 _M.Upgrade = comma_sep(protocol)
 
 -- RFC 7230 Section 5.7.1

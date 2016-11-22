@@ -28,6 +28,12 @@ describe("http patterns", function()
 		assert.same({"GET", "http://foo.com/", 1.0}, request_line:match("GET http://foo.com/ HTTP/1.0\r\n"))
 		assert.same({"OPTIONS", "*", 1.1}, request_line:match("OPTIONS * HTTP/1.1\r\n"))
 	end)
+	it("Splits an Upgrade header", function()
+		local Upgrade = lpeg.Ct(http.Upgrade) * EOF
+		assert.same({"Foo"}, Upgrade:match("Foo"))
+		assert.same({"WebSocket"}, Upgrade:match("WebSocket"))
+		assert.same({"HTTP/2.0", "SHTTP/1.3", "IRC/6.9", "RTA/x11"}, Upgrade:match("HTTP/2.0, SHTTP/1.3, IRC/6.9, RTA/x11"))
+	end)
 	it("Splits a Via header", function()
 		local Via = lpeg.Ct(http.Via) * EOF
 		assert.same({{protocol="HTTP/1.0", by="fred"}}, Via:match("1.0 fred"))

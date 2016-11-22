@@ -210,7 +210,7 @@ These patterns should be considered to have non stable APIs.
   - `Host` (pattern)
   - `Via` (pattern): captures are a list of tables with fields `.protocol`, `.by` and `.comment`
   - `Connection` (pattern)
-  - `Upgrade` (pattern)
+  - `Upgrade` (pattern): captures are a list of strings containing *protocol* or *protocol/version*
 
 
 #### [RFC 7231](https://tools.ietf.org/html/rfc7231)
