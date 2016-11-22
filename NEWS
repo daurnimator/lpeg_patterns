@@ -1,4 +1,4 @@
-UNRELEASED - 2016-11-22
+0.4 - 2016-11-23
 
   - Reduce memory usage by refactoring IPv6 pattern
     Also fixes lpeg 0.10 compatability
