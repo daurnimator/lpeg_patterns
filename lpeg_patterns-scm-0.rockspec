@@ -3,7 +3,7 @@ version = "scm-0"
 
 description= {
 	summary = "a collection of LPEG patterns";
-	license = "MIT/X11";
+	license = "MIT";
 }
 
 dependencies = {
