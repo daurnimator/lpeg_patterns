@@ -559,7 +559,7 @@ local credentials = challenge
 _M.WWW_Authenticate = comma_sep_trim(Ct(challenge), 1)
 _M.Authorization = credentials
 _M.Proxy_Authenticate = _M.WWW_Authenticate
-_M.Proxy_Authorization = _M.Proxy_Authorization
+_M.Proxy_Authorization = _M.Authorization
 
 -- RFC 7239 Section 4
 local value = _M.token + _M.quoted_string
