@@ -24,7 +24,8 @@ _M.Australia = (
 		* seperator^-1 * digit*digit*digit * seperator^-1 * digit*digit*digit
 	-- Local rate calls
 	+ P"1300" * seperator^-1 * digit*digit*digit * seperator^-1 * digit*digit*digit
-	+ P"1345" * seperator^-1 * digit*digit * seperator^-1 * digit*digit --only used for back-to-base monitored alarm systems
+	-- 1345 is only used for back-to-base monitored alarm systems
+	+ P"1345" * seperator^-1 * digit*digit * seperator^-1 * digit*digit
 	+ P"13"   * seperator^-1 * digit*digit * seperator^-1 * digit*digit
 	+ (P"0")^-1*P"198" * seperator^-1 * digit*digit*digit * seperator^-1 * digit*digit*digit -- data calls
 	-- Free calls

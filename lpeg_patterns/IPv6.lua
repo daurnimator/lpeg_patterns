@@ -1,6 +1,6 @@
 -- IPv6
 
-local unpack = table.unpack or unpack -- luacheck: ignore 113
+local unpack = table.unpack or unpack -- luacheck: ignore 113 143
 
 local lpeg = require "lpeg"
 local P = lpeg.P

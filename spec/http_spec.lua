@@ -86,7 +86,8 @@ describe("http patterns", function()
 		assert.same({{"foo", someext = "bar", another = "qux"}}, Transfer_Encoding:match("foo;someext=bar;another=\"qux\""))
 		-- q not allowed
 		assert.falsy(Transfer_Encoding:match("foo;q=0.5"))
-		assert.same({{"foo", queen = "foo"}}, Transfer_Encoding:match("foo;queen=foo")) -- check transfer parameters starting with q (but not q) are allowed
+		-- check transfer parameters starting with q (but not q) are allowed
+		assert.same({{"foo", queen = "foo"}}, Transfer_Encoding:match("foo;queen=foo"))
 	end)
 	it("Parses a TE header", function()
 		local TE = lpeg.Ct(http.TE) * EOF
@@ -113,13 +114,19 @@ describe("http patterns", function()
 	end)
 	it("Parses a Content-Type header", function()
 		local Content_Type = http.Content_Type * EOF
-		assert.same({ type = "foo", subtype = "bar", parameters = {}}, Content_Type:match("foo/bar"))
-		assert.same({ type = "foo", subtype = "bar", parameters = {param="value"}}, Content_Type:match("foo/bar;param=value"))
+		assert.same({ type = "foo", subtype = "bar", parameters = {}},
+			Content_Type:match("foo/bar"))
+		assert.same({ type = "foo", subtype = "bar", parameters = {param="value"}},
+			Content_Type:match("foo/bar;param=value"))
 		-- Examples from RFC7231 3.1.1.1.
-		assert.same({ type = "text", subtype = "html", parameters = {charset="utf-8"}}, Content_Type:match([[text/html;charset=utf-8]]))
-		-- assert.same({ type = "text", subtype = "html", parameters = {charset="utf-8"}}, Content_Type:match([[text/html;charset=UTF-8]]))
-		assert.same({ type = "text", subtype = "html", parameters = {charset="utf-8"}}, Content_Type:match([[Text/HTML;Charset="utf-8"]]))
-		assert.same({ type = "text", subtype = "html", parameters = {charset="utf-8"}}, Content_Type:match([[text/html; charset="utf-8"]]))
+		assert.same({ type = "text", subtype = "html", parameters = {charset="utf-8"}},
+			Content_Type:match([[text/html;charset=utf-8]]))
+		-- assert.same({ type = "text", subtype = "html", parameters = {charset="utf-8"}},
+		-- 	Content_Type:match([[text/html;charset=UTF-8]]))
+		assert.same({ type = "text", subtype = "html", parameters = {charset="utf-8"}},
+			Content_Type:match([[Text/HTML;Charset="utf-8"]]))
+		assert.same({ type = "text", subtype = "html", parameters = {charset="utf-8"}},
+			Content_Type:match([[text/html; charset="utf-8"]]))
 	end)
 	it("Parses an Accept header", function()
 		local Accept = lpeg.Ct(http.Accept) * EOF
@@ -165,10 +172,14 @@ describe("http patterns", function()
 	end)
 	it("Parses a Sec-WebSocket-Extensions header", function()
 		local Sec_WebSocket_Extensions = lpeg.Ct(http.Sec_WebSocket_Extensions) * EOF
-		assert.same({{"foo", parameters = {}}}, Sec_WebSocket_Extensions:match"foo")
-		assert.same({{"foo", parameters = {}}, {"bar", parameters = {}}}, Sec_WebSocket_Extensions:match"foo, bar")
-		assert.same({{"foo", parameters = {hello = true; world = "extension"}}, {"bar", parameters = {}}}, Sec_WebSocket_Extensions:match"foo;hello;world=extension, bar")
-		assert.same({{"foo", parameters = {hello = true; world = "extension"}}, {"bar", parameters = {}}}, Sec_WebSocket_Extensions:match"foo;hello;world=\"extension\", bar")
+		assert.same({{"foo", parameters = {}}},
+			Sec_WebSocket_Extensions:match"foo")
+		assert.same({{"foo", parameters = {}}, {"bar", parameters = {}}},
+			Sec_WebSocket_Extensions:match"foo, bar")
+		assert.same({{"foo", parameters = {hello = true; world = "extension"}}, {"bar", parameters = {}}},
+			Sec_WebSocket_Extensions:match"foo;hello;world=extension, bar")
+		assert.same({{"foo", parameters = {hello = true; world = "extension"}}, {"bar", parameters = {}}},
+			Sec_WebSocket_Extensions:match"foo;hello;world=\"extension\", bar")
 		-- quoted strings must be valid tokens
 		assert.falsy(Sec_WebSocket_Extensions:match"foo;hello;world=\"exte\\\"nsion\", bar")
 	end)
@@ -185,7 +196,12 @@ describe("http patterns", function()
 	it("Parses a Link header", function()
 		local Link = lpeg.Ct(http.Link) * EOF
 		assert.same({{{host="example.com"}}}, Link:match"<//example.com>")
-		assert.same({{{scheme = "http"; host = "example.com"; path = "/TheBook/chapter2";}; rel = "previous"; title="previous chapter"}},
+		assert.same({
+			{
+				{scheme = "http"; host = "example.com"; path = "/TheBook/chapter2";};
+				rel = "previous";
+				title="previous chapter"
+			}},
 			Link:match[[<http://example.com/TheBook/chapter2>; rel="previous"; title="previous chapter"]])
 		assert.same({{{path = "/"}, rel = "http://example.net/foo"}},
 			Link:match[[</>; rel="http://example.net/foo"]])
@@ -201,7 +217,8 @@ describe("http patterns", function()
 		local Set_Cookie = lpeg.Ct(http.Set_Cookie) * EOF
 		assert.same({"SID", "31d4d96e407aad42", {}}, Set_Cookie:match"SID=31d4d96e407aad42")
 		assert.same({"SID", "", {}}, Set_Cookie:match"SID=")
-		assert.same({"SID", "31d4d96e407aad42", {path="/"; domain="example.com"}}, Set_Cookie:match"SID=31d4d96e407aad42; Path=/; Domain=example.com")
+		assert.same({"SID", "31d4d96e407aad42", {path="/"; domain="example.com"}},
+			Set_Cookie:match"SID=31d4d96e407aad42; Path=/; Domain=example.com")
 		assert.same({"SID", "31d4d96e407aad42", {
 			path = "/";
 			domain = "example.com";
@@ -214,7 +231,8 @@ describe("http patterns", function()
 		assert.same({"SID", "31d4d96e407aad42", {path = "/";}}, Set_Cookie:match[[SID="31d4d96e407aad42"; Path=/]])
 		-- Crazy whitespace
 		assert.same({"SID", "31d4d96e407aad42", {path = "/";}}, Set_Cookie:match"SID  =   31d4d96e407aad42  ;   Path  =  /")
-		assert.same({"SID", "31d4d96e407aad42", {["foo  bar"] = true;}}, Set_Cookie:match"SID  =   31d4d96e407aad42  ;  foo  bar")
+		assert.same({"SID", "31d4d96e407aad42", {["foo  bar"] = true;}},
+			Set_Cookie:match"SID  =   31d4d96e407aad42  ;  foo  bar")
 	end)
 	it("Parses a Cookie header", function()
 		local Cookie = http.Cookie * EOF
@@ -257,7 +275,10 @@ describe("http patterns", function()
 	end)
 	it("Parses a HPKP header", function()
 		-- Example from RFC 7469 2.1.5
-		local pkp_patt = lpeg.Cf(lpeg.Ct(true) * http.Public_Key_Pins, function(t, k, v) table.insert(t, {k,v}) return t end) * EOF
+		local pkp_patt = lpeg.Cf(
+			lpeg.Ct(true) * http.Public_Key_Pins,
+			function(t, k, v) table.insert(t, {k,v}) return t end
+		) * EOF
 		assert.same({
 			{ "max-age", "3000" };
 			{ "pin-sha256", "d6qzRu9zOECb90Uez27xWltNsj0e1Md7GkYYkVoZWmM=" };

@@ -178,7 +178,11 @@ local received_protocol = (protocol_name * P"/" + Cc("HTTP")) * protocol_version
 local pseudonym = _M.token
 -- workaround for https://lists.w3.org/Archives/Public/ietf-http-wg/2016OctDec/0527.html
 local received_by = uri.host * ((P":" * uri.port) + -lpeg.B(",")) / "%0" + pseudonym
-_M.Via = comma_sep_trim(Ct(Cg(received_protocol, "protocol") * _M.RWS * Cg(received_by, "by") * (_M.RWS * Cg(_M.comment, "comment"))^-1), 1)
+_M.Via = comma_sep_trim(Ct(
+	Cg(received_protocol, "protocol")
+	* _M.RWS * Cg(received_by, "by")
+	* (_M.RWS * Cg(_M.comment, "comment"))^-1
+), 1)
 
 -- RFC 7230 Section 6.1
 local connection_option = _M.token / string.lower -- case insensitive
@@ -379,7 +383,8 @@ end
 do -- RFC 6266
 	local disp_ext_type = _M.token / string.lower
 	local disposition_type = disp_ext_type
-	local ext_token = C((tchar-P"*"*(-tchar))^1) * P"*" -- can't use 'token' here as we need to not include the "*" at the end
+	-- can't use 'token' here as we need to not include the "*" at the end
+	local ext_token = C((tchar-P"*"*(-tchar))^1) * P"*"
 	local value = _M.token + _M.quoted_string
 	local disp_ext_parm = ext_token * _M.OWS * P"=" * _M.OWS * ext_value
 		+ _M.token * _M.OWS * P"=" * _M.OWS * value
