@@ -236,6 +236,16 @@ describe("http patterns", function()
 		assert.same({["max-age"] = "0"; includesubdomains = true}, sts_patt:match("max-age=0;includeSubdomains"))
 		assert.same({["max-age"] = "0"; includesubdomains = true}, sts_patt:match("max-age=0 ; includeSubdomains"))
 	end)
+	it("Parses a Cache-Control header", function()
+		local cc_patt = lpeg.Cf(lpeg.Ct(true) * http.Cache_Control, rawset) * EOF
+		assert.same({public = true}, cc_patt:match("public"))
+		assert.same({["no-cache"] = true}, cc_patt:match("no-cache"))
+		assert.same({["max-age"] = "31536000"}, cc_patt:match("max-age=31536000"))
+		assert.same({["max-age"] = "31536000", immutable = true}, cc_patt:match("max-age=31536000, immutable"))
+		-- leading/trailing whitespace
+		assert.same({public = true}, cc_patt:match("  public  "))
+		assert.same({["max-age"] = "31536000", immutable = true}, cc_patt:match("   max-age=31536000    ,    immutable   "))
+	end)
 	it("Parses an WWW_Authenticate header", function()
 		local WWW_Authenticate = lpeg.Ct(http.WWW_Authenticate) * EOF
 		assert.same({{"Newauth"}}, WWW_Authenticate:match"Newauth")

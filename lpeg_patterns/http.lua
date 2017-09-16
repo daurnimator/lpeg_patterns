@@ -528,8 +528,8 @@ local delta_seconds = core.DIGIT^1 / tonumber
 _M.Age = delta_seconds
 
 -- RFC 7234 Section 5.2
-local cache_directive = _M.token * (P"=" * (_M.token + _M.quoted_string))^-1
-_M.Cache_Control = comma_sep_trim(cache_directive, 1)
+local cache_directive = _M.token / string.lower * ((P"=" * (_M.token + _M.quoted_string)) + Cc(true))
+_M.Cache_Control = comma_sep_trim(Cg(cache_directive), 1)
 
 -- RFC 7234 Section 5.3
 _M.Expires = HTTP_date

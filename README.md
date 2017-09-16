@@ -258,7 +258,7 @@ These patterns should be considered to have non stable APIs.
 #### [RFC 7234](https://tools.ietf.org/html/rfc7234)
 
   - `Age` (pattern)
-  - `Cache_Control` (pattern)
+  - `Cache_Control` (pattern): captures are grouped into key/value pairs (where a directive with no value has a value of `true`)
   - `Expires` (pattern): capture is a table in the same format as used by [`os.time`](http://www.lua.org/manual/5.3/manual.html#pdf-os.time)
   - `Pragma` (pattern)
   - `Warning` (pattern)

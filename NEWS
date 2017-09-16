@@ -1,3 +1,7 @@
+UNRELEASED
+
+  - http: Cache-Control directives are case-normalised and grouped into pairs
+
 0.4 - 2016-11-23
 
   - Reduce memory usage by refactoring IPv6 pattern
