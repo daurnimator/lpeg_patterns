@@ -71,7 +71,7 @@ _M.host = IP_host + reg_name
 _M.port = DIGIT^0 / tonumber -- 3.2.3
 
 -- Path 3.3
-local pchar = unreserved + _M.pct_encoded + _M.sub_delims + S":@"
+local pchar = unreserved + _M.pct_encoded + _M.sub_delims + S":@" + S"[]"
 local segment = pchar^0
 _M.segment = Cs(segment)
 local segment_nz = pchar^1
