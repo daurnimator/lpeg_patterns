@@ -673,4 +673,21 @@ local policy_token = C"no-referrer"
 	+ C"unsafe-url"
 _M.Referrer_Policy = comma_sep_trim(policy_token, 1)
 
+-- https://w3c.github.io/server-timing/#dfn-server-timing-header-field
+local server_timing_param_name = _M.token
+local server_timing_param_value = _M.token + _M.quoted_string
+local server_timing_param = server_timing_param_name * _M.OWS * P"=" * _M.OWS * server_timing_param_value
+local metric_name = _M.token
+local server_timing_metric = metric_name * Cf(Ct(true) * (_M.OWS * P";" * _M.OWS * Cg(server_timing_param))^0, function(t, k, v)
+	-- Earlier options take precedence
+	local old = t[k]
+	if old == nil then
+		t[k] = v
+	end
+	return t
+end)
+-- TODO: User agents MUST ignore extraneous characters found after a server-timing-param-value but before the next server-timing-param and before the end of the current server-timing-metric.
+-- TODO: User agents MUST ignore extraneous characters found after a metric-name but before the first server-timing-param and before the next server-timing-metric.
+_M.Server_Timing = comma_sep_trim(server_timing_metric)
+
 return _M
