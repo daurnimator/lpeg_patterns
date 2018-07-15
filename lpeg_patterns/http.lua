@@ -657,4 +657,8 @@ local alt_value = alternative * (_M.OWS * P";" * _M.OWS * parameter)^0
 _M.Alt_Svc = clear + comma_sep_trim(alt_value, 1)
 _M.Alt_Used = uri.host * (P":" * uri.port)^-1
 
+-- https://tools.ietf.org/html/draft-ietf-httpbis-expect-ct-06#section-2.1
+local expect_ct_directive = directive
+_M.Expect_CT = no_dup(comma_sep_trim(expect_ct_directive))
+
 return _M

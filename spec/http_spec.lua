@@ -316,4 +316,15 @@ describe("http patterns", function()
 			}
 		}, pkp_patt:match([[pin-sha256="d6qzRu9zOECb90Uez27xWltNsj0e1Md7GkYYkVoZWmM="; pin-sha256="E9CZ9INDbd+2eRQozYqqbQ2yXLVKB9+xcprMF+44U1g="]]))
 	end)
+	it("Parses a Expect-Ct header", function()
+		-- Examples from draft-ietf-httpbis-expect-ct-06 2.1.4
+		local sts_patt = http.Expect_CT * EOF
+		assert.same({["max-age"] = "86400", enforce = true}, sts_patt:match("max-age=86400, enforce"))
+		assert.same({
+			["max-age"] = "86400";
+			["report-uri"] = "https://foo.example/report";
+		}, sts_patt:match([[max-age=86400,report-uri="https://foo.example/report"]]))
+		-- Should fail to parse when duplicate field given
+		assert.same(nil, sts_patt:match("max-age086400, foo=0, foo=1"))
+	end)
 end)

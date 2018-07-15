@@ -310,6 +310,11 @@ These patterns should be considered to have non stable APIs.
   - `Alt_Used` (pattern)
 
 
+#### [Expect-CT Extension for HTTP](https://tools.ietf.org/html/draft-ietf-httpbis-expect-ct-06)
+
+  - `Expect_CT` (pattern)
+
+
 ### `phone`
 
   - `phone` (pattern): includes detailed checking for:
