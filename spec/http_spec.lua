@@ -247,12 +247,14 @@ describe("http patterns", function()
 		assert.same({"foo", {filename="example"}}, Content_Disposition:match"foo; filename*=UTF-8''example")
 	end)
 	it("Parses a Strict-Transport-Security header", function()
-		local sts_patt = lpeg.Cf(lpeg.Ct(true) * http.Strict_Transport_Security, rawset) * EOF
+		local sts_patt = http.Strict_Transport_Security * EOF
 		assert.same({["max-age"] = "0"}, sts_patt:match("max-age=0"))
 		assert.same({["max-age"] = "0"}, sts_patt:match("max-age = 0"))
 		assert.same({["max-age"] = "0"}, sts_patt:match("Max-Age=0"))
 		assert.same({["max-age"] = "0"; includesubdomains = true}, sts_patt:match("max-age=0;includeSubdomains"))
 		assert.same({["max-age"] = "0"; includesubdomains = true}, sts_patt:match("max-age=0 ; includeSubdomains"))
+		-- Should fail to parse when duplicate field given.
+		assert.same(nil, sts_patt:match("foo=0; foo=1"))
 	end)
 	it("Parses a Cache-Control header", function()
 		local cc_patt = lpeg.Cf(lpeg.Ct(true) * http.Cache_Control, rawset) * EOF

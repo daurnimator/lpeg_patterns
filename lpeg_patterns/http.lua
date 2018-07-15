@@ -39,6 +39,24 @@ local function case_insensitive(str)
 	return patt
 end
 
+-- Helper function that doesn't match if there are duplicate keys
+local function no_dup_cmt(s, i, t, name, value, ...)
+	local old = t[name]
+	if old then
+		return false
+	end
+	t[name] = value
+	if ... then
+		return no_dup_cmt(s, i, t, ...)
+	else
+		return true, t
+	end
+end
+
+local function no_dup(patt)
+	return Cmt(Ct(true) * patt, no_dup_cmt)
+end
+
 -- RFC 7230 Section 3.2.3
 _M.OWS = (core.SP + core.HTAB)^0
 _M.RWS = (core.SP + core.HTAB)^1
@@ -430,7 +448,7 @@ _M.Sec_WebSocket_Version_Server = comma_sep_trim(version)
 local directive_name = _M.token / string.lower
 local directive_value = _M.token + _M.quoted_string
 local directive = Cg(directive_name * ((_M.OWS * P"=" * _M.OWS * directive_value) + Cc(true)))
-_M.Strict_Transport_Security = directive^-1 * (_M.OWS * P";" * _M.OWS * directive^-1)^0
+_M.Strict_Transport_Security = no_dup(directive^-1 * (_M.OWS * P";" * _M.OWS * directive^-1)^0)
 
 -- RFC 7089
 _M.Accept_Datetime = _M.IMF_fixdate
