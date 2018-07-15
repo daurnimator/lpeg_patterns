@@ -2,6 +2,8 @@ UNRELEASED
 
   - http: Cache-Control directives are case-normalised and grouped into pairs
   - http: Strict_Transport_Security now returns a table and doesn't match on duplicates
+  - http: Public_Key_Pins capture format and validation
+
 
 0.4 - 2016-11-23
 
