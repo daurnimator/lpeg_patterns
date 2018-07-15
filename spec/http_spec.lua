@@ -253,8 +253,10 @@ describe("http patterns", function()
 		assert.same({["max-age"] = "0"}, sts_patt:match("Max-Age=0"))
 		assert.same({["max-age"] = "0"; includesubdomains = true}, sts_patt:match("max-age=0;includeSubdomains"))
 		assert.same({["max-age"] = "0"; includesubdomains = true}, sts_patt:match("max-age=0 ; includeSubdomains"))
+		-- max-age is required
+		assert.same(nil, sts_patt:match("foo=0"))
 		-- Should fail to parse when duplicate field given.
-		assert.same(nil, sts_patt:match("foo=0; foo=1"))
+		assert.same(nil, sts_patt:match("max-age=42; foo=0; foo=1"))
 	end)
 	it("Parses a Cache-Control header", function()
 		local cc_patt = lpeg.Cf(lpeg.Ct(true) * http.Cache_Control, rawset) * EOF
@@ -324,6 +326,8 @@ describe("http patterns", function()
 			["max-age"] = "86400";
 			["report-uri"] = "https://foo.example/report";
 		}, sts_patt:match([[max-age=86400,report-uri="https://foo.example/report"]]))
+		-- max-age is required
+		assert.same(nil, sts_patt:match("foo=0"))
 		-- Should fail to parse when duplicate field given
 		assert.same(nil, sts_patt:match("max-age086400, foo=0, foo=1"))
 	end)

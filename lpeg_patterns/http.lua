@@ -48,9 +48,10 @@ local function no_dup_cmt(s, i, t, name, value, ...)
 	t[name] = value
 	if ... then
 		return no_dup_cmt(s, i, t, ...)
-	else
+	elseif t["max-age"] then -- max-age is required
 		return true, t
 	end
+	-- else return nil
 end
 
 local function no_dup(patt)
