@@ -662,4 +662,15 @@ _M.Alt_Used = uri.host * (P":" * uri.port)^-1
 local expect_ct_directive = directive
 _M.Expect_CT = no_dup(comma_sep_trim(expect_ct_directive))
 
+-- https://www.w3.org/TR/referrer-policy/#referrer-policy-header
+local policy_token = C"no-referrer"
+	+ C"no-referrer-when-downgrade"
+	+ C"strict-origin"
+	+ C"strict-origin-when-cross-origin"
+	+ C"same-origin"
+	+ C"origin"
+	+ C"origin-when-cross-origin"
+	+ C"unsafe-url"
+_M.Referrer_Policy = comma_sep_trim(policy_token, 1)
+
 return _M

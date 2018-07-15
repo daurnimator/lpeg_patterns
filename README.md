@@ -315,6 +315,11 @@ These patterns should be considered to have non stable APIs.
   - `Expect_CT` (pattern)
 
 
+#### [Referrer-Policy header](https://www.w3.org/TR/referrer-policy/#referrer-policy-header)
+
+  - `Referrer_Policy` (pattern)
+
+
 ### `phone`
 
   - `phone` (pattern): includes detailed checking for:
