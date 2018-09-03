@@ -28,10 +28,6 @@ local _M = {}
 
 local T_F = S"Tt" * Cc(true) + S"Ff" * Cc(false)
 
-local function no_rich_capture(patt)
-	return C(patt) / function(a) return a end
-end
-
 -- Helper function that doesn't match if there are duplicate keys
 local function no_dup_cmt(s, i, t, name, value, ...)
 	local old = t[name]
@@ -167,8 +163,8 @@ _M.Trailer = comma_sep_trim(_M.field_name, 1)
 
 -- RFC 7230 Section 5.3
 local origin_form = Cs(absolute_path * (P"?" * uri.query)^-1)
-local absolute_form = no_rich_capture(uri.absolute_uri)
-local authority_form = no_rich_capture(uri.authority)
+local absolute_form = util.no_rich_capture(uri.absolute_uri)
+local authority_form = util.no_rich_capture(uri.authority)
 local asterisk_form = C"*"
 _M.request_target = asterisk_form + origin_form + absolute_form + authority_form
 
