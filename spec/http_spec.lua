@@ -2,26 +2,6 @@ describe("http patterns", function()
 	local http = require "lpeg_patterns.http"
 	local lpeg = require "lpeg"
 	local EOF = lpeg.P(-1)
-	it("Parses a SLUG header", function()
-		local SLUG = http.SLUG * EOF
-		assert.same("foo", SLUG:match("foo"))
-		assert.same("foo bar", SLUG:match("foo bar"))
-		assert.same("foo bar", SLUG:match("foo  bar"))
-		assert.same("foo   bar", SLUG:match("foo %20 bar"))
-	end)
-	it("Parses an Origin header", function()
-		local Origin = lpeg.Ct(http.Origin) * EOF
-		assert.same({}, Origin:match("null"))
-		assert.same({"http://example.com"}, Origin:match("http://example.com"))
-		assert.same({"http://example.com", "https://foo.org"}, Origin:match("http://example.com https://foo.org"))
-	end)
-	it("Parses an X-Frame-Options header", function()
-		local X_Frame_Options = lpeg.Ct(http.X_Frame_Options) * EOF
-		assert.same({"deny"}, X_Frame_Options:match("deny"))
-		assert.same({"deny"}, X_Frame_Options:match("DENY"))
-		assert.same({"deny"}, X_Frame_Options:match("dEnY"))
-		assert.same({"http://example.com"}, X_Frame_Options:match("Allow-From http://example.com"))
-	end)
 	it("Splits a request line", function()
 		local request_line = lpeg.Ct(http.request_line) * EOF
 		assert.same({"GET", "/", 1.0}, request_line:match("GET / HTTP/1.0\r\n"))
@@ -170,94 +150,6 @@ describe("http patterns", function()
 		assert.same(example_time, Date:match"Sunday, 06-Nov-94 08:49:37 GMT")
 		assert.same(example_time, Date:match"Sun Nov  6 08:49:37 1994")
 	end)
-	it("Parses a Sec-WebSocket-Extensions header", function()
-		local Sec_WebSocket_Extensions = lpeg.Ct(http.Sec_WebSocket_Extensions) * EOF
-		assert.same({{"foo", parameters = {}}},
-			Sec_WebSocket_Extensions:match"foo")
-		assert.same({{"foo", parameters = {}}, {"bar", parameters = {}}},
-			Sec_WebSocket_Extensions:match"foo, bar")
-		assert.same({{"foo", parameters = {hello = true; world = "extension"}}, {"bar", parameters = {}}},
-			Sec_WebSocket_Extensions:match"foo;hello;world=extension, bar")
-		assert.same({{"foo", parameters = {hello = true; world = "extension"}}, {"bar", parameters = {}}},
-			Sec_WebSocket_Extensions:match"foo;hello;world=\"extension\", bar")
-		-- quoted strings must be valid tokens
-		assert.falsy(Sec_WebSocket_Extensions:match"foo;hello;world=\"exte\\\"nsion\", bar")
-	end)
-	it("Parses a Sec_WebSocket-Version-Client header", function()
-		local Sec_WebSocket_Version_Client = http.Sec_WebSocket_Version_Client * EOF
-		assert.same(1, Sec_WebSocket_Version_Client:match"1")
-		assert.same(100, Sec_WebSocket_Version_Client:match"100")
-		assert.same(255, Sec_WebSocket_Version_Client:match"255")
-		assert.falsy(Sec_WebSocket_Version_Client:match"0")
-		assert.falsy(Sec_WebSocket_Version_Client:match"256")
-		assert.falsy(Sec_WebSocket_Version_Client:match"1.2")
-		assert.falsy(Sec_WebSocket_Version_Client:match"090")
-	end)
-	it("Parses a Link header", function()
-		local Link = lpeg.Ct(http.Link) * EOF
-		assert.same({{{host="example.com"}}}, Link:match"<//example.com>")
-		assert.same({
-			{
-				{scheme = "http"; host = "example.com"; path = "/TheBook/chapter2";};
-				rel = "previous";
-				title="previous chapter"
-			}},
-			Link:match[[<http://example.com/TheBook/chapter2>; rel="previous"; title="previous chapter"]])
-		assert.same({{{path = "/"}, rel = "http://example.net/foo"}},
-			Link:match[[</>; rel="http://example.net/foo"]])
-		assert.same({
-				{{path = "/TheBook/chapter2"}, rel = "previous", title = "letztes Kapitel"};
-				{{path = "/TheBook/chapter4"}, rel = "next", title = "nächstes Kapitel"};
-			},
-			Link:match[[</TheBook/chapter2>; rel="previous"; title*=UTF-8'de'letztes%20Kapitel, </TheBook/chapter4>; rel="next"; title*=UTF-8'de'n%c3%a4chstes%20Kapitel]])
-		assert.same({{{scheme = "http"; host = "example.org"; path = "/"}, rel = "start http://example.net/relation/other"}},
-			Link:match[[<http://example.org/>; rel="start http://example.net/relation/other"]])
-	end)
-	it("Parses a Set-Cookie header", function()
-		local Set_Cookie = lpeg.Ct(http.Set_Cookie) * EOF
-		assert.same({"SID", "31d4d96e407aad42", {}}, Set_Cookie:match"SID=31d4d96e407aad42")
-		assert.same({"SID", "", {}}, Set_Cookie:match"SID=")
-		assert.same({"SID", "31d4d96e407aad42", {path="/"; domain="example.com"}},
-			Set_Cookie:match"SID=31d4d96e407aad42; Path=/; Domain=example.com")
-		assert.same({"SID", "31d4d96e407aad42", {
-			path = "/";
-			domain = "example.com";
-			secure = true;
-			expires = "Sun Nov  6 08:49:37 1994";
-		}}, Set_Cookie:match"SID=31d4d96e407aad42; Path=/; Domain=example.com; Secure; Expires=Sun Nov  6 08:49:37 1994")
-		-- Space before '='
-		assert.same({"SID", "31d4d96e407aad42", {path = "/";}}, Set_Cookie:match"SID=31d4d96e407aad42; Path =/")
-		-- Quoted cookie value
-		assert.same({"SID", "31d4d96e407aad42", {path = "/";}}, Set_Cookie:match[[SID="31d4d96e407aad42"; Path=/]])
-		-- Crazy whitespace
-		assert.same({"SID", "31d4d96e407aad42", {path = "/";}}, Set_Cookie:match"SID  =   31d4d96e407aad42  ;   Path  =  /")
-		assert.same({"SID", "31d4d96e407aad42", {["foo  bar"] = true;}},
-			Set_Cookie:match"SID  =   31d4d96e407aad42  ;  foo  bar")
-	end)
-	it("Parses a Cookie header", function()
-		local Cookie = http.Cookie * EOF
-		assert.same({SID = "31d4d96e407aad42"}, Cookie:match"SID=31d4d96e407aad42")
-		assert.same({SID = "31d4d96e407aad42"}, Cookie:match"SID = 31d4d96e407aad42")
-		assert.same({SID = "31d4d96e407aad42", lang = "en-US"}, Cookie:match"SID=31d4d96e407aad42; lang=en-US")
-	end)
-	it("Parses a Content-Disposition header", function()
-		local Content_Disposition = lpeg.Ct(http.Content_Disposition) * EOF
-		assert.same({"foo", {}}, Content_Disposition:match"foo")
-		assert.same({"foo", {filename="example"}}, Content_Disposition:match"foo; filename=example")
-		assert.same({"foo", {filename="example"}}, Content_Disposition:match"foo; filename*=UTF-8''example")
-	end)
-	it("Parses a Strict-Transport-Security header", function()
-		local sts_patt = http.Strict_Transport_Security * EOF
-		assert.same({["max-age"] = "0"}, sts_patt:match("max-age=0"))
-		assert.same({["max-age"] = "0"}, sts_patt:match("max-age = 0"))
-		assert.same({["max-age"] = "0"}, sts_patt:match("Max-Age=0"))
-		assert.same({["max-age"] = "0"; includesubdomains = true}, sts_patt:match("max-age=0;includeSubdomains"))
-		assert.same({["max-age"] = "0"; includesubdomains = true}, sts_patt:match("max-age=0 ; includeSubdomains"))
-		-- max-age is required
-		assert.same(nil, sts_patt:match("foo=0"))
-		-- Should fail to parse when duplicate field given.
-		assert.same(nil, sts_patt:match("max-age=42; foo=0; foo=1"))
-	end)
 	it("Parses a Cache-Control header", function()
 		local cc_patt = lpeg.Cf(lpeg.Ct(true) * http.Cache_Control, rawset) * EOF
 		assert.same({public = true}, cc_patt:match("public"))
@@ -276,59 +168,5 @@ describe("http patterns", function()
 		assert.same({{"Newauth"}, {"Basic"}}, WWW_Authenticate:match"Newauth, Basic")
 		assert.same({{"Newauth", {realm = "apps", type="1", title="Login to \"apps\""}}, {"Basic", {realm="simple"}}},
 			WWW_Authenticate:match[[Newauth realm="apps", type=1, title="Login to \"apps\"", Basic realm="simple"]])
-	end)
-	it("Parses a HPKP header", function()
-		-- Example from RFC 7469 2.1.5
-		local pkp_patt = lpeg.Ct(http.Public_Key_Pins) * EOF
-		assert.same({
-			{
-				sha256 = {
-					"d6qzRu9zOECb90Uez27xWltNsj0e1Md7GkYYkVoZWmM=";
-					"E9CZ9INDbd+2eRQozYqqbQ2yXLVKB9+xcprMF+44U1g=";
-				};
-			}, {
-				["max-age"] = "3000";
-			}
-		}, pkp_patt:match([[max-age=3000; pin-sha256="d6qzRu9zOECb90Uez27xWltNsj0e1Md7GkYYkVoZWmM="; pin-sha256="E9CZ9INDbd+2eRQozYqqbQ2yXLVKB9+xcprMF+44U1g="]]))
-
-		-- max-age is compulsory
-		assert.same(nil, pkp_patt:match([[pin-sha256="d6qzRu9zOECb90Uez27xWltNsj0e1Md7GkYYkVoZWmM="; pin-sha256="E9CZ9INDbd+2eRQozYqqbQ2yXLVKB9+xcprMF+44U1g="]]))
-	end)
-	it("Parses a HPKP Report header", function()
-		-- Example from RFC 7469 2.1.5
-		local pkp_patt = lpeg.Ct(http.Public_Key_Pins_Report_Only) * EOF
-		assert.same({
-			{
-				sha256 = {
-					"d6qzRu9zOECb90Uez27xWltNsj0e1Md7GkYYkVoZWmM=";
-					"E9CZ9INDbd+2eRQozYqqbQ2yXLVKB9+xcprMF+44U1g=";
-				};
-			}, {
-				["max-age"] = "3000";
-			}
-		}, pkp_patt:match([[max-age=3000; pin-sha256="d6qzRu9zOECb90Uez27xWltNsj0e1Md7GkYYkVoZWmM="; pin-sha256="E9CZ9INDbd+2eRQozYqqbQ2yXLVKB9+xcprMF+44U1g="]]))
-		-- max-age isn't compulsory
-		assert.same({
-			{
-				sha256 = {
-					"d6qzRu9zOECb90Uez27xWltNsj0e1Md7GkYYkVoZWmM=";
-					"E9CZ9INDbd+2eRQozYqqbQ2yXLVKB9+xcprMF+44U1g=";
-				};
-			}, {
-			}
-		}, pkp_patt:match([[pin-sha256="d6qzRu9zOECb90Uez27xWltNsj0e1Md7GkYYkVoZWmM="; pin-sha256="E9CZ9INDbd+2eRQozYqqbQ2yXLVKB9+xcprMF+44U1g="]]))
-	end)
-	it("Parses a Expect-Ct header", function()
-		-- Examples from draft-ietf-httpbis-expect-ct-06 2.1.4
-		local sts_patt = http.Expect_CT * EOF
-		assert.same({["max-age"] = "86400", enforce = true}, sts_patt:match("max-age=86400, enforce"))
-		assert.same({
-			["max-age"] = "86400";
-			["report-uri"] = "https://foo.example/report";
-		}, sts_patt:match([[max-age=86400,report-uri="https://foo.example/report"]]))
-		-- max-age is required
-		assert.same(nil, sts_patt:match("foo=0"))
-		-- Should fail to parse when duplicate field given
-		assert.same(nil, sts_patt:match("max-age086400, foo=0, foo=1"))
 	end)
 end)
