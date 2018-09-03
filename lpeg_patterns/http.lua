@@ -10,6 +10,8 @@ local language = require "lpeg_patterns.language"
 local uri = require "lpeg_patterns.uri"
 local util = require "lpeg_patterns.util"
 
+local case_insensitive = util.case_insensitive
+
 local C = lpeg.C
 local Cc = lpeg.Cc
 local Cf = lpeg.Cf
@@ -28,15 +30,6 @@ local T_F = S"Tt" * Cc(true) + S"Ff" * Cc(false)
 
 local function no_rich_capture(patt)
 	return C(patt) / function(a) return a end
-end
-
-local function case_insensitive(str)
-	local patt = P(true)
-	for i=1, #str do
-		local c = str:sub(i, i)
-		patt = patt * S(c:upper() .. c:lower())
-	end
-	return patt
 end
 
 -- Helper function that doesn't match if there are duplicate keys
