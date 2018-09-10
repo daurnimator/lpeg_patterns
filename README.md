@@ -340,3 +340,15 @@ Patterns for definitions from [RFC-4646 Section 2.1](https://tools.ietf.org/html
       - `privateuse` (optional): an array
   - `privateuse` (pattern): captures an array
   - `Language_Tag` (pattern): captures the whole language tag
+
+
+### `utf8`
+
+Patterns for matching utf8 sequences from [RFC 3629 Section 4](https://tools.ietf.org/html/rfc3629#section-4)
+
+  - `UTF8_1` (pattern): matches a 1-byte utf8 sequence
+  - `UTF8_2` (pattern): matches a 2-byte utf8 sequence
+  - `UTF8_3` (pattern): matches a 3-byte utf8 sequence
+  - `UTF8_4` (pattern): matches a 4-byte utf8 sequence
+  - `UTF8_char` (pattern): matches a single utf8 sequence
+  - `UTF8_octets` (pattern): matches multiple utf8 sequences in a row
