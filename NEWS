@@ -1,6 +1,7 @@
 UNRELEASED
 
   - http: split into multiple modules
+  - http.alpn: verify that protocol_id meets unique encoding criteria
 
 
 0.5 - 2018-07-15
