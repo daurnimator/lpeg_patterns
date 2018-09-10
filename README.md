@@ -93,7 +93,7 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `mailbox` (pattern): the mailbox format: matches either `name_addr` or an addr-spec.
   - `name_addr` (pattern): the name and address format i.e. `Display Name<email@example.com>`
     Has captures of the local_part and the domain. Captures the display name in the named capture `"display"`
-  - `email` (pattern): also known as an "addr-spec"; follows [RFC-5322 section 3.4.1](http://tools.ietf.org/html/rfc5322#section-3.4.1)
+  - `email` (pattern): also known as an "addr-spec"; follows [RFC-5322 section 3.4.1](http://tools.ietf.org/html/rfc5322#section-3.4.1) with the internationalisation extensions from [RFC-6532 section 3.1](http://tools.ietf.org/html/rfc6532#section-3.1)
     Has captures of the local_part and the domain
     Be careful trying to reconstruct the email address from the captures; you may need escaping
   - `local_part` (pattern): the bit before the `@` in an email address
@@ -340,3 +340,15 @@ Patterns for definitions from [RFC-4646 Section 2.1](https://tools.ietf.org/html
       - `privateuse` (optional): an array
   - `privateuse` (pattern): captures an array
   - `Language_Tag` (pattern): captures the whole language tag
+
+
+### `utf8`
+
+Patterns for matching utf8 sequences from [RFC 3629 Section 4](https://tools.ietf.org/html/rfc3629#section-4)
+
+  - `UTF8_1` (pattern): matches a 1-byte utf8 sequence
+  - `UTF8_2` (pattern): matches a 2-byte utf8 sequence
+  - `UTF8_3` (pattern): matches a 3-byte utf8 sequence
+  - `UTF8_4` (pattern): matches a 4-byte utf8 sequence
+  - `UTF8_char` (pattern): matches a single utf8 sequence
+  - `UTF8_octets` (pattern): matches multiple utf8 sequences in a row

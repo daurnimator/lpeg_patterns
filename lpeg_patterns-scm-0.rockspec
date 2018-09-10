@@ -51,5 +51,6 @@ build = {
 		["lpeg_patterns.http.websocket"] = "lpeg_patterns/http/websocket.lua";
 		["lpeg_patterns.phone"] = "lpeg_patterns/phone.lua";
 		["lpeg_patterns.language"] = "lpeg_patterns/language.lua";
+		["lpeg_patterns.utf8"] = "lpeg_patterns/utf8.lua";
 	};
 }

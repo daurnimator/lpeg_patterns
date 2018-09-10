@@ -2,6 +2,8 @@ UNRELEASED
 
   - http: split into multiple modules
   - http.alpn: verify that protocol_id meets unique encoding criteria
+  - utf8: Add new utf8 module
+  - email: Allow internationalised email addresses (#15)
 
 
 0.5 - 2018-07-15
