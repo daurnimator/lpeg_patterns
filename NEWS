@@ -1,3 +1,8 @@
+UNRELEASED
+
+  - http: split into multiple modules
+
+
 0.5 - 2018-07-15
 
   - http: Cache-Control directives are case-normalised and grouped into pairs
