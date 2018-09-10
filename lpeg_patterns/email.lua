@@ -11,13 +11,17 @@ local Cg = lpeg.Cg
 local Ct = lpeg.Ct
 local Cs = lpeg.Cs
 
+-- From RFC 6532 Section 3.1
+local utf8 = require "lpeg_patterns.utf8"
+local UTF8_non_ascii = utf8.UTF8_2 + utf8.UTF8_3 + utf8.UTF8_4
+
 local core = require "lpeg_patterns.core"
 local CHAR = core.CHAR
 local CRLF = core.CRLF
 local CTL = core.CTL
 local DQUOTE = core.DQUOTE
 local WSP = core.WSP
-local VCHAR = core.VCHAR
+local VCHAR = core.VCHAR + UTF8_non_ascii
 
 local obs_NO_WS_CTL = R("\1\8", "\11\12", "\14\31") + P"\127"
 
@@ -28,7 +32,7 @@ local quoted_pair = Cg(P"\\" * C(VCHAR + WSP)) + obs_qp
 local FWS = (WSP^0 * CRLF)^-1 * WSP^1 / " " -- Fold whitespace into a single " "
 
 -- Comments
-local ctext   = R"\33\39" + R"\42\91" + R"\93\126"
+local ctext = R"\33\39" + R"\42\91" + R"\93\126" + UTF8_non_ascii
 local comment = P {
 	V"comment" ;
 	ccontent = ctext + quoted_pair + V"comment" ;
@@ -38,13 +42,13 @@ local CFWS = ((FWS^-1 * comment)^1 * FWS^-1 + FWS ) / function() end
 
 -- Atom
 local specials      = S[=[()<>@,;:\".[]]=]
-local atext         = CHAR-specials-P" "-CTL
+local atext         = CHAR-specials-P" "-CTL + UTF8_non_ascii
 local atom          = CFWS^-1 * C(atext^1) * CFWS^-1
 local dot_atom_text = C(atext^1 * ( P"." * atext^1 )^0)
 local dot_atom      = CFWS^-1 * dot_atom_text * CFWS^-1
 
 -- Quoted Strings
-local qtext              = S"\33"+R("\35\91","\93\126")
+local qtext              = S"\33"+R("\35\91","\93\126") + UTF8_non_ascii
 local qcontent           = qtext + quoted_pair
 local quoted_string_text = DQUOTE * Cs((FWS^-1 * qcontent)^0 * FWS^-1) * DQUOTE
 local quoted_string      = CFWS^-1 * quoted_string_text * CFWS^-1
@@ -56,7 +60,7 @@ local phrase = obs_phrase -- obs_phrase is more broad than `word^1`, it's really
 
 -- Addr-spec
 local obs_dtext = obs_NO_WS_CTL + quoted_pair
-local dtext = R("\33\90", "\94\126") + obs_dtext
+local dtext = R("\33\90", "\94\126") + obs_dtext + UTF8_non_ascii
 local domain_literal_text = P"[" * Cs((FWS^-1 * dtext)^0 * FWS^-1) * P"]"
 
 local domain_text     = dot_atom_text + domain_literal_text

@@ -3,8 +3,10 @@ local EOF = lpeg.P(-1)
 
 describe("email Addresses", function()
 	local email = lpeg.Ct(require "lpeg_patterns.email".email) * EOF
-	it("Pass valid addresses", function()
+	it("Parse valid addresses", function()
 		assert.same({"localpart", "example.com"}, email:match "localpart@example.com")
+		-- From https://twitter.com/errbufferoverfl/status/1019780300597891072
+		assert.same({"δοκιμή", "παράδειγμα.δοκιμή"}, email:match "δοκιμή@παράδειγμα.δοκιμή")
 	end)
 	it("Deny invalid addresses", function()
 		assert.falsy(email:match "not an address")
@@ -141,6 +143,8 @@ describe("mailbox", function()
 	local mailbox = lpeg.Ct(require "lpeg_patterns.email".mailbox) * EOF
 	it("matches an addr-spec", function()
 		assert.same({"foo", "example.com"}, mailbox:match "foo@example.com")
+		-- From https://github.com/hectane/hectane/issues/24#issuecomment-223486720
+		assert.same({"me", "example.com", display = "日本語 "}, mailbox:match "日本語 <me@example.com>")
 	end)
 	it("matches a name-addr", function()
 		assert.same({"foo", "example.com"}, mailbox:match "<foo@example.com>")
