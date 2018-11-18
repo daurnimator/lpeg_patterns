@@ -88,6 +88,25 @@ Parses URIs as described in [RFC-3986](https://tools.ietf.org/html/rfc3986).
   - `sub_delims` (pattern): the set of subcomponent delimeters
 
 
+### `iri`
+
+Parses IRIs as described in [RFC-3987](https://tools.ietf.org/html/rfc3987).
+
+Very similar to the [uri](#uri) module, except allows utf8.
+
+  - `IRI` (pattern): on success, returns a table with fields: (similar to [luasocket](http://w3.impa.br/~diego/software/luasocket/url.html#parse))
+      - `scheme`
+      - `userinfo`
+      - `host`
+      - `port`
+      - `path`
+      - `query`
+      - `fragment`
+  - `absolute_IRI` (pattern): similar to `IRI`, but does not permit fragments
+  - `IRI_reference` (pattern): similar to `IRI`, but permits relative URIs
+  - `ipath` (pattern): matches the path portion of an IRI. Captures `nil` for the empty path.
+
+
 ### `email`
 
   - `mailbox` (pattern): the mailbox format: matches either `name_addr` or an addr-spec.
