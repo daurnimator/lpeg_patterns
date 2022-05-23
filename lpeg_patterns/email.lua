@@ -137,6 +137,86 @@ local encoding = mime_charset / string.lower
 local encoded_text = (printable_character - S"?")^1
 local encoded_word = P"=?" * charset * P"?" * encoding * P"?" * C(encoded_text) * P"?="
 
+local date_time do -- RFC 5322 Section 3.3
+	local _2DIGIT = DIGIT * DIGIT
+	local _4DIGIT = _2DIGIT * _2DIGIT
+
+	local function tonumber_10(s)
+	   return tonumber(s, 10)
+	end
+
+	-- captured value follow's Lua's os.date yday convention
+	local day_name = (P"Mon" + P"Tue" + P"Wed" + P"Thu" + P"Fri" + P"Sat" + P"Sun") / {
+	   Mon = 2;
+	   Tue = 3;
+	   Wed = 4;
+	   Thu = 5;
+	   Fri = 6;
+	   Sat = 7;
+	   Sun = 1;
+	}
+	local obs_day_of_week = CFWS^-1 * day_name * CFWS^-1
+	local day_of_week = obs_day_of_week
+	local obs_day = CFWS^-1 * (_2DIGIT^1 / tonumber_10) * CFWS^-1
+	local day = obs_day / 1
+	local month = (P"Jan"+ P"Feb"+ P"Mar"+ P"Apr"+ P"May"+ P"Jun"+ P"Jul"+ P"Aug"+ P"Sep"+ P"Oct"+ P"Nov"+ P"Dec") / {
+	   Jan = 1;
+	   Feb = 2;
+	   Mar = 3;
+	   Apr = 4;
+	   May = 5;
+	   Jun = 6;
+	   Jul = 7;
+	   Aug = 8;
+	   Sep = 9;
+	   Oct = 10;
+	   Nov = 11;
+	   Dec = 12;
+	}
+	local obs_year = CFWS^-1 * DIGIT^2 * CFWS^-1 / function(y)
+	   local r = tonumber_10(y)
+
+	   -- If a two digit year is encountered whose value is between 00 and 49,
+	   -- the year is interpreted by adding 2000, ending up with a value between 2000 and 2049.
+	   if #y == 2 and r < 50 then
+	      return r + 2000
+	   end
+
+	   -- If a two digit year is encountered with a value between 50 and 99,
+	   -- or any three digit year is encountered, the year is interpreted by adding 1900.
+	   if #y <= 3 then
+	      return r + 1900
+	   end
+
+	   return r
+	end
+	local year = obs_year / 1
+	local date = Cg(day, "day") * Cg(month, "month") * Cg(year, "year")
+
+	local obs_hour = CFWS^-1 * (_2DIGIT / tonumber_10) * CFWS^-1
+	local hour = obs_hour / 1
+	local obs_minute = CFWS^-1 * (_2DIGIT / tonumber_10) * CFWS^-1
+	local minute = obs_minute / 1
+	local obs_second = CFWS^-1 * (_2DIGIT / tonumber_10) * CFWS^-1
+	local second = obs_second / 1
+	local time_of_day = Cg(hour, "hour") * P":" * Cg(minute, "min") * (P":" * Cg(second, "sec"))^-1
+	local obs_zone = (P"UT" + P"GMT") / "+0000"
+	   + P"EST" / "-0500"
+	   + P"EDT" / "-0400"
+	   + P"CST" / "-0600"
+	   + P"CDT" / "-0500"
+	   + P"MST" / "-0700"
+	   + P"MDT" / "-0600"
+	   + P"PST" / "-0800"
+	   + P"PDT" / "-0700"
+	   + R("\65\73", "\75\90", "\97\105", "\107\122") / "-0000"
+	-- the FWS isn't optional in RFC5322
+	local zone = FWS^-1 / 0 * C(S"+-" * _4DIGIT) + obs_zone
+	local time = time_of_day * Cg(zone, "zone")
+
+	date_time = (Cg(day_of_week, "wday") * P",")^-1 * date * time * CFWS^-1
+end
+
 return {
 	obs_NO_WS_CTL = obs_NO_WS_CTL;
 	obs_qp = obs_qp;
@@ -196,6 +276,7 @@ return {
 	encoding = encoding;
 	encoded_text = encoded_text;
 	encoded_word = encoded_word;
+	date_time = date_time;
 
 	-- Handy alias
 	email = addr_spec;

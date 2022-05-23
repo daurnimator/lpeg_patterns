@@ -157,3 +157,7 @@ describe("mailbox", function()
 			mailbox:match "<@wow,@such,,@domains:foo@example.com>")
 	end)
 end)
+describe("date", function()
+	local date_time = lpeg.Ct(require "lpeg_patterns.email".date_time) * EOF
+	assert.same({year=2022, month=5, day=22, hour=2, min=15, sec=14, zone="+0100", wday=1}, date_time:match("Sun, 22 May 2022 02:15:14 +0100"))
+end)
