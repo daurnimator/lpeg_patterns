@@ -12,9 +12,14 @@ local Cs = lpeg.Cs
 local Ct = lpeg.Ct
 
 local core = require "lpeg_patterns.core"
+
+local printable_character = lpeg.R("\33\126")
+
+local ALPHA = core.ALPHA
 local CHAR = core.CHAR
 local CRLF = core.CRLF
 local CTL = core.CTL
+local DIGIT = core.DIGIT
 local DQUOTE = core.DQUOTE
 local WSP = core.WSP
 local VCHAR = core.VCHAR
@@ -51,7 +56,7 @@ local quoted_string      = CFWS^-1 * quoted_string_text * CFWS^-1
 
 -- Miscellaneous Tokens
 local word = atom + quoted_string
-local obs_phrase = C(word * (word + P"." + CFWS)^0 / function() end)
+local obs_phrase = Cs(word / 1 * (word / 1 + P"." + CFWS / " ")^0)
 local phrase = obs_phrase -- obs_phrase is more broad than `word^1`, it's really the same but allows "."
 
 -- Addr-spec
@@ -59,6 +64,7 @@ local obs_dtext = obs_NO_WS_CTL + quoted_pair
 local dtext = R("\33\90", "\94\126") + obs_dtext
 local domain_literal_text = P"[" * Cs((FWS^-1 * dtext)^0 * FWS^-1) * P"]"
 
+-- A non-spec-compliant variant that does not allow comments or folding whitespace
 local domain_text = dot_atom_text + domain_literal_text
 local local_part_text = dot_atom_text + quoted_string_text
 local addr_spec_text = local_part_text * P"@" * domain_text
@@ -68,24 +74,131 @@ local obs_domain = Ct(atom * (C"." * atom)^0) / table.concat
 local domain = obs_domain + dot_atom + domain_literal
 local obs_local_part = Ct(word * (C"." * word)^0) / table.concat
 local local_part = obs_local_part + dot_atom + quoted_string
-local addr_spec = local_part * P"@" * domain
+local addr_spec = Cg(local_part, "local-part") * P"@" * Cg(domain, "domain")
 
 local display_name = phrase
 local obs_domain_list = (CFWS + P",")^0 * P"@" * domain
 	* (P"," * CFWS^-1 * (P"@" * domain)^-1)^0
-local obs_route = Cg(Ct(obs_domain_list) * P":", "route")
-local obs_angle_addr = CFWS^-1 * P"<" * obs_route * addr_spec * P">" * CFWS^-1
-local angle_addr = CFWS^-1 * P"<" * addr_spec * P">" * CFWS^-1
+local obs_route = Ct(obs_domain_list) * P":"
+local obs_angle_addr = CFWS^-1 * P"<" * Cg(obs_route, "route") * C(addr_spec) * P">" * CFWS^-1
+local angle_addr = CFWS^-1 * P"<" * C(addr_spec) * P">" * CFWS^-1
 	+ obs_angle_addr
-local name_addr = Cg(display_name, "display")^-1 * angle_addr
-local mailbox = name_addr + addr_spec
+local name_addr = Cg(display_name^-1, "display") * angle_addr
+local mailbox = name_addr + C(addr_spec)
+
+-- https://www.rfc-editor.org/rfc/rfc5322#section-2.2
+-- Header fields are lines beginning with a field name, followed by a
+-- colon (":"), followed by a field body, and terminated by CRLF.  A
+-- field name MUST be composed of printable US-ASCII characters (i.e.,
+-- characters that have values between 33 and 126, inclusive), except
+-- colon.  A field body may be composed of printable US-ASCII characters
+-- as well as the space (SP, ASCII value 32) and horizontal tab (HTAB,
+-- ASCII value 9) characters (together known as the white space
+-- characters, WSP).  A field body MUST NOT include CR and LF except
+-- when used in "folding" and "unfolding", as described in section
+-- 2.2.3.  All field bodies MUST conform to the syntax described in
+-- sections 3 and 4 of this specification.
+-- local ftext = S("\33\57","\59\126")
+-- local field_name = ftext^1
+-- local header_field_body = R("\33\126") + FWS
+
+-- RFC 5322 Section 3.4
+local obs_mbox_list = (CFWS^-1 * P",")^0 * Ct(mailbox) * (P"," * (Ct(mailbox) + CFWS)^-1)^0
+-- mailbox_list is a super-set of obs_mbox_list that allowed empty fields
+local mailbox_list = obs_mbox_list
+local obs_group_list = (CFWS^-1 * P",")^1 * CFWS^-1
+local group_list = mailbox_list + CFWS + obs_group_list
+local group = Cg(display_name, "display") * P":" * Cg(Ct(group_list^-1), "members") * P";" * CFWS^-1
+local address = mailbox + group
+local obs_addr_list = (CFWS^-1 * P",")^0 * Ct(address) * (P"," * (Ct(address) + CFWS)^-1)^0
+-- address_list is a super-set of obs_addr_list that allowed empty fields
+local address_list = obs_addr_list
+
+-- RFC 5322 Section 4.5.4
+local obs_id_left = local_part
+local obs_id_right = domain
+
+-- RFC 5322 Section 3.6.4
+local no_fold_literal = P"[" * dtext^0 * P"]"
+local id_left = dot_atom_text + obs_id_left
+local id_right = dot_atom_text + no_fold_literal + obs_id_right
+-- Semantically, the angle bracket characters are not part of the
+-- msg-id; the msg-id is what is contained between the two angle bracket
+-- characters.
+local msg_id = CFWS^-1 * P"<" * C(id_left * P"@" * id_right) * ">" * CFWS^-1
+
+-- RFC 5987
+local mime_charsetc = ALPHA + DIGIT + S"!#$%&+-^_`{}~"
+local mime_charset = C(mime_charsetc^1)
+
+-- RFC 2047
+local charset = mime_charset / string.lower
+local encoding = mime_charset / string.lower
+local encoded_text = (printable_character - S"?")^1
+local encoded_word = P"=?" * charset * P"?" * encoding * P"?" * C(encoded_text) * P"?="
 
 return {
-	local_part = local_part;
+	obs_NO_WS_CTL = obs_NO_WS_CTL;
+	obs_qp = obs_qp;
+	quoted_pair = quoted_pair;
+	FWS = FWS;
+	ctext = ctext;
+	comment = comment;
+	CFWS = CFWS;
+	specials = specials;
+	atext = atext;
+	atom = atom;
+	dot_atom_text = dot_atom_text;
+	dot_atom = dot_atom;
+	qtext = qtext;
+	qcontent = qcontent;
+	quoted_string_text = quoted_string_text;
+	quoted_string = quoted_string;
+	word = word;
+	obs_phrase = obs_phrase;
+	phrase = phrase;
+	obs_dtext = obs_dtext;
+	dtext = dtext;
+	domain_literal_text = domain_literal_text;
+	domain_literal = domain_literal;
+	obs_domain = obs_domain;
 	domain = domain;
-	email = addr_spec;
+	obs_local_part = obs_local_part;
+	local_part = local_part;
+	addr_spec = addr_spec;
+	display_name = display_name;
+	obs_domain_list = obs_domain_list;
+	obs_route = obs_route;
+	obs_angle_addr = obs_angle_addr;
+	angle_addr = angle_addr;
 	name_addr = name_addr;
 	mailbox = mailbox;
+	-- ftext = ftext;
+	-- field_name = field_name;
+	-- header_field_body = header_field_body;
+	obs_mbox_list = obs_mbox_list;
+	mailbox_list = mailbox_list;
+	obs_group_list = obs_group_list;
+	group_list = group_list;
+	group = group;
+	address = address;
+	obs_addr_list = obs_addr_list;
+	address_list = address_list;
+	obs_id_left = obs_id_left;
+	obs_id_right = obs_id_right;
+	no_fold_literal = no_fold_literal;
+	id_left = id_left;
+	id_right = id_right;
+	msg_id = msg_id;
+	mime_charsetc = mime_charsetc;
+	mime_charset = mime_charset;
+	charset = charset;
+	encoding = encoding;
+	encoded_text = encoded_text;
+	encoded_word = encoded_word;
+
+	-- Handy alias
+	email = addr_spec;
 
 	-- A variant that does not allow comments or folding whitespace
 	local_part_nocfws = local_part_text;
