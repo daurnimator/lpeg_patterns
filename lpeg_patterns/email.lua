@@ -34,7 +34,7 @@ local comment = P {
 	ccontent = ctext + quoted_pair + V"comment" ;
 	comment = P"("* (FWS^-1 * V"ccontent")^0 * FWS^-1 * P")";
 }
-local CFWS = ((FWS^-1 * comment)^1 * FWS^-1 + FWS ) / function() end
+local CFWS = ((FWS^-1 * comment)^1 * FWS^-1 + FWS ) / 0
 
 -- Atom
 local specials      = S[=[()<>@,;:\".[]]=]
