@@ -8,8 +8,8 @@ local S = lpeg.S
 local V = lpeg.V
 local C = lpeg.C
 local Cg = lpeg.Cg
-local Ct = lpeg.Ct
 local Cs = lpeg.Cs
+local Ct = lpeg.Ct
 
 local core = require "lpeg_patterns.core"
 local CHAR = core.CHAR
@@ -59,16 +59,16 @@ local obs_dtext = obs_NO_WS_CTL + quoted_pair
 local dtext = R("\33\90", "\94\126") + obs_dtext
 local domain_literal_text = P"[" * Cs((FWS^-1 * dtext)^0 * FWS^-1) * P"]"
 
-local domain_text     = dot_atom_text + domain_literal_text
+local domain_text = dot_atom_text + domain_literal_text
 local local_part_text = dot_atom_text + quoted_string_text
-local addr_spec_text  = local_part_text * P"@" * domain_text
+local addr_spec_text = local_part_text * P"@" * domain_text
 
 local domain_literal = CFWS^-1 * domain_literal_text * CFWS^-1
 local obs_domain = Ct(atom * (C"." * atom)^0) / table.concat
 local domain = obs_domain + dot_atom + domain_literal
 local obs_local_part = Ct(word * (C"." * word)^0) / table.concat
 local local_part = obs_local_part + dot_atom + quoted_string
-local addr_spec      = local_part * P"@" * domain
+local addr_spec = local_part * P"@" * domain
 
 local display_name = phrase
 local obs_domain_list = (CFWS + P",")^0 * P"@" * domain
