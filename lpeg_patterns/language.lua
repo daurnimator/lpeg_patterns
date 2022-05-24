@@ -77,6 +77,6 @@ local irregular = P"en-GB-oed"
 
 M.Language_Tag = C((M.langtag
 	+ M.privateuse
-	+ irregular) / function() end) -- capture the whole tag. throws away decomposition
+	+ irregular) / 0) -- capture the whole tag. throws away decomposition
 
 return M
